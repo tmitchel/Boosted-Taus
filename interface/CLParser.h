@@ -17,7 +17,7 @@ class CLParser {
     CLParser(int&, char**);
     ~CLParser() {}
     bool Flag(const std::string&);
-    std::string Option(const std::string&);
+    std::string Option(const std::string&, const std::string);
     std::vector<std::string> MultiOption(const std::string&, int, int);
 };
 
@@ -33,12 +33,12 @@ bool CLParser::Flag(const std::string &flag) {
 }
 
 // parse options (contain argument specifying details)
-std::string CLParser::Option(const std::string &flag) {
+std::string CLParser::Option(const std::string &flag, const std::string default_value = "") {
     auto found = std::find(tokens.begin(), tokens.end(), flag);
     if (found != tokens.end() && ++found != tokens.end()) {
         return *found;
     }
-    static const std::string empty("");
+    static const std::string empty(default_value);
     return empty;
 }
 
