@@ -21,8 +21,8 @@ class Electron {
   TLorentzVector p4;
 };
 
-Electron::Electron(Float_t pt, Float_t eta, Float_t phi, Float_t mass) {
-  p4.SetPtEtaPhiM(pt, eta, phi, mass);
+Electron::Electron(Float_t pt, Float_t eta, Float_t phi, Float_t energy) {
+  p4.SetPtEtaPhiE(pt, eta, phi, energy);
 }
 
 #endif  // INTERFACE_ELECTRON_H_

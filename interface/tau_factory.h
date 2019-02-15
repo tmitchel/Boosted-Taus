@@ -12,22 +12,33 @@ typedef std::vector<Tau> VTau;
 
 class Tau_Factory {
  public:
-  explicit Tau_Factory(TTree*);
+  explicit Tau_Factory(TTree *);
   void Run_Factory();
 
   // getters
-  Int_t getNTau() { return nTau; }
+  Int_t getNTotalTau() { return nTau; }
+  Int_t getNGoodTau() { return nGoodTau; }
   std::shared_ptr<VTau> getTaus() { return std::make_shared<VTau>(taus); }
 
  private:
-  Int_t nTau;
+  Int_t nTau, nGoodTau;
   VTau taus;
-  std::vector<Bool_t> *pass_vloose_iso, *pass_loose_iso, *pass_medium_iso,
-      *pass_tight_iso, *pass_vtight_iso;  // all are MVArun2v2DBoldDMwLT
+  std::vector<Bool_t> *pass_vloose_iso, *pass_loose_iso, *pass_medium_iso, *pass_tight_iso,
+      *pass_vtight_iso;  // all are MVArun2v2DBoldDMwLT
   std::vector<Float_t> *pts, *etas, *phis, *masses, *iso;
 };
 
-Tau_Factory::Tau_Factory(TTree* tree) {
+Tau_Factory::Tau_Factory(TTree *tree)
+    : pts(nullptr),
+      etas(nullptr),
+      phis(nullptr),
+      masses(nullptr),
+      iso(nullptr),
+      pass_vloose_iso(nullptr),
+      pass_loose_iso(nullptr),
+      pass_medium_iso(nullptr),
+      pass_tight_iso(nullptr),
+      pass_vtight_iso(nullptr) {
   tree->SetBranchAddress("nTau", &nTau);
   tree->SetBranchAddress("tauPt", &pts);
   tree->SetBranchAddress("tauEta", &etas);
@@ -45,11 +56,12 @@ void Tau_Factory::Run_Factory() {
   taus.clear();
   for (auto i = 0; i < nTau; i++) {
     auto tau = Tau(pts->at(i), etas->at(i), phis->at(i), masses->at(i));
-    tau.setLooseIso(pass_loose_iso->at(i));
+    tau.pass_loose_iso = pass_loose_iso->at(i);
     if (tau.getPt() > 20 && fabs(tau.getEta()) < 2.3 && tau.getLooseIso()) {
       taus.push_back(tau);
     }
   }
+  nGoodTau = taus.size();
 }
 
 #endif  // INTERFACE_TAU_FACTORY_H_

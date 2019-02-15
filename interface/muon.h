@@ -21,8 +21,8 @@ class Muon {
   TLorentzVector p4;
 };
 
-Muon::Muon(Float_t pt, Float_t eta, Float_t phi, Float_t mass) {
-  p4.SetPtEtaPhiM(pt, eta, phi, mass);
+Muon::Muon(Float_t pt, Float_t eta, Float_t phi, Float_t energy) {
+  p4.SetPtEtaPhiE(pt, eta, phi, energy);
 }
 
 #endif  // INTERFACE_MUON_H_

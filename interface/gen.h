@@ -10,12 +10,13 @@ class Gen {
  public:
   Gen(Float_t, Float_t, Float_t, Float_t);
 
-  // setters
-  inline void setPID(Int_t PID) { pid = PID; }
-
   // getters
   Int_t getPID() { return pid; }
   TLorentzVector getP4() { return p4; }
+  Float_t getPt() { return p4.Pt(); }
+  Float_t getEta() { return p4.Eta(); }
+  Float_t getPhi() { return p4.Phi(); }
+  Float_t getMass() { return p4.M(); }
 
  private:
   Int_t pid;

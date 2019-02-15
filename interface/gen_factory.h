@@ -12,21 +12,22 @@ typedef std::vector<Gen> VGen;
 
 class Gen_Factory {
  public:
-  explicit Gen_Factory(TTree*);
+  explicit Gen_Factory(TTree *);
   void Run_Factory();
 
   // getters
-  Int_t getNGen() { return nGen; }
+  Int_t getNTotalGen() { return nGen; }
+  Int_t getNGoodGen() { return nGoodGen; }
   std::shared_ptr<VGen> getGens() { return std::make_shared<VGen>(gen_particles); }
 
  private:
-  Int_t nGen;
+  Int_t nGen, nGoodGen;
   VGen gen_particles;
   std::vector<Int_t> *pids;
   std::vector<Float_t> *pts, *etas, *phis, *masses;
 };
 
-Gen_Factory::Gen_Factory(TTree* tree) {
+Gen_Factory::Gen_Factory(TTree *tree) : pids(nullptr), pts(nullptr), etas(nullptr), phis(nullptr), masses(nullptr) {
   tree->SetBranchAddress("nMC", &nGen);
   tree->SetBranchAddress("mcPt", &pts);
   tree->SetBranchAddress("mcEta", &etas);
@@ -42,6 +43,7 @@ void Gen_Factory::Run_Factory() {
     gen.pid = pids->at(i);
     gen_particles.push_back(gen);
   }
+  nGoodGen = gen_particles.size();
 }
 
 #endif  // INTERFACE_GEN_FACTORY_H_

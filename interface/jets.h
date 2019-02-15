@@ -21,8 +21,8 @@ class Jets {
   TLorentzVector p4;
 };
 
-Jets::Jets(Float_t pt, Float_t eta, Float_t phi, Float_t mass) {
-  p4.SetPtEtaPhiM(pt, eta, phi, mass);
+Jets::Jets(Float_t pt, Float_t eta, Float_t phi, Float_t energy) {
+  p4.SetPtEtaPhiE(pt, eta, phi, energy);
 }
 
 #endif  // INTERFACE_JETS_H_

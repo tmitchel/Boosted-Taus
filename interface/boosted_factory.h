@@ -16,18 +16,29 @@ class Boosted_Factory {
   void Run_Factory();
 
   // getters
-  Int_t getNBoosted() { return nBoostedTau; }
+  Int_t getNTotalBoosted() { return nBoostedTau; }
+  Int_t getNGoodBoosted() { return nGoodTaus; }
   std::shared_ptr<VBoosted> getTaus() { return std::make_shared<VBoosted>(boosteds); }
 
  private:
-  Int_t nBoostedTau;
+  Int_t nBoostedTau, nGoodTaus;
   VBoosted boosteds;
-  std::vector<Bool_t> *pass_vloose_iso, *pass_loose_iso, *pass_medium_iso,
-      *pass_tight_iso, *pass_vtight_iso;  // all are MVArun2v2DBoldDMwLT
+  std::vector<Bool_t> *pass_vloose_iso, *pass_loose_iso, *pass_medium_iso, *pass_tight_iso,
+      *pass_vtight_iso;  // all are MVArun2v2DBoldDMwLT
   std::vector<Float_t> *pts, *etas, *phis, *masses, *iso;
 };
 
-Boosted_Factory::Boosted_Factory(TTree *tree) {
+Boosted_Factory::Boosted_Factory(TTree *tree)
+    : pts(nullptr),
+      etas(nullptr),
+      phis(nullptr),
+      masses(nullptr),
+      iso(nullptr),
+      pass_vloose_iso(nullptr),
+      pass_loose_iso(nullptr),
+      pass_medium_iso(nullptr),
+      pass_tight_iso(nullptr),
+      pass_vtight_iso(nullptr) {
   tree->SetBranchAddress("nTau", &nBoostedTau);
   tree->SetBranchAddress("boostedTauPt", &pts);
   tree->SetBranchAddress("boostedTauEta", &etas);
@@ -50,6 +61,7 @@ void Boosted_Factory::Run_Factory() {
       boosteds.push_back(boosted);
     }
   }
+  nGoodTaus = boosteds.size();
 }
 
 #endif  // INTERFACE_BOOSTED_FACTORY_H_

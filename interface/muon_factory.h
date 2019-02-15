@@ -16,29 +16,31 @@ class Muon_Factory {
   void Run_Factory();
 
   // getters
-  Int_t getNMuon() { return nMu; }
+  Int_t getNTotalMuon() { return nMu; }
+  Int_t getNGoodMuon() { return nGoodMu; }
   std::shared_ptr<VMuon> getMuons() { return std::make_shared<VMuon>(muons); }
 
  private:
-  Int_t nMu;
+  Int_t nMu, nGoodMu;
   VMuon muons;
-  std::vector<Float_t> *pts, *etas, *phis, *masses;
+  std::vector<Float_t> *pts, *etas, *phis, *energy;
 };
 
-Muon_Factory::Muon_Factory(TTree *tree) {
+Muon_Factory::Muon_Factory(TTree *tree) : pts(nullptr), etas(nullptr), phis(nullptr), energy(nullptr) {
   tree->SetBranchAddress("nTau", &nMu);
   tree->SetBranchAddress("muPt", &pts);
   tree->SetBranchAddress("muEta", &etas);
   tree->SetBranchAddress("muPhi", &phis);
-  tree->SetBranchAddress("muMass", &masses);
+  tree->SetBranchAddress("muEn", &energy);
 }
 
 void Muon_Factory::Run_Factory() {
   muons.clear();
   for (auto i = 0; i < nMu; i++) {
-    auto muon = Muon(pts->at(i), etas->at(i), phis->at(i), masses->at(i));
+    auto muon = Muon(pts->at(i), etas->at(i), phis->at(i), energy->at(i));
     muons.push_back(muon);
   }
+  nGoodMu = muons.size();
 }
 
 #endif  // INTERFACE_MUON_FACTORY_H_

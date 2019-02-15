@@ -16,29 +16,31 @@ class Electron_Factory {
   void Run_Factory();
 
   // getters
-  Int_t getNElectron() { return nEle; }
+  Int_t getNTotalElectron() { return nEle; }
+  Int_t getNGoodElectron() { return nGoodEle; }
   std::shared_ptr<VElectron> getElectrons() { return std::make_shared<VElectron>(electrons); }
 
  private:
-  Int_t nEle;
+  Int_t nEle, nGoodEle;
   VElectron electrons;
-  std::vector<Float_t> *pts, *etas, *phis, *masses;
+  std::vector<Float_t> *pts, *etas, *phis, *energy;
 };
 
-Electron_Factory::Electron_Factory(TTree *tree) {
+Electron_Factory::Electron_Factory(TTree *tree) : pts(nullptr), etas(nullptr), phis(nullptr), energy(nullptr) {
   tree->SetBranchAddress("nTau", &nEle);
   tree->SetBranchAddress("elePt", &pts);
   tree->SetBranchAddress("eleEta", &etas);
   tree->SetBranchAddress("elePhi", &phis);
-  tree->SetBranchAddress("eleMass", &masses);
+  tree->SetBranchAddress("eleEn", &energy);
 }
 
 void Electron_Factory::Run_Factory() {
   electrons.clear();
   for (auto i = 0; i < nEle; i++) {
-    auto electron = Electron(pts->at(i), etas->at(i), phis->at(i), masses->at(i));
+    auto electron = Electron(pts->at(i), etas->at(i), phis->at(i), energy->at(i));
     electrons.push_back(electron);
   }
+  nGoodEle = electrons.size();
 }
 
 #endif  // INTERFACE_ELECTRON_FACTORY_H_
