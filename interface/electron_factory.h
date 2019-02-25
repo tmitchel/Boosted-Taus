@@ -3,6 +3,7 @@
 #ifndef INTERFACE_ELECTRON_FACTORY_H_
 #define INTERFACE_ELECTRON_FACTORY_H_
 
+#include <algorithm>
 #include <memory>
 #include <vector>
 #include "./electron.h"
@@ -40,6 +41,10 @@ void Electron_Factory::Run_Factory() {
     auto electron = Electron(pts->at(i), etas->at(i), phis->at(i), energy->at(i));
     electrons.push_back(electron);
   }
+
+  // sort by pT
+  std::sort(electrons.begin(), electrons.end(),
+            [](TLorentzVector p1, TLorentzVector p2) -> bool { return p1.Pt() < p2.Pt(); });
   nGoodEle = electrons.size();
 }
 

@@ -3,6 +3,7 @@
 #ifndef INTERFACE_BOOSTED_FACTORY_H_
 #define INTERFACE_BOOSTED_FACTORY_H_
 
+#include <algorithm>
 #include <memory>
 #include <vector>
 #include "./boosted.h"
@@ -61,6 +62,10 @@ void Boosted_Factory::Run_Factory() {
       boosteds.push_back(boosted);
     }
   }
+
+  // sort by pT
+  std::sort(boosteds.begin(), boosteds.end(),
+            [](TLorentzVector p1, TLorentzVector p2) -> bool { return p1.Pt() < p2.Pt(); });
   nGoodTaus = boosteds.size();
 }
 

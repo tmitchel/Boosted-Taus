@@ -3,6 +3,7 @@
 #ifndef INTERFACE_MUON_FACTORY_H_
 #define INTERFACE_MUON_FACTORY_H_
 
+#include <algorithm>
 #include <memory>
 #include <vector>
 #include "./muon.h"
@@ -40,6 +41,9 @@ void Muon_Factory::Run_Factory() {
     auto muon = Muon(pts->at(i), etas->at(i), phis->at(i), energy->at(i));
     muons.push_back(muon);
   }
+
+  // sort by pT
+  std::sort(muons.begin(), muons.end(), [](TLorentzVector p1, TLorentzVector p2) -> bool { return p1.Pt() < p2.Pt(); });
   nGoodMu = muons.size();
 }
 

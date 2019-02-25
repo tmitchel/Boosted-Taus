@@ -3,6 +3,7 @@
 #ifndef INTERFACE_TAU_FACTORY_H_
 #define INTERFACE_TAU_FACTORY_H_
 
+#include <algorithm>
 #include <memory>
 #include <vector>
 #include "./tau.h"
@@ -68,6 +69,9 @@ void Tau_Factory::Run_Factory() {
       taus.push_back(tau);
     }
   }
+
+  // sort by pT
+  std::sort(taus.begin(), taus.end(), [](TLorentzVector p1, TLorentzVector p2) -> bool { return p1.Pt() < p2.Pt(); });
   nGoodTau = taus.size();
 }
 

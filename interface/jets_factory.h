@@ -3,6 +3,7 @@
 #ifndef INTERFACE_JETS_FACTORY_H_
 #define INTERFACE_JETS_FACTORY_H_
 
+#include <algorithm>
 #include <memory>
 #include <vector>
 #include "./jets.h"
@@ -40,6 +41,9 @@ void Jets_Factory::Run_Factory() {
     auto jet = Jets(pts->at(i), etas->at(i), phis->at(i), energy->at(i));
     jets.push_back(jet);
   }
+
+  // sort by pT
+  std::sort(jets.begin(), jets.end(), [](TLorentzVector p1, TLorentzVector p2) -> bool { return p1.Pt() < p2.Pt(); });
   nGoodJet = jets.size();
 }
 

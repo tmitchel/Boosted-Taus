@@ -3,6 +3,7 @@
 #ifndef INTERFACE_GEN_FACTORY_H_
 #define INTERFACE_GEN_FACTORY_H_
 
+#include <algorithm>
 #include <memory>
 #include <vector>
 #include "./gen.h"
@@ -66,9 +67,18 @@ void Gen_Factory::Run_Factory() {
     gen_particles.push_back(gen);
   }
 
+  // sort by pT
+  std::sort(gen_particles.begin(), gen_particles.end(),
+            [](TLorentzVector p1, TLorentzVector p2) -> bool { return p1.Pt() < p2.Pt(); });
+
   for (auto i = 0; i < jetPt->size(); i++) {
     gen_jets.push_back(Gen(jetPt->at(i), jetEta->at(i), jetPhi->at(i), jetEn->at(i), true));
   }
+
+  // sort by pT
+  std::sort(gen_jets.begin(), gen_jets.end(),
+            [](TLorentzVector p1, TLorentzVector p2) -> bool { return p1.Pt() < p2.Pt(); });
+
   nGoodGen = gen_particles.size();
   MET_p4.SetPtEtaPhiM(genMET, 0, genMETPhi, 0);
 }

@@ -19,7 +19,7 @@ Now, the factory is ready to be used in the event loop. The factory is run once 
 ```
 electron_factory.Run_Factory();
 ```
-The variable `electron_factory` now contains all electron-related data from the ggNtuple. The `Electron`s in the factory can be accessed with the member function `getElectrons()`, which will return a shared pointer the the vector of `Electron`s.
+The variable `electron_factory` now contains all electron-related data from the ggNtuple. The `Electron`s in the factory can be accessed with the member function `getElectrons()`, which will return a shared pointer the the vector of `Electron`s. This shared pointer, unlike the TBranches, will be sorted in order of decreasing pT.
 
 All physics objects are filled in the exact same way making their inclusion as simple as possible. Be aware, a very loose selection is applied on all objects while running the factory. If this selection is too tight for your needs, it can be adjusted in the corresponding class's `Run_Factory()` function.
 
