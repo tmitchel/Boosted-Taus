@@ -15,10 +15,36 @@ This will include the `Electron` class as well as the `Electron_Factory`. The `E
 ```
 auto electron_factory = Electron_Factory(tree);
 ```
-Now, the factory is ready to be used in the event loop. The factory is run once per event to take the information from the input TBranches and produce physics objects. The `Run_Factory()` function is used for this purpose. NOTE: you must do `Run_Factory()` ~BEFORE~ accessing any information from the factory. The factory is run in the example below
+Now, the factory is ready to be used in the event loop. The factory is run once per event to take the information from the input TBranches and produce physics objects. The `Run_Factory()` function is used for this purpose. NOTE: you must do `Run_Factory()` _BEFORE_ accessing any information from the factory. The factory is run in the example below
 ```
 electron_factory.Run_Factory();
 ```
 The variable `electron_factory` now contains all electron-related data from the ggNtuple. The `Electron`s in the factory can be accessed with the member function `getElectrons()`, which will return a shared pointer the the vector of `Electron`s.
 
 All physics objects are filled in the exact same way making their inclusion as simple as possible. Be aware, a very loose selection is applied on all objects while running the factory. If this selection is too tight for your needs, it can be adjusted in the corresponding class's `Run_Factory()` function.
+
+### Creating histograms
+The analysis backend comes with a simple class to hold histograms removing some boilerplate from your analysis code. (Note to self: Perhaps I can convert it to simply read JSON files when creating histograms. Then you can have a JSON file per analyzer and not have to make copies of the header). The `histManager` class is used for this task. Histograms are created inside the `hists` map and linked to a user-defined key. These histograms are initialized when a new `histManager` is constructed, as shown below
+```
+auto hists = std::make_shared<histManager>(output_name);
+```
+The `output_name` is used to create an output ROOT file with the corresponding name. 
+
+The `histManager` provides functions for filling histograms in the map. This is the only way I can find to keep the histograms associated with the output file and available for writing in the end. One benefit is that extra functions are included for common cases beyond a simple fill. One example is the function, `FillPrevBins`. This function's usage is shown below
+```
+hists->FillPrevBins("lead_gen_jet_eff", gen_jets->at(0).getPt(), 1.);
+```
+Calling this function will fill find the bin in which `gen_jets->at(0).getPt()` belongs. Then, it will increase the bin content of all bins up to the selected bin by the value 1. This is especially useful when calculating efficiency as a function of some variable (here as a function of generator-level jet pT).
+
+All histograms in the `histManager` can be written to the associated file with the `Write()` function.
+```
+hists->Write();
+```
+The histograms will all be written in the root directory of the TFile, then the TFile will be closed.
+
+
+## To-Do:
+[ ] add all variables to the classes
+[ ] complete initial studies
+[ ] enable user to pass JSON file to histManager
+
