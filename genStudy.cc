@@ -24,13 +24,10 @@ int main(int argc, char** argv) {
   auto input_name = parser->Option("-i");
   auto output_name = parser->Option("-o");
   auto tree_name = parser->Option("-t", "ggNtuplizer/EventTree");
-  if (tree_name == "") {
-    tree_name = "ggNtuplizer/EventTree";
-  }
 
   // read the input TFile/TTree
   auto fin = std::make_shared<TFile>(input_name.c_str(), "READ");
-  auto hists = new histManager(output_name);
+  auto hists = std::make_shared<histManager>(output_name);
   auto tree = reinterpret_cast<TTree*>(fin->Get(tree_name.c_str()));
 
   // construct our object factories
@@ -85,6 +82,7 @@ int main(int argc, char** argv) {
       hists->Fill("lowpt_dr_gen", all_gen_taus.at(0).getP4().DeltaR(all_gen_taus.at(1).getP4()), 1.);
     }
   }
+
   std::cout << std::endl;
   fin->Close();
   hists->Write();
