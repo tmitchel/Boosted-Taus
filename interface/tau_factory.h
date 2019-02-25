@@ -55,9 +55,16 @@ Tau_Factory::Tau_Factory(TTree *tree)
 void Tau_Factory::Run_Factory() {
   taus.clear();
   for (auto i = 0; i < nTau; i++) {
-    auto tau = Tau(pts->at(i), etas->at(i), phis->at(i), masses->at(i));
-    tau.pass_loose_iso = pass_loose_iso->at(i);
-    if (tau.getPt() > 20 && fabs(tau.getEta()) < 2.3 && tau.getLooseIso()) {
+    // baseline/default selection
+    if (pts->at(i) > 20 && etas->at(i) < 2.3 && pass_vloose_iso->at(i)) {
+      auto tau = Tau(pts->at(i), etas->at(i), phis->at(i), masses->at(i));  // build the tau
+
+      tau.pass_vloose_iso = pass_vloose_iso->at(i);
+      tau.pass_loose_iso  = pass_loose_iso->at(i);
+      tau.pass_medium_iso = pass_medium_iso->at(i);
+      tau.pass_tight_iso  = pass_tight_iso->at(i);
+      tau.pass_vtight_iso = pass_vtight_iso->at(i);
+
       taus.push_back(tau);
     }
   }
