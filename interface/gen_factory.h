@@ -33,7 +33,16 @@ class Gen_Factory {
   std::vector<Float_t> *pts, *etas, *phis, *masses, *jetPt, *jetEta, *jetPhi, *jetEn;
 };
 
-Gen_Factory::Gen_Factory(TTree *tree) : pids(nullptr), pts(nullptr), etas(nullptr), phis(nullptr), masses(nullptr) {
+Gen_Factory::Gen_Factory(TTree *tree)
+    : pids(nullptr),
+      pts(nullptr),
+      etas(nullptr),
+      phis(nullptr),
+      masses(nullptr),
+      jetPt(nullptr),
+      jetEta(nullptr),
+      jetPhi(nullptr),
+      jetEn(nullptr) {
   tree->SetBranchAddress("nMC", &nGen);
   tree->SetBranchAddress("mcPt", &pts);
   tree->SetBranchAddress("mcEta", &etas);
