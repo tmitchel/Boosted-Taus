@@ -44,7 +44,7 @@ The histograms will all be written in the root directory of the TFile, then the 
 
 
 ## To-Do:
-[ ] add all variables to the classes
-[ ] complete initial studies
-[ ] enable user to pass JSON file to histManager
+- [ ] add all variables to the classes
+- [ ] complete initial studies
+- [ ] enable user to pass JSON file to histManager
 
