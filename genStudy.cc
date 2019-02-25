@@ -47,16 +47,22 @@ int main(int argc, char** argv) {
       progress++;
     }
 
+    // keep track of the number of events processed
+    hists->Fill("nevents", 1., 1.);
+
     // run all the factories to fill variables
     gen_factory.Run_Factory();
-
     auto gens = gen_factory.getGens();
-    VGen all_gen_higgs, all_gen_taus;
-    for (auto gen : *gens) {
+
+    // loop over all gen particles
+    VGen all_gen_higgs, all_gen_taus, all_gen_jets;
+    for (auto const &gen : *gens) {
       if (fabs(gen.getPID()) == 25) {
         all_gen_higgs.push_back(gen);
       } else if (fabs(gen.getPID()) == 15) {
         all_gen_taus.push_back(gen);
+      } else if ((fabs(gen.getPID()) > 0 && fabs(gen.getPID()) < 6) || fabs(gen.getPID()) == 21) {
+        all_gen_jets.push_back(gen);
       }
     }
 
@@ -65,21 +71,41 @@ int main(int argc, char** argv) {
       continue;
     }
 
-    hists->Fill("allpt_dr_gen", all_gen_taus.at(0).getP4().DeltaR(all_gen_taus.at(1).getP4()), 1.);
+    for (auto const &jet : all_gen_jets) {
+      // switch gluon pdg ID to be 7
+      auto pid = fabs(jet.getPID());
+      if (pid == 21) {
+        pid = 7;
+      }
 
-    // see if there is a boosted Higgs in this event
-    auto boosted_higgs(false);
-    for (auto higgs : all_gen_higgs) {
-      if (higgs.getPt() > 500) {
-        boosted_higgs = true;
-        break;  // found one so we don't need to search any longer
+      // get jet composition at different pTs
+      hists->Fill("pt0_jet_flavor", pid, 1.);
+      if (jet.getPt() > 400) {
+        hists->Fill("pt400_jet_flavor", pid, 1.);
+      }
+      if (jet.getPt() > 600) {
+        hists->Fill("pt600_jet_flavor", pid, 1.);
+      }
+      if (jet.getPt() > 800) {
+        hists->Fill("pt800_jet_flavor", pid, 1.);
       }
     }
 
-    if (boosted_higgs) {
-      hists->Fill("highpt_dr_gen", all_gen_taus.at(0).getP4().DeltaR(all_gen_taus.at(1).getP4()), 1.);
-    } else {
-      hists->Fill("lowpt_dr_gen", all_gen_taus.at(0).getP4().DeltaR(all_gen_taus.at(1).getP4()), 1.);
+    if (all_gen_jets.size() > 0) {
+      hists->FillPrevBins("lead_jet_eff", all_gen_jets.at(0).getPt(), 1.);
+    }
+
+    // require high pT lead jet
+    if (all_gen_jets.size() == 0 || all_gen_jets.at(0).getPt() < 400) {
+      continue;
+    }
+
+    hists->Fill("lead_jet_flavor", all_gen_jets.at(0).getPID(), 1.);
+    hists->Fill("dr_taus", all_gen_taus.at(0).getP4().DeltaR(all_gen_taus.at(1).getP4()), 1.);
+    hists->Fill("dphi_taus", all_gen_taus.at(0).getP4().DeltaPhi(all_gen_taus.at(1).getP4()), 1.);
+    hists->Fill("dr_jet_MET", all_gen_jets.at(0).getP4().DeltaR(gen_factory.getMETP4()), 1.);
+    if (all_gen_jets.size() > 0) {
+      hists->Fill("dr_higgs_MET", all_gen_higgs.at(0).getP4().DeltaR(gen_factory.getMETP4()), 1.);
     }
   }
 
