@@ -35,6 +35,7 @@ histManager::histManager(std::string fname) : fout(std::make_shared<TFile>(fname
            {"dr_jet_MET", new TH1F("dr_jet_MET", "dr_jet_MET", 100, 0, 5)},
            {"dr_higgs_MET", new TH1F("dr_higgs_MET", "dr_higgs_MET", 100, 0, 5)},
            {"dphi_taus", new TH1F("dphi_taus", "dphi_taus", 100, -3.14, 3.14)},
+           {"lead_gen_jet_eff", new TH1F("lead_gen_jet_eff", "lead_gen_jet_eff", 100, 0, 1000)},
            {"lead_jet_eff", new TH1F("lead_jet_eff", "lead_jet_eff", 100, 0, 1000)}};
 }
 

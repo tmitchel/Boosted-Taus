@@ -39,11 +39,11 @@ int main(int argc, char** argv) {
   auto tau_factory = Tau_Factory(tree);
 
   auto nevts = tree->GetEntries();
-  int progress(1), fraction(nevts/10);
+  int progress(1), fraction((nevts-1)/10);
   for (auto i = 0; i < nevts; i++) {
     tree->GetEntry(i);
     if (i == progress * fraction) {
-      std::cout << progress*10 << "% complete.\r" << std::flush;
+      std::cout << "\t" << progress*10 << "% complete.\r" << std::flush;
       progress++;
     }
 
@@ -91,6 +91,13 @@ int main(int argc, char** argv) {
       }
     }
 
+    // plot lead pT to do gen jet selection efficiency
+    auto gen_jets = gen_factory.getGenJets();
+    if (gen_jets->size() > 0) {
+      hists->FillPrevBins("lead_gen_jet_eff", gen_jets->at(0).getPt(), 1.);
+    }
+
+    // again with gen jets
     if (all_gen_jets.size() > 0) {
       hists->FillPrevBins("lead_jet_eff", all_gen_jets.at(0).getPt(), 1.);
     }
@@ -100,6 +107,7 @@ int main(int argc, char** argv) {
       continue;
     }
 
+    // fill some histograms
     hists->Fill("lead_jet_flavor", all_gen_jets.at(0).getPID(), 1.);
     hists->Fill("dr_taus", all_gen_taus.at(0).getP4().DeltaR(all_gen_taus.at(1).getP4()), 1.);
     hists->Fill("dphi_taus", all_gen_taus.at(0).getP4().DeltaPhi(all_gen_taus.at(1).getP4()), 1.);
