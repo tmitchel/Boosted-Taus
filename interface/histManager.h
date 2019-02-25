@@ -14,6 +14,8 @@ class histManager {
   explicit histManager(std::string);
   ~histManager() {}
   void Fill(std::string, double, double);
+  void FillBin(std::string, int, double);
+  void FillPrevBins(std::string, double, double);
   void Write();
 
  private:
@@ -23,26 +25,36 @@ class histManager {
 
 histManager::histManager(std::string fname) : fout(std::make_shared<TFile>(fname.c_str(), "RECREATE")) {
   fout->cd();
-  hists = {
-    {"lowpt_taus", new TH1F("lowpt_taus", "lowpt_taus", 50, 0, 250)},
-    {"highpt_taus", new TH1F("highpt_taus", "highpt_taus", 100, 0, 500)},
-    {"lowpt_boost", new TH1F("lowpt_boost", "lowpt_boost", 50, 0, 350)},
-    {"highpt_boost", new TH1F("highpt_boost", "highpt_boost", 100, 0, 500)},
-    {"allpt_dr_reco", new TH1F("allpt_dr_reco", "allpt_dr", 100, 0, 5)},
-    {"lowpt_dr_reco", new TH1F("lowpt_dr_reco", "lowpt_dr", 100, 0, 5)},
-    {"highpt_dr_reco", new TH1F("highpt_dr_reco", "highpt_dr", 100, 0, 5)},
-    {"allpt_dr_gen", new TH1F("allpt_dr_gen", "allpt_dr", 100, 0, 5)},
-    {"lowpt_dr_gen", new TH1F("lowpt_dr_gen", "lowpt_dr", 100, 0, 5)},
-    {"highpt_dr_gen", new TH1F("highpt_dr_gen", "highpt_dr", 100, 0, 5)}};
+  hists = {{"pt0_jet_flavor", new TH1F("pt0_jet_flavor", "pt0_jet_flavor", 7, 0.5, 7.5)},
+           {"pt400_jet_flavor", new TH1F("pt400_jet_flavor", "pt400_jet_flavor", 7, 0.5, 7.5)},
+           {"pt600_jet_flavor", new TH1F("pt600_jet_flavor", "pt600_jet_flavor", 7, 0.5, 7.5)},
+           {"pt800_jet_flavor", new TH1F("pt800_jet_flavor", "pt800_jet_flavor", 7, 0.5, 7.5)},
+           {"lead_jet_flavor", new TH1F("lead_jet_flavor", "lead_jet_flavor", 7, 0.5, 7.5)},
+           {"nevents", new TH1F("nevents", "nevents", 1, 0.5, 1.5)},
+           {"dr_taus", new TH1F("dr_taus", "dr_taus", 100, 0, 5)},
+           {"dr_jet_MET", new TH1F("dr_jet_MET", "dr_jet_MET", 100, 0, 5)},
+           {"dr_higgs_MET", new TH1F("dr_higgs_MET", "dr_higgs_MET", 100, 0, 5)},
+           {"dphi_taus", new TH1F("dphi_taus", "dphi_taus", 100, -3.14, 3.14)},
+           {"lead_jet_eff", new TH1F("lead_jet_eff", "lead_jet_eff", 100, 0, 1000)}};
 }
 
 void histManager::Fill(std::string name, double var, double weight) { hists.at(name)->Fill(var, weight); }
 
+void histManager::FillBin(std::string name, int bin, double weight) {
+  auto content = hists.at(name)->GetBinContent(bin);
+  hists.at(name)->SetBinContent(bin, content + weight);
+}
+
+void histManager::FillPrevBins(std::string name, double var, double weight) {
+  auto bin = hists.at(name)->FindBin(var);
+  for (auto ibin = 0; ibin <= bin; ibin++) {
+    auto content = hists.at(name)->GetBinContent(ibin);
+    hists.at(name)->SetBinContent(ibin, content + weight);
+  }
+}
+
 void histManager::Write() {
   fout->cd();
-  // for (auto ihist = hists.begin(); ihist != hists.end(); ihist++) {
-  //   ihist->second->Write();
-  // }
   fout->Write();
   fout->Close();
 }
