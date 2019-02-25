@@ -9,6 +9,7 @@ class Gen {
   friend class Gen_Factory;
  public:
   Gen(Float_t, Float_t, Float_t, Float_t);
+  Gen(Float_t, Float_t, Float_t, Float_t, bool);
 
   // getters
   Int_t getPID() const { return pid; }
@@ -25,6 +26,10 @@ class Gen {
 
 Gen::Gen(Float_t pt, Float_t eta, Float_t phi, Float_t mass) {
   p4.SetPtEtaPhiM(pt, eta, phi, mass);
+}
+
+Gen::Gen(Float_t pt, Float_t eta, Float_t phi, Float_t energy, bool useE) {
+  p4.SetPtEtaPhiE(pt, eta, phi, energy);
 }
 
 #endif  // INTERFACE_GEN_H_
