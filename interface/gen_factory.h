@@ -18,11 +18,16 @@ class Gen_Factory {
   // getters
   Int_t getNTotalGen() { return nGen; }
   Int_t getNGoodGen() { return nGoodGen; }
+  Float_t getMET() { return genMET; }
+  Float_t getMetPhi() { return genMETPhi; }
+  TLorentzVector getMETP4() { return MET_p4; }
   std::shared_ptr<VGen> getGens() { return std::make_shared<VGen>(gen_particles); }
 
  private:
   Int_t nGen, nGoodGen;
+  Float_t genMET, genMETPhi;
   VGen gen_particles;
+  TLorentzVector MET_p4;
   std::vector<Int_t> *pids;
   std::vector<Float_t> *pts, *etas, *phis, *masses;
 };
@@ -34,6 +39,8 @@ Gen_Factory::Gen_Factory(TTree *tree) : pids(nullptr), pts(nullptr), etas(nullpt
   tree->SetBranchAddress("mcPhi", &phis);
   tree->SetBranchAddress("mcMass", &masses);
   tree->SetBranchAddress("mcPID", &pids);
+  tree->SetBranchAddress("genMET", &genMET);
+  tree->SetBranchAddress("genMETPhi", &genMETPhi);
 }
 
 void Gen_Factory::Run_Factory() {
@@ -44,6 +51,7 @@ void Gen_Factory::Run_Factory() {
     gen_particles.push_back(gen);
   }
   nGoodGen = gen_particles.size();
+  MET_p4.SetPtEtaPhiM(genMET, 0, genMETPhi, 0);
 }
 
 #endif  // INTERFACE_GEN_FACTORY_H_
