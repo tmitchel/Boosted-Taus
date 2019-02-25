@@ -43,7 +43,7 @@ void Jets_Factory::Run_Factory() {
   }
 
   // sort by pT
-  std::sort(jets.begin(), jets.end(), [](TLorentzVector p1, TLorentzVector p2) -> bool { return p1.Pt() < p2.Pt(); });
+  std::sort(jets.begin(), jets.end(), [](Jets& p1, Jets& p2) -> bool { return p1.getPt() < p2.getPt(); });
   nGoodJet = jets.size();
 }
 

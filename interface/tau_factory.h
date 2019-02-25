@@ -71,7 +71,7 @@ void Tau_Factory::Run_Factory() {
   }
 
   // sort by pT
-  std::sort(taus.begin(), taus.end(), [](TLorentzVector p1, TLorentzVector p2) -> bool { return p1.Pt() < p2.Pt(); });
+  std::sort(taus.begin(), taus.end(), [](Tau& p1, Tau& p2) -> bool { return p1.getPt() < p2.getPt(); });
   nGoodTau = taus.size();
 }
 
