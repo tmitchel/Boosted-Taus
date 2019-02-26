@@ -54,7 +54,6 @@ int main(int argc, char** argv) {
     gen_factory.Run_Factory();
     auto gens = gen_factory.getGens();
     auto gen_jets = gen_factory.getGenJets();
-    auto jet_genjets = gen_factory.getJetGenJets();
 
     // loop over all gen particles
     VGen all_gen_higgs, all_gen_taus, all_gen_jets;
@@ -96,10 +95,6 @@ int main(int argc, char** argv) {
     // plot lead pT to do gen jet selection efficiency
     if (gen_jets->size() > 0) {
       hists->FillPrevBins("lead_gen_jet_eff", gen_jets->at(0).getPt(), 1.);
-    }
-
-    if (jet_genjets->size() > 0) {
-      hists->FillPrevBins("lead_jet_genjet_eff", jet_genjets->at(0).getPt(), 1.);
     }
 
     // again with gen jets
