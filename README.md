@@ -3,8 +3,22 @@
 <p align="center"><img src="https://amva4newphysics.files.wordpress.com/2017/07/tausignature_trans.png" width="50%" title="Tau Cone" align='left'></p>
 The Higgs decay to tau leptons provides an excellent handle to study the Higgs coupling to fermions. These couplings can be used to gain greater understanding of the nature of the Higgs boson as well as enabling searches for physics beyond the Standard Model. An especially interesting place to conduct these studies is in the region of phase space where the Higgs decays to significantly boosted tau leptons. In this region, the two taus can merge into a single jet leading to increased difficulty in identification. A dedicated strategy is required to properly handle these taus. This repository contains the tools needed to study Higgs bosons decaying to boosted taus along with numerous studies conducted in this region of phase space. <br/><br/><br/><br/>
 
+##### Table of Contents
+[Analysis Backend](#ana-bkg) <br/>
+[Using a physics object](#using) <br/>
+[Creating histograms](#histo) <br/>
+[Command-Line Parsing](#cl) <br/>
+[To-Do](#todo) <br/>
+[Compiling](#compile) <br/>
+[File Locations](#files) <br/>
+[Quick Start](#quick) <br/>
+
+<a name="ana-bkg"/>
+
 ## Analysis Backend
 A common backend has been constructed for use in the studies. All physics objects are defined in headers files contained within the `interface` directory. These header files handle reading from `ggNtuples`, applying basic object selection, and returning objects containing all related information. When writing an analyzer, simply include headers for whichever objects you intend to use. All related data will be read and given to you to do the real analysis work.
+
+<a name="using"/>
 
 ### Using a physics object
 Including a new phyiscs object in your analysis code is as easy as adding a single `#include` statement. For example, if you want to use electrons in your analysis, simply add
@@ -22,6 +36,8 @@ electron_factory.Run_Factory();
 The variable `electron_factory` now contains all electron-related data from the ggNtuple. The `Electron`s in the factory can be accessed with the member function `getElectrons()`, which will return a shared pointer the the vector of `Electron`s. This shared pointer, unlike the TBranches, will be sorted in order of decreasing pT.
 
 All physics objects are filled in the exact same way making their inclusion as simple as possible. Be aware, a very loose selection is applied on all objects while running the factory. If this selection is too tight for your needs, it can be adjusted in the corresponding class's `Run_Factory()` function.
+
+<a name="histo"/>
 
 ### Creating histograms
 The analysis backend comes with a simple class to hold histograms removing some boilerplate from your analysis code. (Note to self: Perhaps I can convert it to simply read JSON files when creating histograms. Then you can have a JSON file per analyzer and not have to make copies of the header). The `histManager` class is used for this task. Histograms are created inside the `hists` map and linked to a user-defined key. These histograms are initialized when a new `histManager` is constructed, as shown below
@@ -42,6 +58,8 @@ hists->Write();
 ```
 The histograms will all be written in the root directory of the TFile, then the TFile will be closed.
 
+<a name="cl"/>
+
 ### Command-Line Parsing
 The `CLParser` class can be used to easily parse command line options. The parser is constructed using argc and argv. The parser can currently handle: flags, options, and multi-options using the corresponding functions `Flag`, `Option`, `MultiOption`. A description of each is shown below followed by a complete example.
 
@@ -57,6 +75,7 @@ auto bins = parser->Option("-b", 3);
 ```
 In this case, the parser will be constructed with command line arguments. `isNN` will be true if `-n` is provided on the command line. `input_name` will be filled with the string following the `-i` flag. Lastly, `bins` will be filled with the 3 strings following the `-b` flag.
 
+<a name="todo"/>
 
 ## To-Do:
 - [ ] add all variables to the classes
