@@ -42,6 +42,21 @@ hists->Write();
 ```
 The histograms will all be written in the root directory of the TFile, then the TFile will be closed.
 
+### Command-Line Parsing
+The `CLParser` class can be used to easily parse command line options. The parser is constructed using argc and argv. The parser can currently handle: flags, options, and multi-options using the corresponding functions `Flag`, `Option`, `MultiOption`. A description of each is shown below followed by a complete example.
+
+- A flag is pretty self-explanatory. If the flag is passed, `Flag` will return true. Otherwise, it will be false
+- An option is a flag with an argument. If the flag is passed, the following string will be returned by the `Option` function
+- A multioption is a flag followed by multiple arguments. When the flag is passed, the subsequent strings will be read. The `MutliOption` function takes a parameter to set how many strings to read
+
+```
+auto parser = std::unique_ptr<CLParser>(new CLParser(argc, argv));
+auto isNN = parser->Flag("-n");
+auto input_name = parser->Option("-i");
+auto bins = parser->Option("-b", 3);
+```
+In this case, the parser will be constructed with command line arguments. `isNN` will be true if `-n` is provided on the command line. `input_name` will be filled with the string following the `-i` flag. Lastly, `bins` will be filled with the 3 strings following the `-b` flag.
+
 
 ## To-Do:
 - [ ] add all variables to the classes
