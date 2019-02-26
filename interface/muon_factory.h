@@ -43,7 +43,7 @@ void Muon_Factory::Run_Factory() {
   }
 
   // sort by pT
-  std::sort(muons.begin(), muons.end(), [](Muon& p1, Muon& p2) -> bool { return p1.getPt() < p2.getPt(); });
+  std::sort(muons.begin(), muons.end(), [](Muon& p1, Muon& p2) -> bool { return p1.getPt() > p2.getPt(); });
   nGoodMu = muons.size();
 }
 

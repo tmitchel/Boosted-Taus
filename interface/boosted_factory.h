@@ -65,7 +65,7 @@ void Boosted_Factory::Run_Factory() {
 
   // sort by pT
   std::sort(boosteds.begin(), boosteds.end(),
-            [](Boosted& p1, Boosted& p2) -> bool { return p1.getPt() < p2.getPt(); });
+            [](Boosted& p1, Boosted& p2) -> bool { return p1.getPt() > p2.getPt(); });
   nGoodTaus = boosteds.size();
 }
 

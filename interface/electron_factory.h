@@ -43,7 +43,7 @@ void Electron_Factory::Run_Factory() {
   }
 
   // sort by pT
-  std::sort(electrons.begin(), electrons.end(), [](Electron &p1, Electron& p2) -> bool { return p1.getPt() < p2.getPt(); });
+  std::sort(electrons.begin(), electrons.end(), [](Electron &p1, Electron& p2) -> bool { return p1.getPt() > p2.getPt(); });
   nGoodEle = electrons.size();
 }
 

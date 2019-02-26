@@ -68,14 +68,14 @@ void Gen_Factory::Run_Factory() {
   }
 
   // sort by pT
-  std::sort(gen_particles.begin(), gen_particles.end(), [](Gen &p1, Gen &p2) -> bool { return p1.getPt() < p2.getPt(); });
+  std::sort(gen_particles.begin(), gen_particles.end(), [](Gen &p1, Gen &p2) -> bool { return p1.getPt() > p2.getPt(); });
 
   for (auto i = 0; i < jetPt->size(); i++) {
     gen_jets.push_back(Gen(jetPt->at(i), jetEta->at(i), jetPhi->at(i), jetEn->at(i), true));
   }
 
   // sort by pT
-  std::sort(gen_jets.begin(), gen_jets.end(), [](Gen &p1, Gen &p2) -> bool { return p1.getPt() < p2.getPt(); });
+  std::sort(gen_jets.begin(), gen_jets.end(), [](Gen &p1, Gen &p2) -> bool { return p1.getPt() > p2.getPt(); });
 
   nGoodGen = gen_particles.size();
   MET_p4.SetPtEtaPhiM(genMET, 0, genMETPhi, 0);
