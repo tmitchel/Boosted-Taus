@@ -23,6 +23,8 @@ class Gen {
   Float_t getVtx() const { return Vtx; }
   Float_t getVty() const { return Vty; }
   Float_t getVtz() const { return Vtz; }
+  Float_t getE() const { return E; }
+  Float_t getEt() const { return Et; }
   Float_t getCalIso04() const { return CalIsoDR04; }
   Float_t getTrkIso03() const { return TrkIsoDR03; }
   Float_t getTrkIso04() const { return TrkIsoDR04; }
@@ -36,7 +38,7 @@ class Gen {
  private:
   TLorentzVector p4, MomP4;
   Int_t PID, GMomPID, MomPID, Parentage, Status;
-  Float_t Vtx, Vty, Vtz, MomPt, MomMass, MomEta, MomPhi, CalIsoDR03, TrkIsoDR03, CalIsoDR04, TrkIsoDR04;
+  Float_t Vtx, Vty, Vtz, E, Et, MomPt, MomMass, MomEta, MomPhi, CalIsoDR03, TrkIsoDR03, CalIsoDR04, TrkIsoDR04;
 };
 
 
