@@ -46,6 +46,7 @@ Tau_Factory::Tau_Factory(TTree *tree, std::string isoType = "IsolationMVArun2v2D
       tauPhi(nullptr),
       tauMass(nullptr),
       iso(nullptr),
+      pass_vloose_iso(nullptr),
       pass_loose_iso(nullptr),
       pass_medium_iso(nullptr),
       pass_tight_iso(nullptr),
@@ -99,10 +100,10 @@ Tau_Factory::Tau_Factory(TTree *tree, std::string isoType = "IsolationMVArun2v2D
   tree->SetBranchAddress("tauMass", &tauMass);
   tree->SetBranchAddress(("tauBy"+isoType+"raw").c_str(), &iso);
   tree->SetBranchAddress(("tauByVLoose"+isoType).c_str(), &pass_vloose_iso);
-  tree->SetBranchAddress(("tauBy"+isoType).c_str(), &pass_loose_iso);
-  tree->SetBranchAddress(("tauBy"+isoType).c_str(), &pass_medium_iso);
-  tree->SetBranchAddress(("tauBy"+isoType).c_str(), &pass_tight_iso);
-  tree->SetBranchAddress(("tauBy"+isoType).c_str(), &pass_vtight_iso);
+  tree->SetBranchAddress(("tauByLoose"+isoType).c_str(), &pass_loose_iso);
+  tree->SetBranchAddress(("tauByMedium"+isoType).c_str(), &pass_medium_iso);
+  tree->SetBranchAddress(("tauByTight"+isoType).c_str(), &pass_tight_iso);
+  tree->SetBranchAddress(("tauByVTight"+isoType).c_str(), &pass_vtight_iso);
   tree->SetBranchAddress("taupfTausDiscriminationByDecayModeFinding", &taupfTausDiscriminationByDecayModeFinding);
   tree->SetBranchAddress("taupfTausDiscriminationByDecayModeFindingNewDMs", &taupfTausDiscriminationByDecayModeFindingNewDMs);
   tree->SetBranchAddress("tauByMVA6VLooseElectronRejection", &tauByMVA6VLooseElectronRejection);

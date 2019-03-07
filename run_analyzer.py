@@ -1,22 +1,23 @@
 import subprocess
 
 
-def format_command(exe, ifile):
-    output_name = ifile.replace('.root', '_output.root')
-    callstring = './{} -i {} -o {}'.format(exe, ifile, output_name)
+def format_command(exe, ext, ifile):
+    output_name = ifile.replace('.root', '_output.root').split('/')[-1]
+    callstring = './{} -i {}{} -o {}'.format(exe, ext, ifile, output_name)
     return callstring
 
 
 def main(args):
-    search = ['ls', '-u', args.input_path]
+    search = ['ls', args.input_path]
     if not args.local:
-        search = ['xrdfs', args.ext] + search
+      search = ['xrdfs', 'root://cmseos.fnal.gov/'] + search
 
     file_list = [
-        format_command(args.exe, ifile) for ifile in subprocess.check_output(search) if '.root' in ifile
+        format_command(args.exe, args.ext, ifile) for ifile in subprocess.check_output(search).split('\n') if '.root' in ifile
     ]
 
     for callstring in file_list:
+        print 'Calling.... {}'.format(callstring)
         subprocess.call(callstring, shell=True)
 
 
@@ -31,5 +32,5 @@ if __name__ == "__main__":
     parser.add_argument('--local', '-l', action='store_true',
                         dest='local', help='is this a local file')
     parser.add_argument('--ext', '-x', action='store', dest='ext',
-                        default='root://cmseos.fnal.gov/', help='reader extension')
+                        default='root://cmsxrootd.fnal.gov/', help='reader extension')
     main(parser.parse_args())
