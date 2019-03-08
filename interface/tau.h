@@ -46,7 +46,7 @@ class Tau {
   Float_t getfootprintCorrection() { return footprintCorrection; }
   Float_t getphotonPtSumOutsideSignalCone() { return photonPtSumOutsideSignalCone; }
   Float_t getDZ() { return dz; }
-  Float_t getDXY() { return ; }
+  Float_t getDXY() { return dxy; }
   TLorentzVector getP4() { return p4; }
 
  private:
@@ -106,7 +106,7 @@ Bool_t Tau::getEleRejection(working_point wp) {
   throw std::invalid_argument("Must use one of the provided electron rejection WPs");
 }
 
-Bool_t Tau::getEleRejection(working_point wp) {
+Bool_t Tau::getMuRejection(working_point wp) {
   if (wp == 1) {
     return ByLooseMuonRejection3;
   } else if (wp == 3) {
