@@ -26,10 +26,9 @@ int main(int argc, char** argv) {
   auto tree_name = parser->Option("-t", "ggNtuplizer/EventTree");
 
   // read the input TFile/TTree
-  auto fin = std::make_shared<TFile>(input_name.c_str(), "READ");
+  auto fin = std::shared_ptr<TFile>(TFile::Open(input_name.c_str()));
   auto hists = std::make_shared<histManager>(output_name);
   auto tree = reinterpret_cast<TTree*>(fin->Get(tree_name.c_str()));
-
   // construct our object factories
   auto gen_factory = Gen_Factory(tree);
   auto jets_factory = Jets_Factory(tree);

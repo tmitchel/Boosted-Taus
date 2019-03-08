@@ -31,8 +31,8 @@ class Gen_Factory {
   VGen gen_particles, gen_jets;
   TLorentzVector MET_p4;
   std::vector<Int_t> *mcPID, *mcGMomPID, *mcMomPID, *mcParentage, *mcStatus;
-  std::vector<Float_t> *mcVtx, *mcVty, *mcVtz, *mcPt, *mcMass, *mcEta, *mcPhi, *mcE, *mcEt, *mcGMomPID,
-      *mcMomPID, *mcMomPt, *mcMomMass, *mcMomEta, *mcMomPhi, *mcParentage, *mcStatus, *mcCalIsoDR03,
+  std::vector<Float_t> *mcVtx, *mcVty, *mcVtz, *mcPt, *mcMass, *mcEta, *mcPhi, *mcE, *mcEt,
+      *mcMomPt, *mcMomMass, *mcMomEta, *mcMomPhi, *mcCalIsoDR03,
       *mcCalIsoDR04, *mcTrkIsoDR03, *mcTrkIsoDR04;
   std::vector<Float_t> *jetGenJetPt, *jetGenJetEta, *jetGenJetPhi, *jetGenJetEn;
 };
