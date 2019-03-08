@@ -1,4 +1,5 @@
 import subprocess
+import multiprocessing
 
 
 def format_command(exe, ext, ifile):
@@ -16,9 +17,15 @@ def main(args):
         format_command(args.exe, args.ext, ifile) for ifile in subprocess.check_output(search).split('\n') if '.root' in ifile
     ]
 
+    # Use 4 cores if the machine has more than 8 total cores.
+    # Otherwise, use half the available cores.
+    n_processes = min(4, multiprocessing.cpu_count() / 2)
+
+    pool = multiprocessing.Pool(processes=n_processes)
+
     for callstring in file_list:
         print 'Calling.... {}'.format(callstring)
-        subprocess.call(callstring, shell=True)
+        pool.apply_async(subprocess.call, args=(callstring, dict(shell=True)))
 
 
 if __name__ == "__main__":
