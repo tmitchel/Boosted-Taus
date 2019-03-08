@@ -29,7 +29,7 @@ class Jets_Factory {
   std::vector<Int_t> *jetLepTrackPID, *jetPartonID, *jetHadFlvr, *jetID, *jetPUFullID, *jetNCH, *jetNNP;
   std::vector<Float_t> *jetPt, *jetEta, *jetPhi, *jetEn, *jetRawPt, *jetRawEn, *jetMt, *jetArea, *jetLeadTrackPt, *jetLeadTrackEta, *jetLeadTrackPhi,
       *jetLepTrackPt, *jetLepTrackEta, *jetLepTrackPhi, *jetCSV2BJetTags, *jetDeepCSVTags_b, *jetDeepCSVTags_bb, *jetDeepCSVTags_c, *jetDeepCSVTags_udsg,
-      *jetP4Smear, *jetP4SmearUp, *jetP4SmearDo, *jetPUID, *jetJECUnc, *jetFiredTrgs, *jetCHF, *jetNHF, *jetCEF, *jetNEF, *jetMUF, *jetVtxPt, *jetVtxMass,
+      *jetP4Smear, *jetP4SmearUp, *jetP4SmearDo, *jetPUID, *jetJECUnc, *jetCHF, *jetNHF, *jetCEF, *jetNEF, *jetMUF, *jetVtxPt, *jetVtxMass,
       *jetVtxNtrks, *jetVtx3DVal, *jetVtx3DSig;
 };
 
