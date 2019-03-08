@@ -21,6 +21,7 @@ using std::vector;
 
 int main(int argc, char** argv) {
   auto parser = std::unique_ptr<CLParser>(new CLParser(argc, argv));
+  auto verbose = parser->Flag("-v");
   auto input_name = parser->Option("-i");
   auto output_name = parser->Option("-o");
   auto tree_name = parser->Option("-t", "ggNtuplizer/EventTree");
@@ -41,7 +42,7 @@ int main(int argc, char** argv) {
   int progress(1), fraction((nevts-1)/10);
   for (auto i = 0; i < nevts; i++) {
     tree->GetEntry(i);
-    if (i == progress * fraction) {
+    if (i == progress * fraction && verbose) {
       std::cout << "\t" << progress*10 << "% complete.\r" << std::flush;
       progress++;
     }
