@@ -8,6 +8,10 @@ def format_command(exe, ext, ifile):
     return callstring
 
 
+def run_command(cmd):
+    return subprocess.call(cmd, shell=True)
+
+
 def main(args):
     search = ['ls', args.input_path]
     if not args.local:
@@ -20,12 +24,10 @@ def main(args):
     # Use 4 cores if the machine has more than 8 total cores.
     # Otherwise, use half the available cores.
     n_processes = min(4, multiprocessing.cpu_count() / 2)
-
+    
     pool = multiprocessing.Pool(processes=n_processes)
-
-    for callstring in file_list:
-        print 'Calling.... {}'.format(callstring)
-        pool.apply_async(subprocess.call, args=(callstring, dict(shell=True)))
+    r = pool.map_async(run_command, file_list)
+    r.wait()
 
 
 if __name__ == "__main__":
