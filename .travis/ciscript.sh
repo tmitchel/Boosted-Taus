@@ -2,5 +2,4 @@
 
 echo `ls`
 echo `pwd`
-echo $TRAVIS_BUILD_DIR
-$TRAVIS_BUILD_DIR/build genStudy.cc
+/home/travis/build/tmitchel/Boosted-Taus/build genStudy.cc
