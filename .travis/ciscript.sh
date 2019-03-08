@@ -2,4 +2,5 @@
 
 echo `ls`
 echo `pwd`
-/home/travis/build/tmitchel/Boosted-Taus/build genStudy.cc a
+cd /home/travis/build/tmitchel/Boosted-Taus/
+build genStudy.cc a
