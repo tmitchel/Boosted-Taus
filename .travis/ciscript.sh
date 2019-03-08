@@ -1,4 +1,5 @@
 #!/bin/bash
 
-./build genStudy.cc
+cd  
+$TRAVIS_BUILD_DIR/build genStudy.cc
 echo "done"
