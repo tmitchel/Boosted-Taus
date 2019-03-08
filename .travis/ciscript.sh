@@ -1,3 +1,4 @@
 #!/bin/bash
 
-echo "hi"
+./build genStudy.cc
+echo "done"
