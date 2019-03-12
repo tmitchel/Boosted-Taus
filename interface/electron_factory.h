@@ -40,12 +40,16 @@ class Electron_Factory {
 };
 
 Electron_Factory::Electron_Factory(TTree *tree)
-    : eleSCEn(nullptr),
+    : eleCharge(nullptr),
+      eleChargeConsistent(nullptr),
+      eleEn(nullptr),
+      eleSCEn(nullptr),
       eleEcalEn(nullptr),
       eleESEnP1(nullptr),
       eleESEnP2(nullptr),
       eleD0(nullptr),
       eleDz(nullptr),
+      eleSIP(nullptr),
       elePt(nullptr),
       elePtError(nullptr),
       eleEta(nullptr),
