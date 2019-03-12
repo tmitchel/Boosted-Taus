@@ -24,10 +24,7 @@ class Electron {
   Float_t getESEnP2() { return ESEnP2; }
   Float_t getD0() { return D0; }
   Float_t getDz() { return Dz; }
-  Float_t getPt() { return Pt; }
   Float_t getPtError() { return PtError; }
-  Float_t getEta() { return Eta; }
-  Float_t getPhi() { return Phi; }
   Float_t getR9() { return R9; }
   Float_t getCalibPt() { return CalibPt; }
   Float_t getCalibEn() { return CalibEn; }
