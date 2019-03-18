@@ -25,18 +25,11 @@ class Boosted_Factory {
   Int_t nBoostedTau, nGoodTaus;
   VBoosted boosteds;
 
-  std::vector<Bool_t> *boostedTaupfTausDiscriminationByDecayModeFinding, *boostedTaupfTausDiscriminationByDecayModeFindingNewDMs, *boostedTauByMVA6VLooseElectronRejection, *boostedTauByMVA6LooseElectronRejection,
-      *boostedTauByMVA6MediumElectronRejection, *boostedTauByMVA6TightElectronRejection, *boostedTauByMVA6VTightElectronRejection, *boostedTauByLooseMuonRejection3, *boostedTauByTightMuonRejection3,
-      *boostedTauByLooseCombinedIsolationDeltaBetaCorr3Hits, *boostedTauByMediumCombinedIsolationDeltaBetaCorr3Hits, *boostedTauByTightCombinedIsolationDeltaBetaCorr3Hits, *boostedTauLeadChargedHadronExists;
+  std::vector<Float_t> *boostedTauPt, *boostedTauEta, *boostedTauPhi, *boostedTauMass, *iso;
 
   std::vector<Bool_t> *pass_vloose_iso, *pass_loose_iso, *pass_medium_iso, *pass_tight_iso, *pass_vtight_iso;
 
-  std::vector<Int_t> *boostedTauDecayMode, *boostedTauNumSignalPFChargedHadrCands, *boostedTauNumSignalPFNeutrHadrCands, *boostedTauNumSignalPFGammaCands, *boostedTauNumSignalPFCands, *boostedTauNumIsolationPFChargedHadrCands,
-      *boostedTauNumIsolationPFNeutrHadrCands, *boostedTauNumIsolationPFGammaCands, *boostedTauNumIsolationPFCands;
 
-  std::vector<Float_t> *boostedTauCombinedIsolationDeltaBetaCorrRaw3Hits, *boostedTauEta, *boostedTauPhi, *boostedTauPt, *boostedTauEt, *boostedTauCharge, *boostedTauP, *boostedTauPx, *boostedTauPy, *boostedTauPz, *boostedTauVz, *boostedTauEnergy, *boostedTauMass, *boostedTauDxy,
-      *boostedTauZImpact, *boostedTauLeadChargedHadronEta, *boostedTauLeadChargedHadronPhi, *boostedTauLeadChargedHadronPt, *boostedTauChargedIsoPtSum, *boostedTauNeutralIsoPtSum, *boostedTauPuCorrPtSum, *boostedTaufootprintCorrection,
-      *boostedTauphotonPtSumOutsideSignalCone, *boostedTaudz, *boostedTaudxy, *iso;
 };
 
 Boosted_Factory::Boosted_Factory(TTree *tree, std::string isoType = "IsolationMVArun2v2DBoldDMwLT")
