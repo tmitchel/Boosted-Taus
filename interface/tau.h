@@ -9,6 +9,7 @@
 
 class Tau {
   friend class Tau_Factory;
+
  public:
   Tau(Float_t, Float_t, Float_t, Float_t);
 

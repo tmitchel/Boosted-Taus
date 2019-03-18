@@ -154,7 +154,6 @@ void Tau_Factory::Run_Factory() {
     // baseline/default selection
     if (tauPt->at(i) > 20 && tauEta->at(i) < 2.3 && pass_vloose_iso->at(i)) {
       auto tau = Tau(tauPt->at(i), tauEta->at(i), tauPhi->at(i));  // build the tau
-
       tau.pass_vloose_iso = pass_vloose_iso->at(i);
       tau.pass_loose_iso = pass_loose_iso->at(i);
       tau.pass_medium_iso = pass_medium_iso->at(i);
