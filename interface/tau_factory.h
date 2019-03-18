@@ -154,13 +154,49 @@ void Tau_Factory::Run_Factory() {
     // baseline/default selection
     if (tauPt->at(i) > 20 && tauEta->at(i) < 2.3 && pass_vloose_iso->at(i)) {
       auto tau = Tau(tauPt->at(i), tauEta->at(i), tauPhi->at(i));  // build the tau
-
       tau.pass_vloose_iso = pass_vloose_iso->at(i);
       tau.pass_loose_iso = pass_loose_iso->at(i);
       tau.pass_medium_iso = pass_medium_iso->at(i);
       tau.pass_tight_iso = pass_tight_iso->at(i);
       tau.pass_vtight_iso = pass_vtight_iso->at(i);
-
+      tau.pfTausDiscriminationByDecayModeFinding = taupfTausDiscriminationByDecayModeFinding->at(i);
+      tau.pfTausDiscriminationByDecayModeFindingNewDMs = taupfTausDiscriminationByDecayModeFindingNewDMs->at(i);
+      tau.ByMVA6VLooseElectronRejection = tauByMVA6VLooseElectronRejection->at(i);
+      tau.ByMVA6LooseElectronRejection = tauByMVA6LooseElectronRejection->at(i);
+      tau.ByMVA6MediumElectronRejection = tauByMVA6MediumElectronRejection->at(i);
+      tau.ByMVA6TightElectronRejection = tauByMVA6TightElectronRejection->at(i);
+      tau.ByMVA6VTightElectronRejection = tauByMVA6VTightElectronRejection->at(i);
+      tau.ByLooseMuonRejection3 = tauByLooseMuonRejection3->at(i);
+      tau.ByTightMuonRejection3 = tauByTightMuonRejection3->at(i);
+      tau.ByLooseCombinedIsolationDeltaBetaCorr3Hits = tauByLooseCombinedIsolationDeltaBetaCorr3Hits->at(i);
+      tau.ByMediumCombinedIsolationDeltaBetaCorr3Hits = tauByMediumCombinedIsolationDeltaBetaCorr3Hits->at(i);
+      tau.ByTightCombinedIsolationDeltaBetaCorr3Hits = tauByTightCombinedIsolationDeltaBetaCorr3Hits->at(i);
+      tau.LeadChargedHadronExists = tauLeadChargedHadronExists->at(i);
+      tau.DecayMode = tauDecayMode->at(i);
+      tau.NumSignalPFChargedHadrCands = tauNumSignalPFChargedHadrCands->at(i);
+      tau.NumSignalPFNeutrHadrCands = tauNumSignalPFNeutrHadrCands->at(i);
+      tau.NumSignalPFGammaCands = tauNumSignalPFGammaCands->at(i);
+      tau.NumSignalPFCands = tauNumSignalPFCands->at(i);
+      tau.NumIsolationPFChargedHadrCands = tauNumIsolationPFChargedHadrCands->at(i);
+      tau.NumIsolationPFNeutrHadrCands = tauNumIsolationPFNeutrHadrCands->at(i);
+      tau.NumIsolationPFGammaCands = tauNumIsolationPFGammaCands->at(i);
+      tau.NumIsolationPFCands = tauNumIsolationPFCands->at(i);
+      tau.CombinedIsolationDeltaBetaCorrRaw3Hits = tauCombinedIsolationDeltaBetaCorrRaw3Hits->at(i);
+      tau.Charge = tauCharge->at(i);
+      tau.Vz = tauVz->at(i);
+      tau.Energy = tauEnergy->at(i);
+      tau.Dxy = tauDxy->at(i);
+      tau.ZImpact = tauZImpact->at(i);
+      tau.LeadChargedHadronEta = tauLeadChargedHadronEta->at(i);
+      tau.LeadChargedHadronPhi = tauLeadChargedHadronPhi->at(i);
+      tau.LeadChargedHadronPt = tauLeadChargedHadronPt->at(i);
+      tau.ChargedIsoPtSum = tauChargedIsoPtSum->at(i);
+      tau.NeutralIsoPtSum = tauNeutralIsoPtSum->at(i);
+      tau.PuCorrPtSum = tauPuCorrPtSum->at(i);
+      tau.footprintCorrection = taufootprintCorrection->at(i);
+      tau.photonPtSumOutsideSignalCone = tauphotonPtSumOutsideSignalCone->at(i);
+      tau.dz = taudz->at(i);
+      tau.dxy = taudxy->at(i);
       taus.push_back(tau);
     }
   }
