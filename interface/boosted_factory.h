@@ -26,16 +26,16 @@ class Boosted_Factory {
   Int_t nBoostedTau, nGoodTaus;
   VBoosted boosteds;
 
-  std::vector<Float_t> *boostedTauPt, *boostedTauEta, *boostedTauPhi, *boostedTauMass, *iso, *taudz, *taudxy, *tauCharge;
+  std::vector<Float_t> *boostedTauPt, *boostedTauEta, *boostedTauPhi, *boostedTauMass, *iso, *boostedTaudz, *boostedTaudxy, *boostedTauCharge;
 
   std::vector<Bool_t> *pass_vloose_iso, *pass_loose_iso, *pass_medium_iso, *pass_tight_iso, *pass_vtight_iso;
 
-  std::vector<Bool_t> *taupfTausDiscriminationByDecayModeFinding, *taupfTausDiscriminationByDecayModeFindingNewDMs, *tauByMVA6VLooseElectronRejection, *tauByMVA6LooseElectronRejection,
-      *tauByMVA6MediumElectronRejection, *tauByMVA6TightElectronRejection, *tauByMVA6VTightElectronRejection, *tauByLooseMuonRejection3, *tauByTightMuonRejection3,
-      *tauByLooseCombinedIsolationDeltaBetaCorr3Hits, *tauByMediumCombinedIsolationDeltaBetaCorr3Hits, *tauByTightCombinedIsolationDeltaBetaCorr3Hits, *tauLeadChargedHadronExists;
+  std::vector<Bool_t> *boostedTaupfTausDiscriminationByDecayModeFinding, *boostedTaupfTausDiscriminationByDecayModeFindingNewDMs, *boostedTauByMVA6VLooseElectronRejection, *boostedTauByMVA6LooseElectronRejection,
+      *boostedTauByMVA6MediumElectronRejection, *boostedTauByMVA6TightElectronRejection, *boostedTauByMVA6VTightElectronRejection, *boostedTauByLooseMuonRejection3, *boostedTauByTightMuonRejection3,
+      *boostedTauByLooseCombinedIsolationDeltaBetaCorr3Hits, *boostedTauByMediumCombinedIsolationDeltaBetaCorr3Hits, *boostedTauByTightCombinedIsolationDeltaBetaCorr3Hits, *boostedTauLeadChargedHadronExists;
 
-  std::vector<Int_t> *tauDecayMode, *tauNumSignalPFChargedHadrCands, *tauNumSignalPFNeutrHadrCands, *tauNumSignalPFGammaCands, *tauNumSignalPFCands, *tauNumIsolationPFChargedHadrCands,
-      *tauNumIsolationPFNeutrHadrCands, *tauNumIsolationPFGammaCands, *tauNumIsolationPFCands;
+  std::vector<Int_t> *boostedTauDecayMode, *boostedTauNumSignalPFChargedHadrCands, *boostedTauNumSignalPFNeutrHadrCands, *boostedTauNumSignalPFGammaCands, *boostedTauNumSignalPFCands, *boostedTauNumIsolationPFChargedHadrCands,
+      *boostedTauNumIsolationPFNeutrHadrCands, *boostedTauNumIsolationPFGammaCands, *boostedTauNumIsolationPFCands;
 };
 
 Boosted_Factory::Boosted_Factory(TTree *tree, std::string isoType = "IsolationMVArun2v2DBoldDMwLT")
@@ -48,7 +48,32 @@ Boosted_Factory::Boosted_Factory(TTree *tree, std::string isoType = "IsolationMV
       pass_loose_iso(nullptr),
       pass_medium_iso(nullptr),
       pass_tight_iso(nullptr),
-      pass_vtight_iso(nullptr) {
+      pass_vtight_iso(nullptr),
+      boostedTaupfTausDiscriminationByDecayModeFinding(nullptr),
+      boostedTaupfTausDiscriminationByDecayModeFindingNewDMs(nullptr),
+      boostedTauByMVA6VLooseElectronRejection(nullptr),
+      boostedTauByMVA6LooseElectronRejection(nullptr),
+      boostedTauByMVA6MediumElectronRejection(nullptr),
+      boostedTauByMVA6TightElectronRejection(nullptr),
+      boostedTauByMVA6VTightElectronRejection(nullptr),
+      boostedTauByLooseMuonRejection3(nullptr),
+      boostedTauByTightMuonRejection3(nullptr),
+      boostedTauByLooseCombinedIsolationDeltaBetaCorr3Hits(nullptr),
+      boostedTauByMediumCombinedIsolationDeltaBetaCorr3Hits(nullptr),
+      boostedTauByTightCombinedIsolationDeltaBetaCorr3Hits(nullptr),
+      boostedTauLeadChargedHadronExists(nullptr),
+      boostedTauDecayMode(nullptr),
+      boostedTauNumSignalPFChargedHadrCands(nullptr),
+      boostedTauNumSignalPFNeutrHadrCands(nullptr),
+      boostedTauNumSignalPFGammaCands(nullptr),
+      boostedTauNumSignalPFCands(nullptr),
+      boostedTauNumIsolationPFChargedHadrCands(nullptr),
+      boostedTauNumIsolationPFNeutrHadrCands(nullptr),
+      boostedTauNumIsolationPFGammaCands(nullptr),
+      boostedTauNumIsolationPFCands(nullptr),
+      boostedTauCharge(nullptr),
+      boostedTaudz(nullptr),
+      boostedTaudxy(nullptr) {
   tree->SetBranchAddress("nTau", &nBoostedTau);
   tree->SetBranchAddress("boostedTauPt", &boostedTauPt);
   tree->SetBranchAddress("boostedTauEta", &boostedTauEta);
