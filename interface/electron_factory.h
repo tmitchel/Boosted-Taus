@@ -120,7 +120,7 @@ Electron_Factory::Electron_Factory(TTree *tree)
       eleResol_rho_dn(nullptr),
       eleResol_phi_up(nullptr),
       eleResol_phi_dn(nullptr) {
-  tree->SetBranchAddress("nTau", &nEle);
+  tree->SetBranchAddress("nEle", &nEle);
   tree->SetBranchAddress("eleSCEn", &eleSCEn);
   tree->SetBranchAddress("eleEcalEn", &eleEcalEn);
   tree->SetBranchAddress("eleESEnP1", &eleESEnP1);
@@ -130,6 +130,7 @@ Electron_Factory::Electron_Factory(TTree *tree)
   tree->SetBranchAddress("eleSIP", &eleSIP);
   tree->SetBranchAddress("elePt", &elePt);
   tree->SetBranchAddress("elePtError", &elePtError);
+  tree->SetBranchAddress("eleEn", &eleEn);
   tree->SetBranchAddress("eleEta", &eleEta);
   tree->SetBranchAddress("elePhi", &elePhi);
   tree->SetBranchAddress("eleR9", &eleR9);
@@ -247,25 +248,25 @@ void Electron_Factory::Run_Factory() {
     electron.Trkdxy = eleTrkdxy->at(i);
     electron.KFHits = eleKFHits->at(i);
     electron.KFChi2 = eleKFChi2->at(i);
-    electron.GSFChi2 = eleGSFChi2->at(i);
-    electron.GSFPt = eleGSFPt->at(i);
-    electron.GSFEta = eleGSFEta->at(i);
-    electron.GSFPhi = eleGSFPhi->at(i);
-    electron.GSFCharge = eleGSFCharge->at(i);
-    electron.GSFHits = eleGSFHits->at(i);
-    electron.GSFMissHits = eleGSFMissHits->at(i);
-    electron.GSFNHitsMax = eleGSFNHitsMax->at(i);
-    electron.GSFVtxProb = eleGSFVtxProb->at(i);
-    electron.GSFlxyPV = eleGSFlxyPV->at(i);
-    electron.GSFlxyBS = eleGSFlxyBS->at(i);
-    electron.BCEn = eleBCEn->at(i);
-    electron.BCEta = eleBCEta->at(i);
-    electron.BCPhi = eleBCPhi->at(i);
-    electron.BCS25 = eleBCS25->at(i);
-    electron.BCS15 = eleBCS15->at(i);
-    electron.BCSieie = eleBCSieie->at(i);
-    electron.BCSieip = eleBCSieip->at(i);
-    electron.BCSipip = eleBCSipip->at(i);
+    // electron.GSFChi2 = eleGSFChi2->at(i);
+    // electron.GSFPt = eleGSFPt->at(i);
+    // electron.GSFEta = eleGSFEta->at(i);
+    // electron.GSFPhi = eleGSFPhi->at(i);
+    // electron.GSFCharge = eleGSFCharge->at(i);
+    // electron.GSFHits = eleGSFHits->at(i);
+    // electron.GSFMissHits = eleGSFMissHits->at(i);
+    // electron.GSFNHitsMax = eleGSFNHitsMax->at(i);
+    // electron.GSFVtxProb = eleGSFVtxProb->at(i);
+    // electron.GSFlxyPV = eleGSFlxyPV->at(i);
+    // electron.GSFlxyBS = eleGSFlxyBS->at(i);
+    // electron.BCEn = eleBCEn->at(i);
+    // electron.BCEta = eleBCEta->at(i);
+    // electron.BCPhi = eleBCPhi->at(i);
+    // electron.BCS25 = eleBCS25->at(i);
+    // electron.BCS15 = eleBCS15->at(i);
+    // electron.BCSieie = eleBCSieie->at(i);
+    // electron.BCSieip = eleBCSieip->at(i);
+    // electron.BCSipip = eleBCSipip->at(i);
     electron.FiredSingleTrgs = eleFiredSingleTrgs->at(i);
     electron.FiredDoubleTrgs = eleFiredDoubleTrgs->at(i);
     electron.FiredL1Trgs = eleFiredL1Trgs->at(i);
