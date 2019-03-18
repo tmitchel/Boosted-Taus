@@ -24,10 +24,12 @@ def main(args):
     # Use 4 cores if the machine has more than 8 total cores.
     # Otherwise, use half the available cores.
     n_processes = min(4, multiprocessing.cpu_count() / 2)
-    
-    pool = multiprocessing.Pool(processes=n_processes)
-    r = pool.map_async(run_command, file_list)
-    r.wait()
+   
+    run_command(file_list[0])
+
+    # pool = multiprocessing.Pool(processes=n_processes)
+    # r = pool.map_async(run_command, file_list)
+    # r.wait()
 
 
 if __name__ == "__main__":
