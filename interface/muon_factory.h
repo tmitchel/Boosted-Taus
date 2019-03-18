@@ -31,7 +31,41 @@ class Muon_Factory {
       *muchi2LocalPosition, *mutrkKink, *muBestTrkPtError, *muBestTrkPt;
 };
 
-Muon_Factory::Muon_Factory(TTree *tree) : muPt(nullptr), muEta(nullptr), muPhi(nullptr), muEn(nullptr) {
+Muon_Factory::Muon_Factory(TTree *tree)
+    : muPt(nullptr),
+      muEta(nullptr),
+      muPhi(nullptr),
+      muEn(nullptr),
+      muFiredTrgs(nullptr),
+      muFiredL1Trgs(nullptr),
+      muCharge(nullptr),
+      muType(nullptr),
+      muIDbit(nullptr),
+      muTrkLayers(nullptr),
+      muPixelLayers(nullptr),
+      muPixelHits(nullptr),
+      muMuonHits(nullptr),
+      muStations(nullptr),
+      muMatches(nullptr),
+      muTrkQuality(nullptr),
+      muBestTrkType(nullptr),
+      muD0(nullptr),
+      muDz(nullptr),
+      muSIP(nullptr),
+      muChi2NDF(nullptr),
+      muInnerD0(nullptr),
+      muInnerDz(nullptr),
+      muIsoTrk(nullptr),
+      muPFChIso(nullptr),
+      muPFPhoIso(nullptr),
+      muPFNeuIso(nullptr),
+      muPFPUIso(nullptr),
+      muInnervalidFraction(nullptr),
+      musegmentCompatibility(nullptr),
+      muchi2LocalPosition(nullptr),
+      mutrkKink(nullptr),
+      muBestTrkPtError(nullptr),
+      muBestTrkPt(nullptr) {
   tree->SetBranchAddress("nTau", &nMu);
   tree->SetBranchAddress("muPt", &muPt);
   tree->SetBranchAddress("muEta", &muEta);
@@ -107,7 +141,7 @@ void Muon_Factory::Run_Factory() {
   }
 
   // sort by pT
-  std::sort(muons.begin(), muons.end(), [](Muon& p1, Muon& p2) -> bool { return p1.getPt() > p2.getPt(); });
+  std::sort(muons.begin(), muons.end(), [](Muon &p1, Muon &p2) -> bool { return p1.getPt() > p2.getPt(); });
   nGoodMu = muons.size();
 }
 
