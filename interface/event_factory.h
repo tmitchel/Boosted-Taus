@@ -19,14 +19,15 @@ class Event_Factory {
   Bool_t getJetTriggerIsPre(int key) { return (HLTJetIsPrescaled >> key & 1) == 1; }
   Int_t getRun() { return run; }
   Int_t getLumi() { return lumis; }
-  ULong64_t getEvent() { return evt; }
+  Long64_t getEvent() { return evt; }
   TLorentzVector getMET() { return MET; }
 
  private:
-  ULong64_t HLTEleMuX, HLTPho, HLTJet, HLTEleMuXIsPrescaled, HLTPhoIsPrescaled, HLTJetIsPrescaled, evt;
+  std::vector<int> *nPU, *puTrue;
+  Long64_t evt;
+  ULong64_t HLTEleMuX, HLTPho, HLTJet, HLTEleMuXIsPrescaled, HLTPhoIsPrescaled, HLTJetIsPrescaled;
   Int_t run, lumis;
   Float_t rho, pfMET, pfMETPhi;
-  std::vector<Int_t> *nPU, *puTrue;
   TLorentzVector MET;
 };
 
@@ -39,7 +40,7 @@ Event_Factory::Event_Factory(TTree* tree) {
   tree->SetBranchAddress("HLTJetIsPrescaled", &HLTJetIsPrescaled);
   tree->SetBranchAddress("nPU", &nPU);
   tree->SetBranchAddress("puTrue", &puTrue);
-  tree->SetBranchAddress("evt", &evt);
+  tree->SetBranchAddress("event", &evt);
   tree->SetBranchAddress("run", &run);
   tree->SetBranchAddress("lumis", &lumis);
   tree->SetBranchAddress("rho", &rho);
