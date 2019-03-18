@@ -58,7 +58,7 @@ void Boosted_Factory::Run_Factory() {
   for (auto i = 0; i < nBoostedTau; i++) {
     auto boosted = Boosted(pts->at(i), etas->at(i), phis->at(i), masses->at(i));
     boosted.pass_loose_iso = pass_loose_iso->at(i);
-    if (boosted.getPt() > 20 && fabs(boosted.getEta()) < 2.3 && boosted.getLooseIso()) {
+    if (boosted.getPt() > 20 && fabs(boosted.getEta()) < 2.3 && boosted.getIso(vloose)) {
       boosteds.push_back(boosted);
     }
   }

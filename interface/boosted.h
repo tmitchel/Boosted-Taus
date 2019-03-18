@@ -125,5 +125,6 @@ Bool_t Boosted::getCombinedIsolationDeltaBetaCorr3Hits(working_point wp) {
     return ByTightCombinedIsolationDeltaBetaCorr3Hits;
   }
   throw std::invalid_argument("Must use one of the provided tau isolation WPs");
+}
 
 #endif  // INTERFACE_BOOSTED_H_
