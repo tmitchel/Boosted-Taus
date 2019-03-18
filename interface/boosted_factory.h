@@ -13,7 +13,7 @@ typedef std::vector<Boosted> VBoosted;
 
 class Boosted_Factory {
  public:
-  explicit Boosted_Factory(TTree *);
+  explicit Boosted_Factory(TTree *, std::string);
   void Run_Factory();
 
   // getters
@@ -24,16 +24,26 @@ class Boosted_Factory {
  private:
   Int_t nBoostedTau, nGoodTaus;
   VBoosted boosteds;
-  std::vector<Bool_t> *pass_vloose_iso, *pass_loose_iso, *pass_medium_iso, *pass_tight_iso,
-      *pass_vtight_iso;  // all are MVArun2v2DBoldDMwLT
-  std::vector<Float_t> *pts, *etas, *phis, *masses, *iso;
+
+  std::vector<Bool_t> *boostedTaupfTausDiscriminationByDecayModeFinding, *boostedTaupfTausDiscriminationByDecayModeFindingNewDMs, *boostedTauByMVA6VLooseElectronRejection, *boostedTauByMVA6LooseElectronRejection,
+      *boostedTauByMVA6MediumElectronRejection, *boostedTauByMVA6TightElectronRejection, *boostedTauByMVA6VTightElectronRejection, *boostedTauByLooseMuonRejection3, *boostedTauByTightMuonRejection3,
+      *boostedTauByLooseCombinedIsolationDeltaBetaCorr3Hits, *boostedTauByMediumCombinedIsolationDeltaBetaCorr3Hits, *boostedTauByTightCombinedIsolationDeltaBetaCorr3Hits, *boostedTauLeadChargedHadronExists;
+
+  std::vector<Bool_t> *pass_vloose_iso, *pass_loose_iso, *pass_medium_iso, *pass_tight_iso, *pass_vtight_iso;
+
+  std::vector<Int_t> *boostedTauDecayMode, *boostedTauNumSignalPFChargedHadrCands, *boostedTauNumSignalPFNeutrHadrCands, *boostedTauNumSignalPFGammaCands, *boostedTauNumSignalPFCands, *boostedTauNumIsolationPFChargedHadrCands,
+      *boostedTauNumIsolationPFNeutrHadrCands, *boostedTauNumIsolationPFGammaCands, *boostedTauNumIsolationPFCands;
+
+  std::vector<Float_t> *boostedTauCombinedIsolationDeltaBetaCorrRaw3Hits, *boostedTauEta, *boostedTauPhi, *boostedTauPt, *boostedTauEt, *boostedTauCharge, *boostedTauP, *boostedTauPx, *boostedTauPy, *boostedTauPz, *boostedTauVz, *boostedTauEnergy, *boostedTauMass, *boostedTauDxy,
+      *boostedTauZImpact, *boostedTauLeadChargedHadronEta, *boostedTauLeadChargedHadronPhi, *boostedTauLeadChargedHadronPt, *boostedTauChargedIsoPtSum, *boostedTauNeutralIsoPtSum, *boostedTauPuCorrPtSum, *boostedTaufootprintCorrection,
+      *boostedTauphotonPtSumOutsideSignalCone, *boostedTaudz, *boostedTaudxy, *iso;
 };
 
-Boosted_Factory::Boosted_Factory(TTree *tree)
-    : pts(nullptr),
-      etas(nullptr),
-      phis(nullptr),
-      masses(nullptr),
+Boosted_Factory::Boosted_Factory(TTree *tree, std::string isoType = "IsolationMVArun2v2DBoldDMwLT")
+    : boostedTauPt(nullptr),
+      boostedTauEta(nullptr),
+      boostedTauPhi(nullptr),
+      boostedTauMass(nullptr),
       iso(nullptr),
       pass_vloose_iso(nullptr),
       pass_loose_iso(nullptr),
@@ -41,10 +51,10 @@ Boosted_Factory::Boosted_Factory(TTree *tree)
       pass_tight_iso(nullptr),
       pass_vtight_iso(nullptr) {
   tree->SetBranchAddress("nTau", &nBoostedTau);
-  tree->SetBranchAddress("boostedTauPt", &pts);
-  tree->SetBranchAddress("boostedTauEta", &etas);
-  tree->SetBranchAddress("boostedTauPhi", &phis);
-  tree->SetBranchAddress("boostedTauMass", &masses);
+  tree->SetBranchAddress("boostedTauPt", &boostedTauPt);
+  tree->SetBranchAddress("boostedTauEta", &boostedTauEta);
+  tree->SetBranchAddress("boostedTauPhi", &boostedTauPhi);
+  tree->SetBranchAddress("boostedTauMass", &boostedTauMass);
   tree->SetBranchAddress("boostedTauByIsolationMVArun2v2DBoldDMwLTraw", &iso);
   tree->SetBranchAddress("boostedTauByVLooseIsolationMVArun2v2DBoldDMwLT", &pass_vloose_iso);
   tree->SetBranchAddress("boostedTauByLooseIsolationMVArun2v2DBoldDMwLT", &pass_loose_iso);
@@ -56,7 +66,7 @@ Boosted_Factory::Boosted_Factory(TTree *tree)
 void Boosted_Factory::Run_Factory() {
   boosteds.clear();
   for (auto i = 0; i < nBoostedTau; i++) {
-    auto boosted = Boosted(pts->at(i), etas->at(i), phis->at(i), masses->at(i));
+    auto boosted = Boosted(boostedTauPt->at(i), boostedTauEta->at(i), boostedTauPhi->at(i));
     boosted.pass_loose_iso = pass_loose_iso->at(i);
     if (boosted.getPt() > 20 && fabs(boosted.getEta()) < 2.3 && boosted.getIso(vloose)) {
       boosteds.push_back(boosted);
