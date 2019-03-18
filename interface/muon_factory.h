@@ -66,7 +66,7 @@ Muon_Factory::Muon_Factory(TTree *tree)
       mutrkKink(nullptr),
       muBestTrkPtError(nullptr),
       muBestTrkPt(nullptr) {
-  tree->SetBranchAddress("nTau", &nMu);
+  tree->SetBranchAddress("nMu", &nMu);
   tree->SetBranchAddress("muPt", &muPt);
   tree->SetBranchAddress("muEta", &muEta);
   tree->SetBranchAddress("muPhi", &muPhi);
