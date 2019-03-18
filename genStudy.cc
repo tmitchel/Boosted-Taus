@@ -9,12 +9,6 @@
 #include "interface/histManager.h"
 #include "interface/CLParser.h"
 #include "interface/gen_factory.h"
-#include "interface/jets_factory.h"
-#include "interface/muon_factory.h"
-#include "interface/electron_factory.h"
-#include "interface/boosted_factory.h"
-#include "interface/tau_factory.h"
-
 
 using std::string;
 using std::vector;
@@ -32,11 +26,6 @@ int main(int argc, char** argv) {
   auto tree = reinterpret_cast<TTree*>(fin->Get(tree_name.c_str()));
   // construct our object factories
   auto gen_factory = Gen_Factory(tree);
-  auto jets_factory = Jets_Factory(tree);
-  auto muon_factory = Muon_Factory(tree);
-  auto electron_factory = Electron_Factory(tree);
-  auto boosted_factory = Boosted_Factory(tree);
-  auto tau_factory = Tau_Factory(tree);
 
   auto nevts = tree->GetEntries();
   int progress(1), fraction((nevts-1)/10);
