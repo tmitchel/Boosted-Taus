@@ -85,6 +85,31 @@ Boosted_Factory::Boosted_Factory(TTree *tree, std::string isoType = "IsolationMV
   tree->SetBranchAddress("boostedTauByMediumIsolationMVArun2v2DBoldDMwLT", &pass_medium_iso);
   tree->SetBranchAddress("boostedTauByTightIsolationMVArun2v2DBoldDMwLT", &pass_tight_iso);
   tree->SetBranchAddress("boostedTauByVTightIsolationMVArun2v2DBoldDMwLT", &pass_vtight_iso);
+  tree->SetBranchAddress("boostedTaupfTausDiscriminationByDecayModeFinding", &boostedTaupfTausDiscriminationByDecayModeFinding);
+  tree->SetBranchAddress("boostedTaupfTausDiscriminationByDecayModeFindingNewDMs", &boostedTaupfTausDiscriminationByDecayModeFindingNewDMs);
+  tree->SetBranchAddress("boostedTauByMVA6VLooseElectronRejection", &boostedTauByMVA6VLooseElectronRejection);
+  tree->SetBranchAddress("boostedTauByMVA6LooseElectronRejection", &boostedTauByMVA6LooseElectronRejection);
+  tree->SetBranchAddress("boostedTauByMVA6MediumElectronRejection", &boostedTauByMVA6MediumElectronRejection);
+  tree->SetBranchAddress("boostedTauByMVA6TightElectronRejection", &boostedTauByMVA6TightElectronRejection);
+  tree->SetBranchAddress("boostedTauByMVA6VTightElectronRejection", &boostedTauByMVA6VTightElectronRejection);
+  tree->SetBranchAddress("boostedTauByLooseMuonRejection3", &boostedTauByLooseMuonRejection3);
+  tree->SetBranchAddress("boostedTauByTightMuonRejection3", &boostedTauByTightMuonRejection3);
+  tree->SetBranchAddress("boostedTauByLooseCombinedIsolationDeltaBetaCorr3Hits", &boostedTauByLooseCombinedIsolationDeltaBetaCorr3Hits);
+  tree->SetBranchAddress("boostedTauByMediumCombinedIsolationDeltaBetaCorr3Hits", &boostedTauByMediumCombinedIsolationDeltaBetaCorr3Hits);
+  tree->SetBranchAddress("boostedTauByTightCombinedIsolationDeltaBetaCorr3Hits", &boostedTauByTightCombinedIsolationDeltaBetaCorr3Hits);
+  tree->SetBranchAddress("boostedTauLeadChargedHadronExists", &boostedTauLeadChargedHadronExists);
+  tree->SetBranchAddress("boostedTauDecayMode", &boostedTauDecayMode);
+  tree->SetBranchAddress("boostedTauNumSignalPFChargedHadrCands", &boostedTauNumSignalPFChargedHadrCands);
+  tree->SetBranchAddress("boostedTauNumSignalPFNeutrHadrCands", &boostedTauNumSignalPFNeutrHadrCands);
+  tree->SetBranchAddress("boostedTauNumSignalPFGammaCands", &boostedTauNumSignalPFGammaCands);
+  tree->SetBranchAddress("boostedTauNumSignalPFCands", &boostedTauNumSignalPFCands);
+  tree->SetBranchAddress("boostedTauNumIsolationPFChargedHadrCands", &boostedTauNumIsolationPFChargedHadrCands);
+  tree->SetBranchAddress("boostedTauNumIsolationPFNeutrHadrCands", &boostedTauNumIsolationPFNeutrHadrCands);
+  tree->SetBranchAddress("boostedTauNumIsolationPFGammaCands", &boostedTauNumIsolationPFGammaCands);
+  tree->SetBranchAddress("boostedTauNumIsolationPFCands", &boostedTauNumIsolationPFCands);
+  tree->SetBranchAddress("boostedTauCharge", &boostedTauCharge);
+  tree->SetBranchAddress("boostedTaudz", &boostedTaudz);
+  tree->SetBranchAddress("boostedTaudxy", &boostedTaudxy);
 }
 
 void Boosted_Factory::Run_Factory() {
