@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <string>
 #include <vector>
 #include "./boosted.h"
 #include "TTree.h"
@@ -25,11 +26,16 @@ class Boosted_Factory {
   Int_t nBoostedTau, nGoodTaus;
   VBoosted boosteds;
 
-  std::vector<Float_t> *boostedTauPt, *boostedTauEta, *boostedTauPhi, *boostedTauMass, *iso;
+  std::vector<Float_t> *boostedTauPt, *boostedTauEta, *boostedTauPhi, *boostedTauMass, *iso, *taudz, *taudxy, *tauCharge;
 
   std::vector<Bool_t> *pass_vloose_iso, *pass_loose_iso, *pass_medium_iso, *pass_tight_iso, *pass_vtight_iso;
 
+  std::vector<Bool_t> *taupfTausDiscriminationByDecayModeFinding, *taupfTausDiscriminationByDecayModeFindingNewDMs, *tauByMVA6VLooseElectronRejection, *tauByMVA6LooseElectronRejection,
+      *tauByMVA6MediumElectronRejection, *tauByMVA6TightElectronRejection, *tauByMVA6VTightElectronRejection, *tauByLooseMuonRejection3, *tauByTightMuonRejection3,
+      *tauByLooseCombinedIsolationDeltaBetaCorr3Hits, *tauByMediumCombinedIsolationDeltaBetaCorr3Hits, *tauByTightCombinedIsolationDeltaBetaCorr3Hits, *tauLeadChargedHadronExists;
 
+  std::vector<Int_t> *tauDecayMode, *tauNumSignalPFChargedHadrCands, *tauNumSignalPFNeutrHadrCands, *tauNumSignalPFGammaCands, *tauNumSignalPFCands, *tauNumIsolationPFChargedHadrCands,
+      *tauNumIsolationPFNeutrHadrCands, *tauNumIsolationPFGammaCands, *tauNumIsolationPFCands;
 };
 
 Boosted_Factory::Boosted_Factory(TTree *tree, std::string isoType = "IsolationMVArun2v2DBoldDMwLT")
@@ -60,7 +66,6 @@ void Boosted_Factory::Run_Factory() {
   boosteds.clear();
   for (auto i = 0; i < nBoostedTau; i++) {
     auto boosted = Boosted(boostedTauPt->at(i), boostedTauEta->at(i), boostedTauPhi->at(i));
-    boosted.pass_loose_iso = pass_loose_iso->at(i);
     if (boosted.getPt() > 20 && fabs(boosted.getEta()) < 2.3 && boosted.getIso(vloose)) {
       boosteds.push_back(boosted);
     }
