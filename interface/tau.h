@@ -62,7 +62,7 @@ class Tau {
 
   Float_t CombinedIsolationDeltaBetaCorrRaw3Hits, Charge, Vz, Dxy, Mass,
       ZImpact, LeadChargedHadronEta, LeadChargedHadronPhi, LeadChargedHadronPt, ChargedIsoPtSum, NeutralIsoPtSum, PuCorrPtSum, footprintCorrection,
-      photonPtSumOutsideSignalCone, dz, dxy;
+      photonPtSumOutsideSignalCone, dz, dxy, Energy;
 };
 
 Tau::Tau(Float_t pt, Float_t eta, Float_t phi, Float_t mass = 1.77682) {
