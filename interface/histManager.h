@@ -3,9 +3,12 @@
 #ifndef INTERFACE_HISTMANAGER_H_
 #define INTERFACE_HISTMANAGER_H_
 
+#include <iostream>
+#include <fstream>
 #include <map>
 #include <memory>
 #include <string>
+#include "./json.hpp"
 #include "TFile.h"
 #include "TH1F.h"
 
@@ -13,6 +16,7 @@ class histManager {
  public:
   explicit histManager(std::string);
   ~histManager() {}
+  void load_histograms(std::string);
   void Fill(std::string, double, double);
   void FillBin(std::string, int, double);
   void FillPrevBins(std::string, double, double);
@@ -25,36 +29,20 @@ class histManager {
 
 histManager::histManager(std::string fname) : fout(std::make_shared<TFile>(fname.c_str(), "RECREATE")) {
   fout->cd();
-  hists = {
-      {"pt0_jet_flavor", new TH1F("pt0_jet_flavor", "pt0_jet_flavor", 7, 0.5, 7.5)},
-      {"pt400_jet_flavor", new TH1F("pt400_jet_flavor", "pt400_jet_flavor", 7, 0.5, 7.5)},
-      {"pt600_jet_flavor", new TH1F("pt600_jet_flavor", "pt600_jet_flavor", 7, 0.5, 7.5)},
-      {"pt800_jet_flavor", new TH1F("pt800_jet_flavor", "pt800_jet_flavor", 7, 0.5, 7.5)},
-      {"lead_jet_flavor", new TH1F("lead_jet_flavor", "lead_jet_flavor", 7, 0.5, 7.5)},
-      {"nevents", new TH1F("nevents", "nevents", 1, 0.5, 1.5)},
-      {"dr_taus", new TH1F("dr_taus", "dr_taus", 100, 0, 5)},
-      {"dr_jet_MET", new TH1F("dr_jet_MET", "dr_jet_MET", 100, 0, 5)},
-      {"dr_higgs_MET", new TH1F("dr_higgs_MET", "dr_higgs_MET", 100, 0, 5)},
-      {"dphi_taus", new TH1F("dphi_taus", "dphi_taus", 100, -3.14, 3.14)},
-      {"lead_gen_jet_eff", new TH1F("lead_gen_jet_eff", "lead_gen_jet_eff", 100, 0, 1000)},
-      {"lead_jet_eff", new TH1F("lead_jet_eff", "lead_jet_eff", 100, 0, 1000)},
-      {"cutflow", new TH1F("cutflow", "cutflow", 3, 0.5, 3.5)},
+  hists = {};  // you can hardcode histograms here
+}
 
-      {"is_prescaled", new TH1F("is_prescaled", "is_prescaled", 8, 0.5, 8.5)},
-      {"all_trigger_eff", new TH1F("all_trigger_eff", "all_trigger_eff", 4, 0.5, 4.5)},
-      {"lead_jet_pt", new TH1F("lead_jet_pt", "lead_jet_pt", 15, 500, 1000)},
-      {"jet320_trigger_eff", new TH1F("jet320_trigger_eff", "jet320_trigger_eff", 15, 500., 1000)},
-      {"jet500_trigger_eff", new TH1F("jet500_trigger_eff", "jet500_trigger_eff", 15, 500., 1000)},
-      {"HT300_MET110_trigger_eff", new TH1F("HT300_MET110_trigger_eff", "HT300_MET110_trigger_eff", 15, 500., 1000.)},
-      {"HT800_trigger_eff", new TH1F("HT800_trigger_eff", "HT800_trigger_eff", 15, 500., 1000.)},
-
-      {"all_iso_eff", new TH1F("all_iso_eff", "all_iso_eff", 3, 0.5, 3.5)},
-      {"all_tau_pt", new TH1F("all_tau_pt", "all_tau_pt", 20, 0, 600)},
-      {"ntau", new TH1F("ntau", "ntau", 1, 0.5, 1.5)},
-      {"loose_boosted_eff", new TH1F("loose_boosted_eff", "loose_boosted_eff", 20, 0., 600.)},
-      {"medium_boosted_eff", new TH1F("medium_boosted_eff", "medium_boosted_eff", 20, 0., 600.)},
-      {"tight_boosted_eff", new TH1F("tight_boosted_eff", "tight_boosted_eff", 20, 0., 600.)},
-  };
+void histManager::load_histograms(std::string json_file) {
+  std::ifstream histograms(json_file);
+  nlohmann::json histo_definitions;
+  histograms >> histo_definitions;
+  for (auto it = histo_definitions.begin(); it != histo_definitions.end(); it++) {
+    if (it.value().size() == 3) {
+      hists[it.key()] = new TH1F(it.key().c_str(), it.key().c_str(), it.value().at(0), it.value().at(1), it.value().at(2));
+    } else {
+      std::cout << "Histogram " << it.key() << " has the wrong number of bins. Skipping." << std::endl;
+    }
+  }
 }
 
 void histManager::Fill(std::string name, double var, double weight) { hists.at(name)->Fill(var, weight); }
