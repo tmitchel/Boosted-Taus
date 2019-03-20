@@ -74,17 +74,17 @@ Boosted_Factory::Boosted_Factory(TTree *tree, std::string isoType = "IsolationMV
       boostedTauCharge(nullptr),
       boostedTaudz(nullptr),
       boostedTaudxy(nullptr) {
-  tree->SetBranchAddress("nTau", &nBoostedTau);
+  tree->SetBranchAddress("nBoostedTau", &nBoostedTau);
   tree->SetBranchAddress("boostedTauPt", &boostedTauPt);
   tree->SetBranchAddress("boostedTauEta", &boostedTauEta);
   tree->SetBranchAddress("boostedTauPhi", &boostedTauPhi);
   tree->SetBranchAddress("boostedTauMass", &boostedTauMass);
-  tree->SetBranchAddress("boostedTauByIsolationMVArun2v2DBoldDMwLTraw", &iso);
-  tree->SetBranchAddress("boostedTauByVLooseIsolationMVArun2v2DBoldDMwLT", &pass_vloose_iso);
-  tree->SetBranchAddress("boostedTauByLooseIsolationMVArun2v2DBoldDMwLT", &pass_loose_iso);
-  tree->SetBranchAddress("boostedTauByMediumIsolationMVArun2v2DBoldDMwLT", &pass_medium_iso);
-  tree->SetBranchAddress("boostedTauByTightIsolationMVArun2v2DBoldDMwLT", &pass_tight_iso);
-  tree->SetBranchAddress("boostedTauByVTightIsolationMVArun2v2DBoldDMwLT", &pass_vtight_iso);
+  tree->SetBranchAddress("boostedTauByIsolationMVArun2v1DBoldDMwLTraw", &iso);
+  tree->SetBranchAddress("boostedTauByVLooseIsolationMVArun2v1DBoldDMwLT", &pass_vloose_iso);
+  tree->SetBranchAddress("boostedTauByLooseIsolationMVArun2v1DBoldDMwLT", &pass_loose_iso);
+  tree->SetBranchAddress("boostedTauByMediumIsolationMVArun2v1DBoldDMwLT", &pass_medium_iso);
+  tree->SetBranchAddress("boostedTauByTightIsolationMVArun2v1DBoldDMwLT", &pass_tight_iso);
+  tree->SetBranchAddress("boostedTauByVTightIsolationMVArun2v1DBoldDMwLT", &pass_vtight_iso);
   tree->SetBranchAddress("boostedTaupfTausDiscriminationByDecayModeFinding", &boostedTaupfTausDiscriminationByDecayModeFinding);
   tree->SetBranchAddress("boostedTaupfTausDiscriminationByDecayModeFindingNewDMs", &boostedTaupfTausDiscriminationByDecayModeFindingNewDMs);
   tree->SetBranchAddress("boostedTauByMVA6VLooseElectronRejection", &boostedTauByMVA6VLooseElectronRejection);
