@@ -1,0 +1,30 @@
+{
+    "pt0_jet_flavor": [7, 0.5, 7.5],
+    "pt400_jet_flavor": [7, 0.5, 7.5],
+    "pt600_jet_flavor": [7, 0.5, 7.5],
+    "pt800_jet_flavor": [7, 0.5, 7.5],
+    "lead_jet_flavor": [7, 0.5, 7.5],
+    "nevents": [1, 0.5, 1.5],
+    "dr_taus": [100, 0, 5],
+    "dr_jet_MET": [100, 0, 5],
+    "dr_higgs_MET": [100, 0, 5],
+    "dphi_taus": [100, -3.14, 3.14],
+    "lead_gen_jet_eff": [100, 0, 1000],
+    "lead_jet_eff": [100, 0, 1000],
+    "cutflow": [3, 0.5, 3.5],
+
+    "is_prescaled": [8, 0.5, 8.5],
+    "all_trigger_eff": [4, 0.5, 4.5],
+    "lead_jet_pt": [15, 500, 1000],
+    "jet320_trigger_eff": [15, 500, 1000],
+    "jet500_trigger_eff": [15, 500, 1000],
+    "HT300_MET110_trigger_eff": [15, 500, 1000],
+    "HT800_trigger_eff": [15, 500, 1000],
+
+    "all_iso_eff": [3, 0.5, 3.5],
+    "all_tau_pt": [20, 0, 600],
+    "ntau": [1, 0.5, 1.5],
+    "loose_boosted_eff": [20, 0, 600],
+    "medium_boosted_eff": [20, 0, 600],
+    "tight_boosted_eff": [20, 0, 600]
+}
