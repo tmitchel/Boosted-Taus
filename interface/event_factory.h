@@ -38,8 +38,8 @@ Event_Factory::Event_Factory(TTree* tree) {
   tree->SetBranchAddress("HLTEleMuXIsPrescaled", &HLTEleMuXIsPrescaled);
   tree->SetBranchAddress("HLTPhoIsPrescaled", &HLTPhoIsPrescaled);
   tree->SetBranchAddress("HLTJetIsPrescaled", &HLTJetIsPrescaled);
-  tree->SetBranchAddress("nPU", &nPU);
-  tree->SetBranchAddress("puTrue", &puTrue);
+  // tree->SetBranchAddress("nPU", &nPU);
+  // tree->SetBranchAddress("puTrue", &puTrue);
   tree->SetBranchAddress("event", &evt);
   tree->SetBranchAddress("run", &run);
   tree->SetBranchAddress("lumis", &lumis);
