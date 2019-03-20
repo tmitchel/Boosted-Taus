@@ -173,7 +173,9 @@ int main(int argc, char **argv) {
       }
     }
 
-    std::cout << std::endl;
+    if (verbose) {
+      std::cout << std::endl;
+    }
     fin->Close();
     hists->Write();
     return 1;
