@@ -4,6 +4,7 @@ import multiprocessing
 
 def format_command(exe, ext, ifile):
     output_name = ifile.replace('.root', '_output.root').split('/')[-1]
+    print output_name
     callstring = './{} -i {}{} -o {}'.format(exe, ext, ifile, output_name)
     return callstring
 
@@ -25,11 +26,9 @@ def main(args):
     # Otherwise, use half the available cores.
     n_processes = min(4, multiprocessing.cpu_count() / 2)
    
-    run_command(file_list[0])
-
-    # pool = multiprocessing.Pool(processes=n_processes)
-    # r = pool.map_async(run_command, file_list)
-    # r.wait()
+    pool = multiprocessing.Pool(processes=n_processes)
+    r = pool.map_async(run_command, file_list)
+    r.wait()
 
 
 if __name__ == "__main__":
