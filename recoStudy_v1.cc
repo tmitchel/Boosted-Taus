@@ -67,15 +67,15 @@ int main(int argc, char **argv) {
     }
 
     // only look at events with high pT jet
-    if (!found_jet) {
-      hists->Fill("cutflow", 2, 1.);
+    if (found_jet) {
+      hists->FillBin("cutflow", 2, 1.);
     } else {
       continue;
     }
 
     // need to have at least 1 tau in the event
     if (boost_factory.getNGoodBoosted() > 0) {
-      hists->Fill("cutflow", 3, 1.);
+      hists->FillBin("cutflow", 3, 1.);
     } else {
       continue;
     }
@@ -89,52 +89,54 @@ int main(int argc, char **argv) {
     // are triggers prescaled?
     if (event.getJetTriggerIsPre(16)) {
       hists->FillBin("is_prescaled", 1, 1.);
-    } else if (event.getJetTriggerIsPre(16)) {
+    } else if (!event.getJetTriggerIsPre(16)) {
       hists->FillBin("is_prescaled", 2, 1.);
     }
 
     if (event.getJetTriggerIsPre(19)) {
       hists->FillBin("is_prescaled", 3, 1.);
-    } else if (event.getJetTriggerIsPre(19)) {
+    } else if (!event.getJetTriggerIsPre(19)) {
       hists->FillBin("is_prescaled", 4, 1.);
     }
 
     if (event.getJetTriggerIsPre(22)) {
       hists->FillBin("is_prescaled", 5, 1.);
-    } else if (event.getJetTriggerIsPre(22)) {
+    } else if (!event.getJetTriggerIsPre(22)) {
       hists->FillBin("is_prescaled", 6, 1.);
     }
 
     if (event.getJetTriggerIsPre(32)) {
       hists->FillBin("is_prescaled", 7, 1.);
-    } else if (event.getJetTriggerIsPre(32)) {
+    } else if (!event.getJetTriggerIsPre(32)) {
       hists->FillBin("is_prescaled", 8, 1.);
     }
 
     // trigger efficiencies
 
+    hists->Fill("lead_jet_pt", jets->at(0).getPt(), 1.);
+
     // HLT_PFJet320_v
     if (event.getJetTrigger(16)) {
       hists->FillBin("all_trigger_eff", 1, 1.);
-      hists->FillPrevBins("jet320_trigger_eff", lead_tau.getPt(), 1.);
+      hists->Fill("jet320_trigger_eff", jets->at(0).getPt(), 1.);
     }
 
     // HLT_PFJet500_v
     if (event.getJetTrigger(19)) {
       hists->FillBin("all_trigger_eff", 2, 1.);
-      hists->FillPrevBins("jet500_trigger_eff", lead_tau.getPt(), 1.);
+      hists->Fill("jet500_trigger_eff", jets->at(0).getPt(), 1.);
     }
 
     // HLT_PFHT300_PFMET110_v
     if (event.getJetTrigger(22)) {
       hists->FillBin("all_trigger_eff", 3, 1.);
-      hists->FillPrevBins("HT300_MET110_trigger_eff", lead_tau.getPt(), 1.);
+      hists->Fill("HT300_MET110_trigger_eff", jets->at(0).getPt(), 1.);
     }
 
     // HLT_PFHT800_v
     if (event.getJetTrigger(32)) {
       hists->FillBin("all_trigger_eff", 4, 1.);
-      hists->FillPrevBins("HT800_trigger_eff", lead_tau.getPt(), 1.);
+      hists->Fill("HT800_trigger_eff", jets->at(0).getPt(), 1.);
     }
 
     ////////////////////////////
@@ -178,3 +180,4 @@ int main(int argc, char **argv) {
     hists->Write();
     return 1;
   }
+}

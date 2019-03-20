@@ -42,17 +42,18 @@ histManager::histManager(std::string fname) : fout(std::make_shared<TFile>(fname
 
       {"is_prescaled", new TH1F("is_prescaled", "is_prescaled", 8, 0.5, 8.5)},
       {"all_trigger_eff", new TH1F("all_trigger_eff", "all_trigger_eff", 4, 0.5, 4.5)},
-      {"jet320_trigger_eff", new TH1F("jet320_trigger_eff", "jet320_trigger_eff", 50, 0., 640)},
-      {"jet500_trigger_eff", new TH1F("jet500_trigger_eff", "jet500_trigger_eff", 50, 0., 1000)},
-      {"HT300_MET110_trigger_eff", new TH1F("HT300_MET110_trigger_eff", "HT300_MET110_trigger_eff", 50, 0., 1000.)},
-      {"HT800_trigger_eff", new TH1F("HT800_trigger_eff", "HT800_trigger_eff", 50, 0., 1600.)},
+      {"lead_jet_pt", new TH1F("lead_jet_pt", "lead_jet_pt", 15, 500, 1000)},
+      {"jet320_trigger_eff", new TH1F("jet320_trigger_eff", "jet320_trigger_eff", 15, 500., 1000)},
+      {"jet500_trigger_eff", new TH1F("jet500_trigger_eff", "jet500_trigger_eff", 15, 500., 1000)},
+      {"HT300_MET110_trigger_eff", new TH1F("HT300_MET110_trigger_eff", "HT300_MET110_trigger_eff", 15, 500., 1000.)},
+      {"HT800_trigger_eff", new TH1F("HT800_trigger_eff", "HT800_trigger_eff", 15, 500., 1000.)},
 
       {"all_iso_eff", new TH1F("all_iso_eff", "all_iso_eff", 3, 0.5, 3.5)},
-      {"all_tau_pt", new TH1F("all_tau_pt", "all_tau_pt", 50, 0, 1000)},
+      {"all_tau_pt", new TH1F("all_tau_pt", "all_tau_pt", 20, 0, 600)},
       {"ntau", new TH1F("ntau", "ntau", 1, 0.5, 1.5)},
-      {"loose_boosted_eff", new TH1F("loose_boosted_eff", "loose_boosted_eff", 50, 0., 600.)},
-      {"medium_boosted_eff", new TH1F("medium_boosted_eff", "medium_boosted_eff", 50, 0., 600.)},
-      {"tight_boosted_eff", new TH1F("tight_boosted_eff", "tight_boosted_eff", 50, 0., 600.)},
+      {"loose_boosted_eff", new TH1F("loose_boosted_eff", "loose_boosted_eff", 20, 0., 600.)},
+      {"medium_boosted_eff", new TH1F("medium_boosted_eff", "medium_boosted_eff", 20, 0., 600.)},
+      {"tight_boosted_eff", new TH1F("tight_boosted_eff", "tight_boosted_eff", 20, 0., 600.)},
   };
 }
 

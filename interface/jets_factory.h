@@ -147,9 +147,6 @@ void Jets_Factory::Run_Factory() {
     jet.DeepCSVTags_udsg = jetDeepCSVTags_udsg->at(i);
     jet.PartonID = jetPartonID->at(i);
     jet.HadFlvr = jetHadFlvr->at(i);
-    jet.P4Smear = jetP4Smear->at(i);
-    jet.P4SmearUp = jetP4SmearUp->at(i);
-    jet.P4SmearDo = jetP4SmearDo->at(i);
     jet.PFLooseId = jetPFLooseId->at(i);
     jet.ID = jetID->at(i);
     jet.PUID = jetPUID->at(i);
@@ -163,11 +160,6 @@ void Jets_Factory::Run_Factory() {
     jet.NCH = jetNCH->at(i);
     jet.NNP = jetNNP->at(i);
     jet.MUF = jetMUF->at(i);
-    jet.VtxPt = jetVtxPt->at(i);
-    jet.VtxMass = jetVtxMass->at(i);
-    jet.VtxNtrks = jetVtxNtrks->at(i);
-    jet.Vtx3DVal = jetVtx3DVal->at(i);
-    jet.Vtx3DSig = jetVtx3DSig->at(i);
     jets.push_back(jet);
   }
 
