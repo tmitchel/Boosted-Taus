@@ -2,10 +2,10 @@ import subprocess
 import multiprocessing
 
 
-def format_command(exe, ext, ifile):
+def format_command(args, ifile):
     output_name = ifile.replace('.root', '_output.root').split('/')[-1]
     print output_name
-    callstring = './{} -i {}{} -o {}'.format(exe, ext, ifile, output_name)
+    callstring = './{} -i {}{} -o {}/{} -j {}'.format(args.exe, args.ext, ifile, args.output_dir, output_name, args.json)
     return callstring
 
 
@@ -19,7 +19,7 @@ def main(args):
       search = ['xrdfs', 'root://cmseos.fnal.gov/'] + search
 
     file_list = [
-        format_command(args.exe, args.ext, ifile) for ifile in subprocess.check_output(search).split('\n') if '.root' in ifile
+        format_command(args, ifile) for ifile in subprocess.check_output(search).split('\n') if '.root' in ifile
     ]
 
     # Use 4 cores if the machine has more than 8 total cores.
@@ -43,4 +43,8 @@ if __name__ == "__main__":
                         dest='local', help='is this a local file')
     parser.add_argument('--ext', '-x', action='store', dest='ext',
                         default='root://cmsxrootd.fnal.gov/', help='reader extension')
+    parser.add_argument('--output-dir', action='store', dest='output_dir',
+                        default='output', help='name of output directory')
+    parser.add_argument('--json', '-j', action='store', dest='json',
+                        default='configs/test.json', help='name of json config')
     main(parser.parse_args())
