@@ -19,10 +19,12 @@ int main(int argc, char** argv) {
   auto input_name = parser->Option("-i");
   auto output_name = parser->Option("-o");
   auto tree_name = parser->Option("-t", "ggNtuplizer/EventTree");
+  auto histograms = parser->Option("-j", "test.json");
 
   // read the input TFile/TTree
   auto fin = std::shared_ptr<TFile>(TFile::Open(input_name.c_str()));
   auto hists = std::make_shared<histManager>(output_name);
+  hists->load_histograms(histograms);
   auto tree = reinterpret_cast<TTree*>(fin->Get(tree_name.c_str()));
   // construct our object factories
   auto gen_factory = Gen_Factory(tree);
@@ -91,19 +93,18 @@ int main(int argc, char** argv) {
       hists->FillPrevBins("lead_jet_eff", all_gen_jets.at(0).getPt(), 1.);
     }
 
+    // deltaR without high pT jet
+    hists->Fill("dr_taus", all_gen_taus.at(0).getP4().DeltaR(all_gen_taus.at(1).getP4()), 1.);
+
     // require high pT lead jet
-    if (all_gen_jets.size() == 0 || all_gen_jets.at(0).getPt() < 400) {
+    if (all_gen_jets.size() == 0 || all_gen_jets.at(0).getPt() < 500) {
       continue;
     }
 
     // fill some histograms
     hists->Fill("lead_jet_flavor", all_gen_jets.at(0).getPID(), 1.);
-    hists->Fill("dr_taus", all_gen_taus.at(0).getP4().DeltaR(all_gen_taus.at(1).getP4()), 1.);
+    hists->Fill("dr_taus_boost", all_gen_taus.at(0).getP4().DeltaR(all_gen_taus.at(1).getP4()), 1.);
     hists->Fill("dphi_taus", all_gen_taus.at(0).getP4().DeltaPhi(all_gen_taus.at(1).getP4()), 1.);
-    hists->Fill("dr_jet_MET", all_gen_jets.at(0).getP4().DeltaR(gen_factory.getMETP4()), 1.);
-    if (all_gen_jets.size() > 0) {
-      hists->Fill("dr_higgs_MET", all_gen_higgs.at(0).getP4().DeltaR(gen_factory.getMETP4()), 1.);
-    }
   }
 
   std::cout << std::endl;
