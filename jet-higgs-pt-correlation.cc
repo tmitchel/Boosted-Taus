@@ -11,6 +11,7 @@
 #include "interface/histManager.h"
 #include "interface/jets_factory.h"
 #include "interface/tau_factory.h"
+#include "interface/gen_factory.h"
 
 using std::string;
 using std::vector;
@@ -29,6 +30,7 @@ int main(int argc, char **argv) {
   hists->load_histograms(histograms);
   auto tree = reinterpret_cast<TTree *>(fin->Get(tree_name.c_str()));
 
+  auto gen_factory = Gen_Factory(tree);
   auto tau_factory = Tau_Factory(tree);
   auto boost_factory = Boosted_Factory(tree);
   auto jet_factory = Jets_Factory(tree);
@@ -42,14 +44,19 @@ int main(int argc, char **argv) {
       progress++;
     }
 
+    gen_factory.Run_Factory();
     tau_factory.Run_Factory();
     boost_factory.Run_Factory();
     jet_factory.Run_Factory();
+    auto gens = gen_factory.getGens();
     auto taus = tau_factory.getTaus();
     auto boosts = boost_factory.getTaus();
     auto jets = jet_factory.getJets();
 
     hists->FillBin("cutflow", 1, 1.);
+    if (boost_factory.getNGoodBoosted() > 0 && jet_factory.getNGoodJets() > 0) {
+      hists->Fill2d("boost-vs-jet-pt", boost_factory.getTaus()->at(0).getPt(), jets->at(0).getPt(), 1.);
+    }
 
     bool found_jet(false);
     for (auto &jet : *jets) {
@@ -74,6 +81,14 @@ int main(int argc, char **argv) {
     }
 
     hists->Fill("boost_pt", boost_factory.getTaus()->at(0).getPt(), 1.);
-    hists->Fill2d("boost-vs-jet-pt", boost_factory.getTaus()->at(0).getPt(), jets->at(0).getPt(), 1.);
+    for (auto const &gen : *gens) {
+      if (fabs(gen.getPID()) == 25) {
+        hists->FillBin("cutflow", 4, 1.);
+      }
+    } 
+
+    fin->Close();
+    hists->Write();
+    return 1;
   }
 }
