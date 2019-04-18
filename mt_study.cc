@@ -39,11 +39,11 @@ int main(int argc, char **argv) {
   auto event = Event_Factory(tree);
 
   auto nevts = tree->GetEntries();
-  int progress(1), fraction((nevts - 1) / 10);
+  int progress(0), fraction((nevts - 1) / 10);
   for (auto i = 0; i < nevts; i++) {
     tree->GetEntry(i);
     if (i == progress * fraction && verbose) {
-      std::cout << "\t" << progress * 10 << "% complete.\r" << std::flush;
+      std::cout << "\t" << progress * 10 << "% complete. (" << nevts << " total events)\r" << std::flush;
       progress++;
     }
 
@@ -88,6 +88,10 @@ int main(int argc, char **argv) {
           z_boson = (muon1 + muon2);
         }
       }
+    }
+
+    if (z_boson.Pt() < 500) {
+      continue;
     }
 
     auto lead_jet = jets->at(0);
