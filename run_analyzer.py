@@ -63,4 +63,5 @@ if __name__ == "__main__":
                         default='configs/test.json', help='name of json config')
     parser.add_argument('--verbose', action='store_true', dest='verbose')
     parser.add_argument('--parallel', action='store_true', dest='parallel', help='run in multiprocess')
+
     main(parser.parse_args())

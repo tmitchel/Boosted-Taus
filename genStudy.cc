@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
   auto input_name = parser->Option("-i");
   auto output_name = parser->Option("-o");
   auto tree_name = parser->Option("-t", "ggNtuplizer/EventTree");
-  auto histograms = parser->Option("-j", "test.json");
+  auto histograms = parser->Option("-j", "configs/test.json");
 
   // read the input TFile/TTree
   auto fin = std::shared_ptr<TFile>(TFile::Open(input_name.c_str()));
