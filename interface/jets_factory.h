@@ -47,6 +47,7 @@ Jets_Factory::Jets_Factory(TTree *tree)
       jetLeadTrackPhi(nullptr),
       jetLepTrackPID(nullptr),
       jetLepTrackPt(nullptr),
+      jetLepTrackEta(nullptr),
       jetLepTrackPhi(nullptr),
       jetCSV2BJetTags(nullptr),
       jetDeepCSVTags_b(nullptr),

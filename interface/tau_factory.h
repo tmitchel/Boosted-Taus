@@ -40,7 +40,7 @@ class Tau_Factory {
       *tauphotonPtSumOutsideSignalCone, *taudz, *taudxy, *iso;
 };
 
-Tau_Factory::Tau_Factory(TTree *tree, std::string isoType = "IsolationMVArun2v2DBoldDMwLT")
+Tau_Factory::Tau_Factory(TTree *tree, std::string isoType = "IsolationMVArun2v1DBoldDMwLT")
     : tauPt(nullptr),
       tauEta(nullptr),
       tauPhi(nullptr),

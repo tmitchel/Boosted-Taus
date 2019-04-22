@@ -106,6 +106,9 @@ Muon_Factory::Muon_Factory(TTree *tree)
 void Muon_Factory::Run_Factory() {
   muons.clear();
   for (auto i = 0; i < nMu; i++) {
+    if (muPt->at(i) < 20) {
+      continue;
+    }
     auto muon = Muon(muPt->at(i), muEta->at(i), muPhi->at(i), muEn->at(i));
     muon.FiredTrgs = muFiredTrgs->at(i);
     muon.FiredL1Trgs = muFiredL1Trgs->at(i);
