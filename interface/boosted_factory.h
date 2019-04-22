@@ -115,7 +115,7 @@ Boosted_Factory::Boosted_Factory(TTree *tree, std::string isoType = "IsolationMV
 void Boosted_Factory::Run_Factory() {
   boosteds.clear();
   for (auto i = 0; i < nBoostedTau; i++) {
-    if (boostedTauPt->at(i) > 20 && fabs(boostedTauEta->at(i)) < 2.3 && pass_vloose_iso->at(i)) {
+    if (boostedTauPt->at(i) > 30 && fabs(boostedTauEta->at(i)) < 2.3 && pass_loose_iso->at(i)) {
       auto boosted = Boosted(boostedTauPt->at(i), boostedTauEta->at(i), boostedTauPhi->at(i));
       boosted.pass_vloose_iso = pass_vloose_iso->at(i);
       boosted.pass_loose_iso = pass_loose_iso->at(i);
