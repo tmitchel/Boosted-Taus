@@ -7,6 +7,7 @@
 #include "TFile.h"
 #include "TLorentzVector.h"
 #include "TTree.h"
+#include "TH1F.h"
 #include "interface/CLParser.h"
 #include "interface/boosted_factory.h"
 #include "interface/event_factory.h"
@@ -37,6 +38,11 @@ int main(int argc, char **argv) {
   auto jet_factory = Jets_Factory(tree);
   auto muon_factory = Muon_Factory(tree);
   auto event = Event_Factory(tree);
+  auto nevt_hist = reinterpret_cast<TH1F *>(fin->Get("hEvents"));
+
+  std::string sample_name = input_name.substr(input_name.rfind("/") + 1, std::string::npos);
+  sample_name = sample_name.substr(0, sample_name.rfind(".root"));
+  double evtwt = lumi["2017"] * cross_sections[sample_name] / nevt_hist->Integral();
 
   auto nevts = tree->GetEntries();
   int progress(0), fraction((nevts - 1) / 10);
@@ -52,62 +58,112 @@ int main(int argc, char **argv) {
     boost_factory.Run_Factory();
     jet_factory.Run_Factory();
     muon_factory.Run_Factory();
+    event.Run_Factory();
     auto gens = gen_factory.getGens();
     auto boosts = boost_factory.getTaus();
     auto jets = jet_factory.getJets();
     auto muons = muon_factory.getMuons();
 
-    hists->FillBin("all", 1., 1.);
+    /////////////////////
+    // Event Selection //
+    /////////////////////
 
     // only look at mutau channel
-    bool isMuTau(false);
+    int taus_to_muons(0);
     for (auto& gen : *gens) {
       if (fabs(gen.getPID()) == 13 && fabs(gen.getMomPID()) == 15) {
-        isMuTau = true;
-        break;
+        taus_to_muons++;
       }
     }
 
-    hists->FillBin("some", 1., 1.);
-
     // now make the cut
-    if (!isMuTau) {
+    if (taus_to_muons != 1) {
+      continue;
+    }
+
+    if (boosts->size() < 2) {
       continue;
     }
 
     // get our Z boson
-    double best_mass(999);
-    TLorentzVector z_boson, lead_muon;
-    for (auto& mu1 : *muons) {
-      for (auto& mu2 : *muons) {
-        auto muon1 = mu1.getP4();
-        auto muon2 = mu2.getP4();
-        if (fabs(91.2 - (muon1 + muon2).M()) < fabs(91.2 - best_mass)) {
-          best_mass = (muon1 + muon2).M();
-          lead_muon = muon1.Pt() > muon2.Pt() ? muon1 : muon2;
-          z_boson = (muon1 + muon2);
+    double best_mass(-999);
+    TLorentzVector z_boson, z_muon, z_tau;
+    for (auto& mu : *muons) {
+      for (auto& tau : *boosts) {
+        auto m4 = mu.getP4();
+        auto t4 = tau.getP4();
+        if (mu.getCharge() * tau.getCharge() > 0 || m4.DeltaR(t4) < 0.02) {
+          continue;
+        }
+        // pick pair based on closest match to Z mass
+        if (65. - (m4 + t4).M() < 65. - best_mass && (m4 + t4).M() < 65. && m4.DeltaR(t4) < 1.) {
+          best_mass = (m4 + t4).M();
+          z_boson = (m4 + t4);
+          z_muon = m4;
+          z_tau = t4;
         }
       }
     }
 
-    if (z_boson.Pt() < 500) {
-      continue;
-    }
-
+    // make sure Z and high pT jet are back-to-back
     auto lead_jet = jets->at(0);
     if (lead_jet.getP4().DeltaR(z_boson) < 2.5) {
       continue;
     }
 
-    auto mu_pt(-999.), best_dr(999.);
-    for (auto& boost : *boosts) {
-      if (lead_muon.DeltaR(boost.getP4()) < best_dr) {
-          best_dr = lead_muon.DeltaR(boost.getP4());
-          mu_pt = lead_muon.Pt();
+    // make sure our lead muon is actually a muon
+    // same for the tau
+    bool is_real_muon(false), is_real_tau(false);
+    for (auto& gen : *gens) {
+      if (fabs(gen.getPID()) == 13 && gen.getP4().DeltaR(z_muon) < 0.5) {
+        is_real_muon = true;
+      } else if (fabs(gen.getPID()) == 15 && gen.getP4().DeltaR(z_tau) < 0.5) {
+        is_real_tau = true;
       }
     }
 
-    hists->Fill("closest_mu_pt", mu_pt, 1.);
+    if (!is_real_muon || !is_real_tau) {
+      continue;
+    }
+
+    //////////////
+    // Plotting //
+    //////////////
+
+    double HT(0.);
+    TLorentzVector MHT;
+    MHT.SetPtEtaPhiM(0, 0, 0, 0);
+    for (auto& jet : *jets) {
+      HT += jet.getPt();
+      MHT += jet.getP4();
+    }
+
+    hists->Fill("ht", HT, evtwt);
+    hists->Fill("mht", MHT.Pt(), evtwt);
+    hists->Fill("met", event.getMET().Pt(), evtwt);
+    hists->Fill2d("met_vs_Zpt", event.getMET().Pt(), z_boson.Pt(), evtwt);
+    hists->Fill("mu_pt", z_muon.Pt(), evtwt);
+    hists->Fill("tau_pt", z_tau.Pt(), evtwt);
+
+    auto mu_pt(-999.), best_dr(999.);
+    for (auto& boost : *boosts) {
+      if (z_muon.DeltaR(boost.getP4()) < best_dr) {
+          best_dr = z_muon.DeltaR(boost.getP4());
+          mu_pt = z_muon.Pt();
+      }
+    }
+    hists->Fill("closest_mu_pt", mu_pt, evtwt);
+    hists->Fill("Z_mass", z_boson.M(), evtwt);
+    hists->Fill("Z_pt", z_boson.Pt(), evtwt);
+    hists->Fill("mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
+    
+    hists->Fill("lead_boost_mu_dr", boosts->at(0).getP4().DeltaR(z_muon), evtwt);
+    hists->Fill("sublead_boost_mu_dr", boosts->at(1).getP4().DeltaR(z_muon), evtwt);
+    if (boosts->at(0).getP4().DeltaR(z_muon) < boosts->at(1).getP4().DeltaR(z_muon)) {
+      hists->Fill("which_boost", 1., evtwt);
+    } else {
+      hists->Fill("which_boost", 2., evtwt);
+    }
   }
 
   if (verbose) {
