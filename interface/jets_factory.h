@@ -13,7 +13,7 @@ typedef std::vector<Jets> VJets;
 
 class Jets_Factory {
  public:
-  explicit Jets_Factory(TTree *);
+  Jets_Factory(TTree *, bool);
   void Run_Factory();
 
   // getters
@@ -22,6 +22,7 @@ class Jets_Factory {
   std::shared_ptr<VJets> getJets() { return std::make_shared<VJets>(jets); }
 
  private:
+  Bool_t is_data;
   Int_t nJet, nGoodJet;
   VJets jets;
   std::vector<Bool_t> *jetPFLooseId;
@@ -33,8 +34,9 @@ class Jets_Factory {
       *jetVtxNtrks, *jetVtx3DVal, *jetVtx3DSig;
 };
 
-Jets_Factory::Jets_Factory(TTree *tree)
-    : jetPt(nullptr),
+Jets_Factory::Jets_Factory(TTree *tree, bool is_data_)
+    : is_data(is_data_),
+      jetPt(nullptr),
       jetEta(nullptr),
       jetPhi(nullptr),
       jetEn(nullptr),
@@ -98,11 +100,13 @@ Jets_Factory::Jets_Factory(TTree *tree)
   tree->SetBranchAddress("jetDeepCSVTags_bb", &jetDeepCSVTags_bb);
   tree->SetBranchAddress("jetDeepCSVTags_c", &jetDeepCSVTags_c);
   tree->SetBranchAddress("jetDeepCSVTags_udsg", &jetDeepCSVTags_udsg);
-  tree->SetBranchAddress("jetPartonID", &jetPartonID);
-  tree->SetBranchAddress("jetHadFlvr", &jetHadFlvr);
-  tree->SetBranchAddress("jetP4Smear", &jetP4Smear);
-  tree->SetBranchAddress("jetP4SmearUp", &jetP4SmearUp);
-  tree->SetBranchAddress("jetP4SmearDo", &jetP4SmearDo);
+  if (!is_data) {
+    tree->SetBranchAddress("jetPartonID", &jetPartonID);
+    tree->SetBranchAddress("jetHadFlvr", &jetHadFlvr);
+    tree->SetBranchAddress("jetP4Smear", &jetP4Smear);
+    tree->SetBranchAddress("jetP4SmearUp", &jetP4SmearUp);
+    tree->SetBranchAddress("jetP4SmearDo", &jetP4SmearDo);
+  }
   tree->SetBranchAddress("jetPFLooseId", &jetPFLooseId);
   tree->SetBranchAddress("jetID", &jetID);
   tree->SetBranchAddress("jetPUID", &jetPUID);
@@ -146,8 +150,10 @@ void Jets_Factory::Run_Factory() {
     jet.DeepCSVTags_bb = jetDeepCSVTags_bb->at(i);
     jet.DeepCSVTags_c = jetDeepCSVTags_c->at(i);
     jet.DeepCSVTags_udsg = jetDeepCSVTags_udsg->at(i);
-    jet.PartonID = jetPartonID->at(i);
-    jet.HadFlvr = jetHadFlvr->at(i);
+    if (!is_data) {
+      jet.PartonID = jetPartonID->at(i);
+      jet.HadFlvr = jetHadFlvr->at(i);
+    }
     jet.PFLooseId = jetPFLooseId->at(i);
     jet.ID = jetID->at(i);
     jet.PUID = jetPUID->at(i);

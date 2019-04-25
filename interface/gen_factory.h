@@ -13,7 +13,7 @@ typedef std::vector<Gen> VGen;
 
 class Gen_Factory {
  public:
-  explicit Gen_Factory(TTree *);
+  Gen_Factory(TTree *, bool);
   void Run_Factory();
 
   // getters
@@ -26,6 +26,7 @@ class Gen_Factory {
   std::shared_ptr<VGen> getGenJets() { return std::make_shared<VGen>(gen_jets); }
 
  private:
+  Bool_t is_data;
   Int_t nMC, nGoodGen;
   Float_t genMET, genMETPhi;
   VGen gen_particles, gen_jets;
@@ -37,8 +38,9 @@ class Gen_Factory {
   std::vector<Float_t> *jetGenJetPt, *jetGenJetEta, *jetGenJetPhi, *jetGenJetEn;
 };
 
-Gen_Factory::Gen_Factory(TTree *tree)
-    : mcPID(nullptr),
+Gen_Factory::Gen_Factory(TTree *tree, bool is_data_)
+    : is_data(is_data_),
+      mcPID(nullptr),
       mcVtx(nullptr),
       mcVty(nullptr),
       mcVtz(nullptr),
@@ -64,40 +66,45 @@ Gen_Factory::Gen_Factory(TTree *tree)
       jetGenJetEta(nullptr),
       jetGenJetPhi(nullptr),
       jetGenJetEn(nullptr) {
-  tree->SetBranchAddress("nMC", &nMC);
-  tree->SetBranchAddress("mcPID", &mcPID);
-  tree->SetBranchAddress("mcVtx", &mcVtx);
-  tree->SetBranchAddress("mcVty", &mcVty);
-  tree->SetBranchAddress("mcVtz", &mcVtz);
-  tree->SetBranchAddress("mcPt", &mcPt);
-  tree->SetBranchAddress("mcMass", &mcMass);
-  tree->SetBranchAddress("mcEta", &mcEta);
-  tree->SetBranchAddress("mcPhi", &mcPhi);
-  tree->SetBranchAddress("mcE", &mcE);
-  tree->SetBranchAddress("mcEt", &mcEt);
-  tree->SetBranchAddress("mcGMomPID", &mcGMomPID);
-  tree->SetBranchAddress("mcMomPID", &mcMomPID);
-  tree->SetBranchAddress("mcMomPt", &mcMomPt);
-  tree->SetBranchAddress("mcMomMass", &mcMomMass);
-  tree->SetBranchAddress("mcMomEta", &mcMomEta);
-  tree->SetBranchAddress("mcMomPhi", &mcMomPhi);
-  tree->SetBranchAddress("mcParentage", &mcParentage);
-  tree->SetBranchAddress("mcStatus", &mcStatus);
-  tree->SetBranchAddress("mcCalIsoDR03", &mcCalIsoDR03);
-  tree->SetBranchAddress("mcCalIsoDR04", &mcCalIsoDR04);
-  tree->SetBranchAddress("mcTrkIsoDR03", &mcTrkIsoDR03);
-  tree->SetBranchAddress("mcTrkIsoDR04", &mcTrkIsoDR04);
+  if (!is_data) {
+    tree->SetBranchAddress("nMC", &nMC);
+    tree->SetBranchAddress("mcPID", &mcPID);
+    tree->SetBranchAddress("mcVtx", &mcVtx);
+    tree->SetBranchAddress("mcVty", &mcVty);
+    tree->SetBranchAddress("mcVtz", &mcVtz);
+    tree->SetBranchAddress("mcPt", &mcPt);
+    tree->SetBranchAddress("mcMass", &mcMass);
+    tree->SetBranchAddress("mcEta", &mcEta);
+    tree->SetBranchAddress("mcPhi", &mcPhi);
+    tree->SetBranchAddress("mcE", &mcE);
+    tree->SetBranchAddress("mcEt", &mcEt);
+    tree->SetBranchAddress("mcGMomPID", &mcGMomPID);
+    tree->SetBranchAddress("mcMomPID", &mcMomPID);
+    tree->SetBranchAddress("mcMomPt", &mcMomPt);
+    tree->SetBranchAddress("mcMomMass", &mcMomMass);
+    tree->SetBranchAddress("mcMomEta", &mcMomEta);
+    tree->SetBranchAddress("mcMomPhi", &mcMomPhi);
+    tree->SetBranchAddress("mcParentage", &mcParentage);
+    tree->SetBranchAddress("mcStatus", &mcStatus);
+    tree->SetBranchAddress("mcCalIsoDR03", &mcCalIsoDR03);
+    tree->SetBranchAddress("mcCalIsoDR04", &mcCalIsoDR04);
+    tree->SetBranchAddress("mcTrkIsoDR03", &mcTrkIsoDR03);
+    tree->SetBranchAddress("mcTrkIsoDR04", &mcTrkIsoDR04);
 
-  tree->SetBranchAddress("jetGenJetPt", &jetGenJetPt);
-  tree->SetBranchAddress("jetGenJetEta", &jetGenJetEta);
-  tree->SetBranchAddress("jetGenJetPhi", &jetGenJetPhi);
-  tree->SetBranchAddress("jetGenJetEn", &jetGenJetEn);
+    tree->SetBranchAddress("jetGenJetPt", &jetGenJetPt);
+    tree->SetBranchAddress("jetGenJetEta", &jetGenJetEta);
+    tree->SetBranchAddress("jetGenJetPhi", &jetGenJetPhi);
+    tree->SetBranchAddress("jetGenJetEn", &jetGenJetEn);
 
-  tree->SetBranchAddress("genMET", &genMET);
-  tree->SetBranchAddress("genMETPhi", &genMETPhi);
+    tree->SetBranchAddress("genMET", &genMET);
+    tree->SetBranchAddress("genMETPhi", &genMETPhi);
+  }
 }
 
 void Gen_Factory::Run_Factory() {
+  if (is_data) {
+    return;
+  }
   // get gen quarks (mc*)
   gen_particles.clear();
   for (auto i = 0; i < nMC; i++) {

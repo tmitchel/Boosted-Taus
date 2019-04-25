@@ -9,10 +9,12 @@ class Muon {
   friend class Muon_Factory;
 
  public:
+  Muon() {}
   Muon(Float_t, Float_t, Float_t, Float_t);
 
   // getters
   TLorentzVector getP4() { return p4; }
+  Bool_t getID(int key) { return (IDbit >> key & 1) == 1; }
   Float_t getPt() { return p4.Pt(); }
   Float_t getEta() { return p4.Eta(); }
   Float_t getPhi() { return p4.Phi(); }
@@ -21,7 +23,6 @@ class Muon {
   Float_t getFiredL1Trgs() { return FiredL1Trgs; }
   Float_t getCharge() { return Charge; }
   Float_t getType() { return Type; }
-  Float_t getIDbit() { return IDbit; }
   Float_t getTrkLayers() { return TrkLayers; }
   Float_t getPixelLayers() { return PixelLayers; }
   Float_t getPixelHits() { return PixelHits; }

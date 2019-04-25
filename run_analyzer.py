@@ -13,6 +13,8 @@ def format_command(args, ifile):
     callstring = './{} -i {}{} -o {}/{} -j {} -t {}'.format(args.exe, args.ext, ifile, args.output_dir, output_name, args.json, args.treename)
     if args.verbose:
       callstring += ' -v'
+    if 'JetHT_Run' in ifile:
+      callstring += ' --data'
     return callstring
 
 
@@ -35,7 +37,7 @@ def main(args):
     if args.parallel:
       # Use 4 cores if the machine has more than 8 total cores.
       # Otherwise, use half the available cores.
-      n_processes = min(4, multiprocessing.cpu_count() / 2)
+      n_processes = min(5, multiprocessing.cpu_count() / 2)
  
       pool = multiprocessing.Pool(processes=n_processes)
       r = pool.map_async(run_command, commands)
