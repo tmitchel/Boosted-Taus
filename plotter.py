@@ -1,5 +1,12 @@
 import ROOT as r
 from glob import glob
+from pprint import pprint
+
+
+def grab(fin, prefix, var, rebin):
+    ihist = fin.Get(prefix + var).Clone()
+    ihist.Rebin(rebin)
+    return ihist
 
 
 def get_histos(fout, fileList, variable, rebin):
@@ -7,14 +14,20 @@ def get_histos(fout, fileList, variable, rebin):
     them into a dictionary"""
 
     hists = {}
+    os_anti_hists, ss_anti_hists, ss_iso_hists = {}, {}, {}
     for ifile in fileList:
         fin = r.TFile(ifile, 'READ')
         fout.cd()
-        ihist = fin.Get(variable).Clone()
-        ihist.Rebin(rebin)
-        hists[ifile.split('/')[-1].replace('.root', '')] = ihist
+        hists[ifile.split('/')[-1].replace('.root', '')] = grab(fin, '', variable, rebin)
+        os_anti_hists[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_antiiso_', variable, rebin)
+        ss_anti_hists[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_antiiso_', variable, rebin)
+        ss_iso_hists[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_iso_', variable, rebin)
         fin.Close()
-    return hists
+    return hists, {
+        'os_anti': os_anti_hists,
+        'ss_anti': ss_anti_hists,
+        'ss_iso': ss_iso_hists
+    }
 
 
 def format_data(data, legend):
@@ -27,6 +40,27 @@ def format_data(data, legend):
     return data
 
 
+def build_qcd(osss_histos):
+    # copy the data histograms
+    os_anti = osss_histos['os_anti']['Data'].Clone()
+    ss_anti = osss_histos['ss_anti']['Data'].Clone()
+    ss_iso = osss_histos['ss_iso']['Data'].Clone()
+
+    # do data - bkgs
+    bkgs = ['DYJets', 'SingleTop', 'ttbar', 'WJets', 'Diboson']
+    for bkg in bkgs:
+        os_anti.Add(osss_histos['os_anti'][bkg], -1)
+        ss_anti.Add(osss_histos['ss_anti'][bkg], -1)
+        ss_iso.Add(osss_histos['ss_iso'][bkg], -1)
+
+    print os_anti.Integral(), ss_anti.Integral()
+    osss_ratio = os_anti.Integral() / ss_anti.Integral()
+    os_iso = ss_iso.Clone()
+    print osss_ratio
+    os_iso.Scale(osss_ratio)
+    return os_iso
+
+
 def format_backgrounds(histos, legend):
     """Make all the backgrounds look pretty then build the
     stack and the stat uncertainty histogram"""
@@ -34,8 +68,9 @@ def format_backgrounds(histos, legend):
     histos['DYJets'].SetFillColor(r.TColor.GetColor("#f9cd66"))
     histos['SingleTop'].SetFillColor(r.TColor.GetColor("#9feff2"))
     histos['ttbar'].SetFillColor(r.TColor.GetColor("#cfe87f"))
-    histos['WJets'].SetFillColor(r.TColor.GetColor("#ffccff"))
+    histos['WJets'].SetFillColor(r.TColor.GetColor("#00AAFF"))
     histos['Diboson'].SetFillColor(r.TColor.GetColor("#de5a6a"))
+    histos['QCD'].SetFillColor(r.TColor.GetColor("#ffccff"))
 
     stack = r.THStack()
     stat = histos['DYJets'].Clone()
@@ -113,7 +148,6 @@ def format_labels(can):
     prel.SetTextFont(52)
     prel.SetTextSize(0.06)
     prel.DrawLatex(0.16, 0.74, "Preliminary")
-    return ll, cms, prel
 
 
 def formatRatio(data, stat):
@@ -177,7 +211,9 @@ def main(args):
     # get the input files
     filelist = [ifile for ifile in glob('{}/*.root'.format(args.input_dir))]
     fout = r.TFile('out.root', 'RECREATE')
-    histos = get_histos(fout, filelist, args.variable, args.rebin)
+    histos, osss_histos = get_histos(fout, filelist, args.variable, args.rebin)
+    pprint(osss_histos)
+    histos['QCD'] = build_qcd(osss_histos)
 
     # create the histogram legend
     legend = r.TLegend(0.7, 0.7, 0.85, 0.85)
@@ -201,7 +237,7 @@ def main(args):
     data.Draw('lep same')
     legend.Draw('same')
 
-    ll, cms, prel = format_labels(can)
+    format_labels(can)
 
     can.cd(2)
 
