@@ -10,4 +10,9 @@ set -ex
 sudo chmod 777 /home/travis/build/tmitchel/Boosted-Taus/
 
 cd /home/travis/build/tmitchel/Boosted-Taus/
-./build genStudy.cc a
+
+for i in plugins/*; do
+    if [ -f $i ] ; then
+        ./build $i test_build
+    fi
+done

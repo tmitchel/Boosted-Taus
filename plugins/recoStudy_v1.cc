@@ -6,13 +6,13 @@
 #include "TFile.h"
 #include "TLorentzVector.h"
 #include "TTree.h"
-#include "interface/CLParser.h"
-#include "interface/boosted_factory.h"
-#include "interface/event_factory.h"
-#include "interface/gen_factory.h"
-#include "interface/histManager.h"
-#include "interface/jets_factory.h"
-#include "interface/tau_factory.h"
+#include "../interface/CLParser.h"
+#include "../interface/boosted_factory.h"
+#include "../interface/event_factory.h"
+#include "../interface/gen_factory.h"
+#include "../interface/histManager.h"
+#include "../interface/jets_factory.h"
+#include "../interface/tau_factory.h"
 
 using std::string;
 using std::vector;
@@ -31,10 +31,10 @@ int main(int argc, char **argv) {
   hists->load_histograms(histograms);
   auto tree = reinterpret_cast<TTree *>(fin->Get(tree_name.c_str()));
   // construct our object factories
-  auto gen_factory = Gen_Factory(tree);
+  auto gen_factory = Gen_Factory(tree, false);
   auto tau_factory = Tau_Factory(tree);
   auto boost_factory = Boosted_Factory(tree);
-  auto jet_factory = Jets_Factory(tree);
+  auto jet_factory = Jets_Factory(tree, false);
   auto event = Event_Factory(tree);
 
   auto nevts = tree->GetEntries();

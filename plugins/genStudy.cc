@@ -6,9 +6,9 @@
 #include "TFile.h"
 #include "TLorentzVector.h"
 #include "TTree.h"
-#include "interface/histManager.h"
-#include "interface/CLParser.h"
-#include "interface/gen_factory.h"
+#include "../interface/histManager.h"
+#include "../interface/CLParser.h"
+#include "../interface/gen_factory.h"
 
 using std::string;
 using std::vector;
@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
   hists->load_histograms(histograms);
   auto tree = reinterpret_cast<TTree*>(fin->Get(tree_name.c_str()));
   // construct our object factories
-  auto gen_factory = Gen_Factory(tree);
+  auto gen_factory = Gen_Factory(tree, false);
 
   auto nevts = tree->GetEntries();
   int progress(1), fraction((nevts-1)/10);
