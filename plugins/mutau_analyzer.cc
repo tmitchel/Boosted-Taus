@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
     // }
 
     // if we have one good reco muon, this is mutau channel
-    if (muon_factory.getNGoodMuon() < 1) {
+    if (muon_factory.getNGoodMuon() != 1) {
       continue;
     }
     hists->FillBin("cutflow", 2., evtwt);
@@ -109,6 +109,7 @@ int main(int argc, char **argv) {
     // get our Z boson
     auto found(false);
     Muon good_muon;
+    Boosted good_tau;
     TLorentzVector z_boson, z_muon, z_tau;
     for (auto& mu : *muons) {
       if (found) {
@@ -126,6 +127,7 @@ int main(int argc, char **argv) {
           z_muon = m4;
           z_tau = t4;
           good_muon = mu;
+          good_tau = tau;
           found = true;
           break;
         }
@@ -134,6 +136,11 @@ int main(int argc, char **argv) {
 
     // check muon ID
     if (!good_muon.getID(2)) { // medium-prompt id
+      continue;
+    }
+
+    // anti-muon discriminator
+    if (!good_tau.getMuRejection(tight)) {
       continue;
     }
 

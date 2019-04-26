@@ -11,6 +11,7 @@ class Boosted {
   friend class Boosted_Factory;
 
  public:
+  Boosted() {}
   Boosted(Float_t, Float_t, Float_t, Float_t);
 
   // getters
