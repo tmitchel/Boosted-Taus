@@ -4,10 +4,6 @@
 #include <memory>
 #include <utility>
 #include <vector>
-#include "TFile.h"
-#include "TLorentzVector.h"
-#include "TTree.h"
-#include "TH1F.h"
 #include "../interface/CLParser.h"
 #include "../interface/boosted_factory.h"
 #include "../interface/event_factory.h"
@@ -15,11 +11,15 @@
 #include "../interface/histManager.h"
 #include "../interface/jets_factory.h"
 #include "../interface/muon_factory.h"
+#include "TFile.h"
+#include "TH1F.h"
+#include "TLorentzVector.h"
+#include "TTree.h"
 
 using std::string;
 using std::vector;
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   auto parser = std::unique_ptr<CLParser>(new CLParser(argc, argv));
   auto verbose = parser->Flag("-v");
   auto is_data = parser->Flag("--data");
@@ -32,14 +32,14 @@ int main(int argc, char **argv) {
   auto fin = std::shared_ptr<TFile>(TFile::Open(input_name.c_str()));
   auto hists = std::make_shared<histManager>(output_name);
   hists->load_histograms(histograms);
-  auto tree = reinterpret_cast<TTree *>(fin->Get(tree_name.c_str()));
+  auto tree = reinterpret_cast<TTree*>(fin->Get(tree_name.c_str()));
   // construct our object factories
   auto boost_factory = Boosted_Factory(tree);
   auto gen_factory = Gen_Factory(tree, is_data);
   auto jet_factory = Jets_Factory(tree, is_data);
   auto muon_factory = Muon_Factory(tree);
   auto event = Event_Factory(tree);
-  auto nevt_hist = reinterpret_cast<TH1F *>(fin->Get("hcount"));
+  auto nevt_hist = reinterpret_cast<TH1F*>(fin->Get("hcount"));
 
   std::string sample_name = input_name.substr(input_name.rfind("/") + 1, std::string::npos);
   sample_name = sample_name.substr(0, sample_name.rfind(".root"));
@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
       for (auto& tau : *boosts) {
         auto m4 = mu.getP4();
         auto t4 = tau.getP4();
-        if (mu.getCharge() * tau.getCharge() > 0 || m4.DeltaR(t4) < 0.02) {
+        if (m4.DeltaR(t4) < 0.02) {
           continue;
         }
         // pick pair
@@ -132,11 +132,6 @@ int main(int argc, char **argv) {
           break;
         }
       }
-    }
-
-    // check muon ID
-    if (!good_muon.getID(2)) { // medium-prompt id
-      continue;
     }
 
     // anti-muon discriminator
@@ -157,9 +152,9 @@ int main(int argc, char **argv) {
     }
     hists->FillBin("cutflow", 6., evtwt);
 
-    //////////////
-    // Plotting //
-    //////////////
+    ///////////////////////////////
+    // Calculate other variables //
+    ///////////////////////////////
 
     // calculate HT, MHT
     double HT(0.);
@@ -171,34 +166,76 @@ int main(int argc, char **argv) {
     }
 
     // calculate transverse masses
-    auto mt_mutau  = transverse_mass({z_muon.Pt(), z_muon.Px(), z_muon.Py()}, {z_tau.Pt(), z_tau.Px(), z_tau.Py()});
-    auto mt_mumet  = transverse_mass({z_muon.Pt(), z_muon.Px(), z_muon.Py()}, {met.Pt(), met.Px(), met.Py()});
+    auto mt_mutau = transverse_mass({z_muon.Pt(), z_muon.Px(), z_muon.Py()}, {z_tau.Pt(), z_tau.Px(), z_tau.Py()});
+    auto mt_mumet = transverse_mass({z_muon.Pt(), z_muon.Px(), z_muon.Py()}, {met.Pt(), met.Px(), met.Py()});
     auto mt_mettau = transverse_mass({met.Pt(), met.Px(), met.Py()}, {z_tau.Pt(), z_tau.Px(), z_tau.Py()});
 
-    // Fill the plots
+    /////////////////////////
+    // OS/SS Ratio Regions //
+    /////////////////////////
+
+    if (!good_muon.getID(2) && good_muon.getID(1)) {  // muon passes loose, not medium
+      if (good_muon.getCharge() == good_tau.getCharge()) {
+        // Same-Sign, anti-isolated region
+        hists->Fill("SS_antiiso_ht", HT, evtwt);
+        hists->Fill("SS_antiiso_mht", MHT.Pt(), evtwt);
+        hists->Fill("SS_antiiso_met", met.Pt(), evtwt);
+        hists->Fill("SS_antiiso_mu_pt", z_muon.Pt(), evtwt);
+        hists->Fill("SS_antiiso_tau_pt", z_tau.Pt(), evtwt);
+        hists->Fill("SS_antiiso_Z_mass", z_boson.M(), evtwt);
+        hists->Fill("SS_antiiso_Z_pt", z_boson.Pt(), evtwt);
+        hists->Fill("SS_antiiso_mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
+        hists->Fill("SS_antiiso_mt_mutau", mt_mutau, evtwt);
+      } else {
+        // Opposite-Sign, anti-isolated region
+        hists->Fill("OS_antiiso_ht", HT, evtwt);
+        hists->Fill("OS_antiiso_mht", MHT.Pt(), evtwt);
+        hists->Fill("OS_antiiso_met", met.Pt(), evtwt);
+        hists->Fill("OS_antiiso_mu_pt", z_muon.Pt(), evtwt);
+        hists->Fill("OS_antiiso_tau_pt", z_tau.Pt(), evtwt);
+        hists->Fill("OS_antiiso_Z_mass", z_boson.M(), evtwt);
+        hists->Fill("OS_antiiso_Z_pt", z_boson.Pt(), evtwt);
+        hists->Fill("OS_antiiso_mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
+        hists->Fill("OS_antiiso_mt_mutau", mt_mutau, evtwt);
+      }
+    } else if (good_muon.getID(2)) {  // muon passes medium
+      if (good_muon.getCharge() == good_tau.getCharge()) {
+        // Same-Sign, Isolated region
+        hists->Fill("SS_iso_ht", HT, evtwt);
+        hists->Fill("SS_iso_mht", MHT.Pt(), evtwt);
+        hists->Fill("SS_iso_met", met.Pt(), evtwt);
+        hists->Fill("SS_iso_mu_pt", z_muon.Pt(), evtwt);
+        hists->Fill("SS_iso_tau_pt", z_tau.Pt(), evtwt);
+        hists->Fill("SS_iso_Z_mass", z_boson.M(), evtwt);
+        hists->Fill("SS_iso_Z_pt", z_boson.Pt(), evtwt);
+        hists->Fill("SS_iso_mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
+        hists->Fill("SS_iso_mt_mutau", mt_mutau, evtwt);
+      }
+    }
+
+    // Now apply the normal muon isolation
+    if (!good_muon.getID(2)) {
+      continue;
+    }
+
+    // Now apply opposite-sign selection
+    if (good_muon.getCharge() * good_tau.getCharge() > 0) {
+      continue;
+    }
+
+    //////////////
+    // Plotting //
+    //////////////
     hists->Fill("ht", HT, evtwt);
     hists->Fill("mht", MHT.Pt(), evtwt);
     hists->Fill("met", met.Pt(), evtwt);
-    hists->Fill2d("met_vs_Zpt", met.Pt(), z_boson.Pt(), evtwt);
+
     hists->Fill("mu_pt", z_muon.Pt(), evtwt);
     hists->Fill("tau_pt", z_tau.Pt(), evtwt);
-
-    hists->Fill("mt_mutau", mt_mutau, evtwt);
-    hists->Fill("mt_mumet", mt_mumet, evtwt);
-    hists->Fill("mt_mettau", mt_mettau, evtwt);
-
-    hists->Fill("closest_mu_pt", z_muon.Pt(), evtwt);
     hists->Fill("Z_mass", z_boson.M(), evtwt);
     hists->Fill("Z_pt", z_boson.Pt(), evtwt);
     hists->Fill("mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
-    
-    hists->Fill("lead_boost_mu_dr", boosts->at(0).getP4().DeltaR(z_muon), evtwt);
-    hists->Fill("sublead_boost_mu_dr", boosts->at(1).getP4().DeltaR(z_muon), evtwt);
-    if (boosts->at(0).getP4().DeltaR(z_muon) < boosts->at(1).getP4().DeltaR(z_muon)) {
-      hists->Fill("which_boost", 1., evtwt);
-    } else {
-      hists->Fill("which_boost", 2., evtwt);
-    }
+    hists->Fill("mt_mutau", mt_mutau, evtwt);
   }
 
   if (verbose) {
