@@ -2,7 +2,7 @@ import ROOT as r
 from glob import glob
 
 
-def get_histos(fout, fileList, variable):
+def get_histos(fout, fileList, variable, rebin):
     """Read all histograms from the input directory and pack
     them into a dictionary"""
 
@@ -11,6 +11,7 @@ def get_histos(fout, fileList, variable):
         fin = r.TFile(ifile, 'READ')
         fout.cd()
         ihist = fin.Get(variable).Clone()
+        ihist.Rebin(rebin)
         hists[ifile.split('/')[-1].replace('.root', '')] = ihist
         fin.Close()
     return hists
@@ -176,7 +177,7 @@ def main(args):
     # get the input files
     filelist = [ifile for ifile in glob('{}/*.root'.format(args.input_dir))]
     fout = r.TFile('out.root', 'RECREATE')
-    histos = get_histos(fout, filelist, args.variable)
+    histos = get_histos(fout, filelist, args.variable, args.rebin)
 
     # create the histogram legend
     legend = r.TLegend(0.7, 0.7, 0.85, 0.85)
@@ -224,5 +225,7 @@ if __name__ == "__main__":
                         dest='variable', help='variable to plot')
     parser.add_argument('--scale', '-s', action='store',
                         default=1., type=float, help='scale the top by x')
+    parser.add_argument('--rebin', '-r', action='store', type=int,
+                        dest='rebin', default=1, help='amount to rebin by')
 
     main(parser.parse_args())
