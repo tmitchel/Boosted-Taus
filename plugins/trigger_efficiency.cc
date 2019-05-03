@@ -58,8 +58,6 @@ int main(int argc, char **argv) {
             progress++;
         }
 
-        hists->FillBin("cutflow", 1., evtwt);
-
         // run all the factories to fill variables
         jet_factory.Run_Factory();
         event.Run_Factory();
@@ -81,31 +79,31 @@ int main(int argc, char **argv) {
         hists->Fill("cutflow", 1., evtwt);
 
         // get trigger turn on as function of jet pT
-        for (auto pt = 300; pt < 700; pt += 5) {
+        for (auto pt = 300; pt < 1000; pt += 5) {
             if (jets->at(0).getPt() > pt) {
-                hists->FillPrevBins("pt_turnon_den", jets->at(0).getPt(), evtwt);
+                hists->Fill("pt_turnon_den", pt, evtwt);
                 if ((event.getJetTrigger(39) || event.getJetTrigger(40))) {
-                    hists->FillPrevBins("pt_turnon", jets->at(0).getPt(), evtwt);
+                    hists->Fill("pt_turnon", pt, evtwt);
                 }
             }
         }
 
         // get trigger turn on as function of met
-        for (auto met = 50; met < 300; met += 5) {
+        for (auto met = 50; met < 800; met += 5) {
             if (MET.Pt() > met) {
-                hists->FillPrevBins("met_turnon_den", MET.Pt(), evtwt);
+                hists->Fill("met_turnon_den", met, evtwt);
                 if ((event.getJetTrigger(39) || event.getJetTrigger(40))) {
-                    hists->FillPrevBins("met_turnon", MET.Pt(), evtwt);
+                    hists->Fill("met_turnon", met, evtwt);
                 }
             }
         }
 
         // get trigger turn on as function of mht
-        for (auto mht = 0; mht < 300; mht++) {
+        for (auto mht = 0; mht < 800; mht++) {
             if (MHT.Pt() > mht) {
-                hists->FillPrevBins("mht_turnon_den", MHT.Pt(), evtwt);
+                hists->Fill("mht_turnon_den", mht, evtwt);
                 if ((event.getJetTrigger(39) || event.getJetTrigger(40))) {
-                    hists->FillPrevBins("mht_turnon", MHT.Pt(), evtwt);
+                    hists->Fill("mht_turnon", mht, evtwt);
                 }
             }
         }
