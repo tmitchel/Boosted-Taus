@@ -93,18 +93,24 @@ int main(int argc, char** argv) {
     // if (taus_to_muons != 1) {
     //   continue;
     // }
+    
+    // apply trigger
+    if (!event.getJetTrigger(39) && !event.getJetTrigger(40)) {
+      continue;
+    }
+    hists->FillBin("cutflow", 2., evtwt);
 
     // if we have one good reco muon, this is mutau channel
     if (muon_factory.getNGoodMuon() != 1) {
       continue;
     }
-    hists->FillBin("cutflow", 2., evtwt);
+    hists->FillBin("cutflow", 3., evtwt);
 
     // make sure we have 2 boosted taus
     if (boosts->size() < 2) {
       continue;
     }
-    hists->FillBin("cutflow", 3., evtwt);
+    hists->FillBin("cutflow", 4., evtwt);
 
     // get our Z boson
     auto found(false);
@@ -138,19 +144,20 @@ int main(int argc, char** argv) {
     if (!good_tau.getMuRejection(tight)) {
       continue;
     }
+    hists->FillBin("cutflow", 5., evtwt);
 
     // make sure Z and high pT jet are back-to-back
     auto lead_jet = jets->at(0);
-    if (lead_jet.getP4().DeltaR(z_boson) < 2.5) {
-      continue;
-    }
-    hists->FillBin("cutflow", 4., evtwt);
-
-    // high MET cut
-    if (met.Pt() < 50) {
+    if (lead_jet.getP4().DeltaR(z_boson) < 2.) {
       continue;
     }
     hists->FillBin("cutflow", 6., evtwt);
+
+    // high MET cut
+    if (met.Pt() < 100) {
+      continue;
+    }
+    hists->FillBin("cutflow", 7., evtwt);
 
     ///////////////////////////////
     // Calculate other variables //
@@ -186,6 +193,16 @@ int main(int argc, char** argv) {
         hists->Fill("SS_antiiso_Z_pt", z_boson.Pt(), evtwt);
         hists->Fill("SS_antiiso_mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
         hists->Fill("SS_antiiso_mt_mutau", mt_mutau, evtwt);
+      } else {
+        hists->Fill("OS_antiiso_ht", HT, evtwt);
+        hists->Fill("OS_antiiso_mht", MHT.Pt(), evtwt);
+        hists->Fill("OS_antiiso_met", met.Pt(), evtwt);
+        hists->Fill("OS_antiiso_mu_pt", z_muon.Pt(), evtwt);
+        hists->Fill("OS_antiiso_tau_pt", z_tau.Pt(), evtwt);
+        hists->Fill("OS_antiiso_Z_mass", z_boson.M(), evtwt);
+        hists->Fill("OS_antiiso_Z_pt", z_boson.Pt(), evtwt);
+        hists->Fill("OS_antiiso_mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
+        hists->Fill("OS_antiiso_mt_mutau", mt_mutau, evtwt);
       }
     } else {  // tau passes loose isolation
       if (!good_muon.getID(2)) {  // muon fails medium ID
@@ -232,16 +249,19 @@ int main(int argc, char** argv) {
     if (!good_muon.getID(2)) {
       continue;
     }
+    hists->FillBin("cutflow", 8., evtwt);
 
     // Now apply opposite-sign selection
     if (good_muon.getCharge() * good_tau.getCharge() > 0) {
       continue;
     }
+    hists->FillBin("cutflow", 9., evtwt);
 
     // apply tau isolation
     if (!good_tau.getIso(loose)) {
       continue;
     }
+    hists->FillBin("cutflow", 10., evtwt);
 
     //////////////
     // Plotting //

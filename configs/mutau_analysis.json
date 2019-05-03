@@ -1,7 +1,7 @@
 {
-    "cutflow": [6, 0.6, 6.5],
+    "cutflow": [10, 0.5, 10.5],
     "met": [50, 0, 500],
-    "Z_mass": [50, 20, 120],
+    "Z_mass": [20, 20, 120],
     "Z_pt": [50, 200, 1000],
     "mu_tau_dr": [50, 0, 2],
     "ht": [50, 500, 5000],
@@ -11,7 +11,7 @@
     "mt_mutau": [50, 0, 200],
 
     "OS_antiid_met": [50, 0, 500],
-    "OS_antiid_Z_mass": [50, 20, 120],
+    "OS_antiid_Z_mass": [20, 20, 120],
     "OS_antiid_Z_pt": [50, 200, 1000],
     "OS_antiid_mu_tau_dr": [50, 0, 2],
     "OS_antiid_ht": [50, 500, 5000],
@@ -21,7 +21,7 @@
     "OS_antiid_mt_mutau": [50, 0, 200],
 
     "SS_antiid_met": [50, 0, 500],
-    "SS_antiid_Z_mass": [50, 20, 120],
+    "SS_antiid_Z_mass": [20, 20, 120],
     "SS_antiid_Z_pt": [50, 200, 1000],
     "SS_antiid_mu_tau_dr": [50, 0, 2],
     "SS_antiid_ht": [50, 500, 5000],
@@ -31,7 +31,7 @@
     "SS_antiid_mt_mutau": [50, 0, 200],
     
     "SS_id_met": [50, 0, 500],
-    "SS_id_Z_mass": [50, 20, 120],
+    "SS_id_Z_mass": [20, 20, 120],
     "SS_id_Z_pt": [50, 200, 1000],
     "SS_id_mu_tau_dr": [50, 0, 2],
     "SS_id_ht": [50, 500, 5000],
@@ -41,12 +41,22 @@
     "SS_id_mt_mutau": [50, 0, 200],
 
     "SS_antiiso_met": [50, 0, 500],
-    "SS_antiiso_Z_mass": [50, 20, 120],
+    "SS_antiiso_Z_mass": [20, 20, 120],
     "SS_antiiso_Z_pt": [50, 200, 1000],
     "SS_antiiso_mu_tau_dr": [50, 0, 2],
     "SS_antiiso_ht": [50, 500, 5000],
     "SS_antiiso_mht": [50, 0, 1000],
     "SS_antiiso_mu_pt": [50, 0, 500],
     "SS_antiiso_tau_pt": [50, 0, 500],
-    "SS_antiiso_mt_mutau": [50, 0, 200]
+    "SS_antiiso_mt_mutau": [50, 0, 200],
+
+    "OS_antiiso_met": [50, 0, 500],
+    "OS_antiiso_Z_mass": [20, 20, 120],
+    "OS_antiiso_Z_pt": [50, 200, 1000],
+    "OS_antiiso_mu_tau_dr": [50, 0, 2],
+    "OS_antiiso_ht": [50, 500, 5000],
+    "OS_antiiso_mht": [50, 0, 1000],
+    "OS_antiiso_mu_pt": [50, 0, 500],
+    "OS_antiiso_tau_pt": [50, 0, 500],
+    "OS_antiiso_mt_mutau": [50, 0, 200]
 }
