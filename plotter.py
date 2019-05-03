@@ -14,19 +14,21 @@ def get_histos(fout, fileList, variable, rebin):
     them into a dictionary"""
 
     hists = {}
-    os_anti_hists, ss_anti_hists, ss_iso_hists = {}, {}, {}
+    os_antiid_hists, ss_antiid_hists, ss_id_hists, ss_antiiso_hists = {}, {}, {}, {}
     for ifile in fileList:
         fin = r.TFile(ifile, 'READ')
         fout.cd()
         hists[ifile.split('/')[-1].replace('.root', '')] = grab(fin, '', variable, rebin)
-        os_anti_hists[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_antiiso_', variable, rebin)
-        ss_anti_hists[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_antiiso_', variable, rebin)
-        ss_iso_hists[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_iso_', variable, rebin)
+        os_antiid_hists[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_antiid_', variable, rebin)
+        ss_antiid_hists[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_antiid_', variable, rebin)
+        ss_id_hists[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_id_', variable, rebin)
+        ss_antiiso_hists[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_antiiso_', variable, rebin)
         fin.Close()
     return hists, {
-        'os_anti': os_anti_hists,
-        'ss_anti': ss_anti_hists,
-        'ss_iso': ss_iso_hists
+        'os_antiid': os_antiid_hists,
+        'ss_antiid': ss_antiid_hists,
+        'ss_id': ss_id_hists,
+        'ss_antiiso': ss_antiiso_hists
     }
 
 
@@ -42,22 +44,27 @@ def format_data(data, legend):
 
 def build_qcd(osss_histos):
     # copy the data histograms
-    os_anti = osss_histos['os_anti']['Data'].Clone()
-    ss_anti = osss_histos['ss_anti']['Data'].Clone()
-    ss_iso = osss_histos['ss_iso']['Data'].Clone()
+    os_antiid = osss_histos['os_antiid']['Data'].Clone()
+    ss_antiid = osss_histos['ss_antiid']['Data'].Clone()
+    ss_id = osss_histos['ss_id']['Data'].Clone()
+    ss_antiiso = osss_histos['ss_antiiso']['Data'].Clone()
 
     # do data - bkgs
     bkgs = ['DYJets', 'SingleTop', 'ttbar', 'WJets', 'Diboson']
     for bkg in bkgs:
-        os_anti.Add(osss_histos['os_anti'][bkg], -1)
-        ss_anti.Add(osss_histos['ss_anti'][bkg], -1)
-        ss_iso.Add(osss_histos['ss_iso'][bkg], -1)
+        os_antiid.Add(osss_histos['os_antiid'][bkg], -1)
+        ss_antiid.Add(osss_histos['ss_antiid'][bkg], -1)
+        ss_id.Add(osss_histos['ss_id'][bkg], -1)
+        ss_antiiso.Add(osss_histos['ss_antiiso'][bkg], -1)
 
-    print os_anti.Integral(), ss_anti.Integral()
-    osss_ratio = os_anti.Integral() / ss_anti.Integral()
-    os_iso = ss_iso.Clone()
+    osss_ratio = os_antiid.Integral() / ss_antiid.Integral()
     print osss_ratio
-    os_iso.Scale(osss_ratio)
+    norm = ss_id.Clone()
+    norm.Scale(osss_ratio)
+    os_iso = ss_antiiso.Clone()
+    os_iso.Scale(norm.Integral()/os_iso.Integral())
+    print norm.Integral(), os_iso.Integral()
+    print 'QCD', os_iso.Integral()
     return os_iso
 
 
