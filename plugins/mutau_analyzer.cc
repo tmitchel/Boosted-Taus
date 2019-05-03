@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
     // if (taus_to_muons != 1) {
     //   continue;
     // }
-    
+
     // apply trigger
     if (!event.getJetTrigger(39) && !event.getJetTrigger(40)) {
       continue;
@@ -181,66 +181,96 @@ int main(int argc, char** argv) {
     // OS/SS Ratio Regions //
     /////////////////////////
 
-    // get shape from Same-Sign tau anti-isolated region
-    if (!good_tau.getIso(loose)) {
-      if (good_muon.getCharge() == good_tau.getCharge()) {
-        hists->Fill("SS_antiiso_ht", HT, evtwt);
-        hists->Fill("SS_antiiso_mht", MHT.Pt(), evtwt);
-        hists->Fill("SS_antiiso_met", met.Pt(), evtwt);
-        hists->Fill("SS_antiiso_mu_pt", z_muon.Pt(), evtwt);
-        hists->Fill("SS_antiiso_tau_pt", z_tau.Pt(), evtwt);
-        hists->Fill("SS_antiiso_Z_mass", z_boson.M(), evtwt);
-        hists->Fill("SS_antiiso_Z_pt", z_boson.Pt(), evtwt);
-        hists->Fill("SS_antiiso_mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
-        hists->Fill("SS_antiiso_mt_mutau", mt_mutau, evtwt);
-      } else {
-        hists->Fill("OS_antiiso_ht", HT, evtwt);
-        hists->Fill("OS_antiiso_mht", MHT.Pt(), evtwt);
-        hists->Fill("OS_antiiso_met", met.Pt(), evtwt);
-        hists->Fill("OS_antiiso_mu_pt", z_muon.Pt(), evtwt);
-        hists->Fill("OS_antiiso_tau_pt", z_tau.Pt(), evtwt);
-        hists->Fill("OS_antiiso_Z_mass", z_boson.M(), evtwt);
-        hists->Fill("OS_antiiso_Z_pt", z_boson.Pt(), evtwt);
-        hists->Fill("OS_antiiso_mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
-        hists->Fill("OS_antiiso_mt_mutau", mt_mutau, evtwt);
-      }
-    } else {  // tau passes loose isolation
-      if (!good_muon.getID(2)) {  // muon fails medium ID
-        if (good_muon.getCharge() == good_tau.getCharge()) {
-          // Same-Sign, anti-ID region
-          hists->Fill("SS_antiid_ht", HT, evtwt);
-          hists->Fill("SS_antiid_mht", MHT.Pt(), evtwt);
-          hists->Fill("SS_antiid_met", met.Pt(), evtwt);
-          hists->Fill("SS_antiid_mu_pt", z_muon.Pt(), evtwt);
-          hists->Fill("SS_antiid_tau_pt", z_tau.Pt(), evtwt);
-          hists->Fill("SS_antiid_Z_mass", z_boson.M(), evtwt);
-          hists->Fill("SS_antiid_Z_pt", z_boson.Pt(), evtwt);
-          hists->Fill("SS_antiid_mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
-          hists->Fill("SS_antiid_mt_mutau", mt_mutau, evtwt);
-        } else {
-          // Opposite-Sign, anti-ID region
-          hists->Fill("OS_antiid_ht", HT, evtwt);
-          hists->Fill("OS_antiid_mht", MHT.Pt(), evtwt);
-          hists->Fill("OS_antiid_met", met.Pt(), evtwt);
-          hists->Fill("OS_antiid_mu_pt", z_muon.Pt(), evtwt);
-          hists->Fill("OS_antiid_tau_pt", z_tau.Pt(), evtwt);
-          hists->Fill("OS_antiid_Z_mass", z_boson.M(), evtwt);
-          hists->Fill("OS_antiid_Z_pt", z_boson.Pt(), evtwt);
-          hists->Fill("OS_antiid_mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
-          hists->Fill("OS_antiid_mt_mutau", mt_mutau, evtwt);
+    if (good_tau.getIso(loose)) {
+      if (good_muon.getID(2)) {
+        if (good_muon.getCharge() * good_tau.getCharge() < 0) {
+          hists->Fill("OS_id_iso_ht", HT, evtwt);
+          hists->Fill("OS_id_iso_mht", MHT.Pt(), evtwt);
+          hists->Fill("OS_id_iso_met", met.Pt(), evtwt);
+          hists->Fill("OS_id_iso_mu_pt", z_muon.Pt(), evtwt);
+          hists->Fill("OS_id_iso_tau_pt", z_tau.Pt(), evtwt);
+          hists->Fill("OS_id_iso_Z_mass", z_boson.M(), evtwt);
+          hists->Fill("OS_id_iso_Z_pt", z_boson.Pt(), evtwt);
+          hists->Fill("OS_id_iso_mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
+          hists->Fill("OS_id_iso_mt_mutau", mt_mutau, evtwt);
+        } else {  // SS
+          hists->Fill("SS_id_iso_ht", HT, evtwt);
+          hists->Fill("SS_id_iso_mht", MHT.Pt(), evtwt);
+          hists->Fill("SS_id_iso_met", met.Pt(), evtwt);
+          hists->Fill("SS_id_iso_mu_pt", z_muon.Pt(), evtwt);
+          hists->Fill("SS_id_iso_tau_pt", z_tau.Pt(), evtwt);
+          hists->Fill("SS_id_iso_Z_mass", z_boson.M(), evtwt);
+          hists->Fill("SS_id_iso_Z_pt", z_boson.Pt(), evtwt);
+          hists->Fill("SS_id_iso_mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
+          hists->Fill("SS_id_iso_mt_mutau", mt_mutau, evtwt);
         }
-      } else if (good_muon.getID(2)) {  // muon passes medium
-        if (good_muon.getCharge() == good_tau.getCharge()) {
-          // Same-Sign, ID region
-          hists->Fill("SS_id_ht", HT, evtwt);
-          hists->Fill("SS_id_mht", MHT.Pt(), evtwt);
-          hists->Fill("SS_id_met", met.Pt(), evtwt);
-          hists->Fill("SS_id_mu_pt", z_muon.Pt(), evtwt);
-          hists->Fill("SS_id_tau_pt", z_tau.Pt(), evtwt);
-          hists->Fill("SS_id_Z_mass", z_boson.M(), evtwt);
-          hists->Fill("SS_id_Z_pt", z_boson.Pt(), evtwt);
-          hists->Fill("SS_id_mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
-          hists->Fill("SS_id_mt_mutau", mt_mutau, evtwt);
+      } else {  // fails medium id
+        if (good_muon.getCharge() * good_tau.getCharge() < 0) {
+          hists->Fill("OS_antiid_iso_ht", HT, evtwt);
+          hists->Fill("OS_antiid_iso_mht", MHT.Pt(), evtwt);
+          hists->Fill("OS_antiid_iso_met", met.Pt(), evtwt);
+          hists->Fill("OS_antiid_iso_mu_pt", z_muon.Pt(), evtwt);
+          hists->Fill("OS_antiid_iso_tau_pt", z_tau.Pt(), evtwt);
+          hists->Fill("OS_antiid_iso_Z_mass", z_boson.M(), evtwt);
+          hists->Fill("OS_antiid_iso_Z_pt", z_boson.Pt(), evtwt);
+          hists->Fill("OS_antiid_iso_mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
+          hists->Fill("OS_antiid_iso_mt_mutau", mt_mutau, evtwt);
+        } else {  // SS
+          hists->Fill("SS_antiid_iso_ht", HT, evtwt);
+          hists->Fill("SS_antiid_iso_mht", MHT.Pt(), evtwt);
+          hists->Fill("SS_antiid_iso_met", met.Pt(), evtwt);
+          hists->Fill("SS_antiid_iso_mu_pt", z_muon.Pt(), evtwt);
+          hists->Fill("SS_antiid_iso_tau_pt", z_tau.Pt(), evtwt);
+          hists->Fill("SS_antiid_iso_Z_mass", z_boson.M(), evtwt);
+          hists->Fill("SS_antiid_iso_Z_pt", z_boson.Pt(), evtwt);
+          hists->Fill("SS_antiid_iso_mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
+          hists->Fill("SS_antiid_iso_mt_mutau", mt_mutau, evtwt);
+        }
+      }
+    } else {  // fails tau isolation
+      if (good_muon.getID(2)) {
+        if (good_muon.getCharge() * good_tau.getCharge() < 0) {
+          hists->Fill("OS_id_antiiso_ht", HT, evtwt);
+          hists->Fill("OS_id_antiiso_mht", MHT.Pt(), evtwt);
+          hists->Fill("OS_id_antiiso_met", met.Pt(), evtwt);
+          hists->Fill("OS_id_antiiso_mu_pt", z_muon.Pt(), evtwt);
+          hists->Fill("OS_id_antiiso_tau_pt", z_tau.Pt(), evtwt);
+          hists->Fill("OS_id_antiiso_Z_mass", z_boson.M(), evtwt);
+          hists->Fill("OS_id_antiiso_Z_pt", z_boson.Pt(), evtwt);
+          hists->Fill("OS_id_antiiso_mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
+          hists->Fill("OS_id_antiiso_mt_mutau", mt_mutau, evtwt);
+        } else {  // SS
+          hists->Fill("SS_id_antiiso_ht", HT, evtwt);
+          hists->Fill("SS_id_antiiso_mht", MHT.Pt(), evtwt);
+          hists->Fill("SS_id_antiiso_met", met.Pt(), evtwt);
+          hists->Fill("SS_id_antiiso_mu_pt", z_muon.Pt(), evtwt);
+          hists->Fill("SS_id_antiiso_tau_pt", z_tau.Pt(), evtwt);
+          hists->Fill("SS_id_antiiso_Z_mass", z_boson.M(), evtwt);
+          hists->Fill("SS_id_antiiso_Z_pt", z_boson.Pt(), evtwt);
+          hists->Fill("SS_id_antiiso_mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
+          hists->Fill("SS_id_antiiso_mt_mutau", mt_mutau, evtwt);
+        }
+      } else {  // fails medium id
+        if (good_muon.getCharge() * good_tau.getCharge() < 0) {
+          hists->Fill("OS_antiid_antiiso_ht", HT, evtwt);
+          hists->Fill("OS_antiid_antiiso_mht", MHT.Pt(), evtwt);
+          hists->Fill("OS_antiid_antiiso_met", met.Pt(), evtwt);
+          hists->Fill("OS_antiid_antiiso_mu_pt", z_muon.Pt(), evtwt);
+          hists->Fill("OS_antiid_antiiso_tau_pt", z_tau.Pt(), evtwt);
+          hists->Fill("OS_antiid_antiiso_Z_mass", z_boson.M(), evtwt);
+          hists->Fill("OS_antiid_antiiso_Z_pt", z_boson.Pt(), evtwt);
+          hists->Fill("OS_antiid_antiiso_mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
+          hists->Fill("OS_antiid_antiiso_mt_mutau", mt_mutau, evtwt);
+        } else {  // SS
+          hists->Fill("SS_antiid_antiiso_ht", HT, evtwt);
+          hists->Fill("SS_antiid_antiiso_mht", MHT.Pt(), evtwt);
+          hists->Fill("SS_antiid_antiiso_met", met.Pt(), evtwt);
+          hists->Fill("SS_antiid_antiiso_mu_pt", z_muon.Pt(), evtwt);
+          hists->Fill("SS_antiid_antiiso_tau_pt", z_tau.Pt(), evtwt);
+          hists->Fill("SS_antiid_antiiso_Z_mass", z_boson.M(), evtwt);
+          hists->Fill("SS_antiid_antiiso_Z_pt", z_boson.Pt(), evtwt);
+          hists->Fill("SS_antiid_antiiso_mu_tau_dr", z_tau.DeltaR(z_muon), evtwt);
+          hists->Fill("SS_antiid_antiiso_mt_mutau", mt_mutau, evtwt);
         }
       }
     }
