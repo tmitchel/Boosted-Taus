@@ -78,6 +78,8 @@ int main(int argc, char** argv) {
         MHT += jet.getP4();
     }
 
+    hists->Fill("cutflow", 1., evtwt);
+
     // get trigger turn on as function of jet pT
     for (auto pt = 300; pt < 700; pt+=5) {
         if (jets->at(0).getPt() > pt && (event.getJetTrigger(39) || event.getJetTrigger(40))) {
