@@ -2,5 +2,8 @@
     "cutflow": [1, 0.5, 1.5],
     "pt_turnon": [80, 300, 700],
     "met_turnon": [50, 50, 300],
-    "mht_turnon": [60, 0, 300]
+    "mht_turnon": [60, 0, 300],
+    "pt_turnon_den": [80, 300, 700],
+    "met_turnon_den": [50, 50, 300],
+    "mht_turnon_den": [60, 0, 300]
 }

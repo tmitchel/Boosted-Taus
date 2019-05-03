@@ -17,95 +17,104 @@
 using std::string;
 using std::vector;
 
-int main(int argc, char** argv) {
-  auto parser = std::unique_ptr<CLParser>(new CLParser(argc, argv));
-  auto verbose = parser->Flag("-v");
-  auto is_data = parser->Flag("--data");
-  auto input_name = parser->Option("-i");
-  auto output_name = parser->Option("-o");
-  auto tree_name = parser->Option("-t", "ggNtuplizer/EventTree");
-  auto histograms = parser->Option("-j", "test.json");
+int main(int argc, char **argv) {
+    auto parser = std::unique_ptr<CLParser>(new CLParser(argc, argv));
+    auto verbose = parser->Flag("-v");
+    auto is_data = parser->Flag("--data");
+    auto input_name = parser->Option("-i");
+    auto output_name = parser->Option("-o");
+    auto tree_name = parser->Option("-t", "ggNtuplizer/EventTree");
+    auto histograms = parser->Option("-j", "test.json");
 
-  // read the input TFile/TTree
-  auto fin = std::shared_ptr<TFile>(TFile::Open(input_name.c_str()));
-  auto hists = std::make_shared<histManager>(output_name);
-  hists->load_histograms(histograms);
-  auto tree = reinterpret_cast<TTree*>(fin->Get(tree_name.c_str()));
-  // construct our object factories
-  auto jet_factory = Jets_Factory(tree, is_data);
-  auto event = Event_Factory(tree);
-  auto nevt_hist = reinterpret_cast<TH1F*>(fin->Get("hcount"));
+    // read the input TFile/TTree
+    auto fin = std::shared_ptr<TFile>(TFile::Open(input_name.c_str()));
+    auto hists = std::make_shared<histManager>(output_name);
+    hists->load_histograms(histograms);
+    auto tree = reinterpret_cast<TTree *>(fin->Get(tree_name.c_str()));
+    // construct our object factories
+    auto jet_factory = Jets_Factory(tree, is_data);
+    auto event = Event_Factory(tree);
+    auto nevt_hist = reinterpret_cast<TH1F *>(fin->Get("hcount"));
 
-  std::string sample_name = input_name.substr(input_name.rfind("/") + 1, std::string::npos);
-  sample_name = sample_name.substr(0, sample_name.rfind(".root"));
-  if (input_name.find("WJetsToLNu_HT-2500ToInf") != std::string::npos) {
-    sample_name = "WJetsToLNu_HT-2500ToInf";
-  } else if (input_name.find("WJetsToLNu_HT-800To1200") != std::string::npos) {
-    sample_name = "WJetsToLNu_HT-800To1200";
-  }
-  std::cout << sample_name << std::endl;
-  double evtwt = lumi["2017"] * cross_sections[sample_name] / nevt_hist->GetBinContent(2);
-  if (is_data) {
-    evtwt = 1.;
-  }
-
-  auto nevts = tree->GetEntries();
-  int progress(0), fraction((nevts - 1) / 10);
-  for (auto i = 0; i < nevts; i++) {
-    tree->GetEntry(i);
-    if (i == progress * fraction && verbose) {
-      std::cout << "\t" << progress * 10 << "% complete. (" << nevts << " total events)\r" << std::flush;
-      progress++;
+    std::string sample_name = input_name.substr(input_name.rfind("/") + 1, std::string::npos);
+    sample_name = sample_name.substr(0, sample_name.rfind(".root"));
+    if (input_name.find("WJetsToLNu_HT-2500ToInf") != std::string::npos) {
+        sample_name = "WJetsToLNu_HT-2500ToInf";
+    } else if (input_name.find("WJetsToLNu_HT-800To1200") != std::string::npos) {
+        sample_name = "WJetsToLNu_HT-800To1200";
+    }
+    std::cout << sample_name << std::endl;
+    double evtwt = lumi["2017"] * cross_sections[sample_name] / nevt_hist->GetBinContent(2);
+    if (is_data) {
+        evtwt = 1.;
     }
 
-    hists->FillBin("cutflow", 1., evtwt);
+    auto nevts = tree->GetEntries();
+    int progress(0), fraction((nevts - 1) / 10);
+    for (auto i = 0; i < nevts; i++) {
+        tree->GetEntry(i);
+        if (i == progress * fraction && verbose) {
+            std::cout << "\t" << progress * 10 << "% complete. (" << nevts << " total events)\r" << std::flush;
+            progress++;
+        }
 
-    // run all the factories to fill variables
-    jet_factory.Run_Factory();
-    event.Run_Factory();
-    auto jets = jet_factory.getJets();
-    auto MET = event.getMET();
+        hists->FillBin("cutflow", 1., evtwt);
 
-    /////////////////////
-    // Event Selection //
-    /////////////////////
+        // run all the factories to fill variables
+        jet_factory.Run_Factory();
+        event.Run_Factory();
+        auto jets = jet_factory.getJets();
+        auto MET = event.getMET();
 
-    // just skim selection for now
+        /////////////////////
+        // Event Selection //
+        /////////////////////
 
-    // calculate MHT
-    TLorentzVector MHT;
-    for (auto jet : *jets) {
-        MHT += jet.getP4();
-    }
+        // just skim selection for now
 
-    hists->Fill("cutflow", 1., evtwt);
+        // calculate MHT
+        TLorentzVector MHT;
+        for (auto jet : *jets) {
+            MHT += jet.getP4();
+        }
 
-    // get trigger turn on as function of jet pT
-    for (auto pt = 300; pt < 700; pt+=5) {
-        if (jets->at(0).getPt() > pt && (event.getJetTrigger(39) || event.getJetTrigger(40))) {
-            hists->FillPrevBins("pt_turnon", jets->at(0).getPt(), evtwt);
+        hists->Fill("cutflow", 1., evtwt);
+
+        // get trigger turn on as function of jet pT
+        for (auto pt = 300; pt < 700; pt += 5) {
+            if (jets->at(0).getPt() > pt) {
+                hists->FillPrevBins("pt_turnon_den", jets->at(0).getPt(), evtwt);
+                if ((event.getJetTrigger(39) || event.getJetTrigger(40))) {
+                    hists->FillPrevBins("pt_turnon", jets->at(0).getPt(), evtwt);
+                }
+            }
+        }
+
+        // get trigger turn on as function of met
+        for (auto met = 50; met < 300; met += 5) {
+            if (MET.Pt() > met) {
+                hists->FillPrevBins("met_turnon_den", MET.Pt(), evtwt);
+                if ((event.getJetTrigger(39) || event.getJetTrigger(40))) {
+                    hists->FillPrevBins("met_turnon", MET.Pt(), evtwt);
+                }
+            }
+        }
+
+        // get trigger turn on as function of mht
+        for (auto mht = 0; mht < 300; mht++) {
+            if (MHT.Pt() > mht) {
+                hists->FillPrevBins("mht_turnon_den", MHT.Pt(), evtwt);
+                if ((event.getJetTrigger(39) || event.getJetTrigger(40))) {
+                    hists->FillPrevBins("mht_turnon", MHT.Pt(), evtwt);
+                }
+            }
         }
     }
 
-    // get trigger turn on as function of met
-    for (auto met = 50; met < 300; met+=5) {
-        if (MET.Pt() > met && (event.getJetTrigger(39) || event.getJetTrigger(40))) {
-            hists->FillPrevBins("met_turnon", MET.Pt(), evtwt);
-        }
+    if (verbose) {
+        std::cout << std::endl;
     }
-
-    // get trigger turn on as function of mht
-    for (auto mht = 0; mht < 300; mht++) {
-        if (MHT.Pt() > mht && (event.getJetTrigger(39) || event.getJetTrigger(40))) {
-            hists->FillPrevBins("mht_turnon", MHT.Pt(), evtwt);
-        }
-    }
-  }
-
-  if (verbose) {
-    std::cout << std::endl;
-  }
-  fin->Close();
-  hists->Write();
-  return 1;
+    fin->Close();
+    hists->Write();
+    return 1;
 }
