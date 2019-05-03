@@ -7,7 +7,6 @@
 #include "../interface/CLParser.h"
 #include "../interface/boosted_factory.h"
 #include "../interface/event_factory.h"
-#include "../interface/gen_factory.h"
 #include "../interface/histManager.h"
 #include "../interface/jets_factory.h"
 #include "../interface/muon_factory.h"
@@ -35,7 +34,6 @@ int main(int argc, char** argv) {
   auto tree = reinterpret_cast<TTree*>(fin->Get(tree_name.c_str()));
   // construct our object factories
   auto boost_factory = Boosted_Factory(tree);
-  auto gen_factory = Gen_Factory(tree, is_data);
   auto jet_factory = Jets_Factory(tree, is_data);
   auto muon_factory = Muon_Factory(tree);
   auto event = Event_Factory(tree);
@@ -67,12 +65,10 @@ int main(int argc, char** argv) {
 
     // run all the factories to fill variables
     boost_factory.Run_Factory();
-    gen_factory.Run_Factory();
     jet_factory.Run_Factory();
     muon_factory.Run_Factory();
     event.Run_Factory();
     auto boosts = boost_factory.getTaus();
-    auto gens = gen_factory.getGens();
     auto jets = jet_factory.getJets();
     auto muons = muon_factory.getMuons();
     auto met = event.getMET();
@@ -80,19 +76,6 @@ int main(int argc, char** argv) {
     /////////////////////
     // Event Selection //
     /////////////////////
-
-    // // only look at mutau channel
-    // int taus_to_muons(0);
-    // for (auto& gen : *gens) {
-    //   if (fabs(gen.getPID()) == 13 && fabs(gen.getMomPID()) == 15) {
-    //     taus_to_muons++;
-    //   }
-    // }
-
-    // // now make the cut
-    // if (taus_to_muons != 1) {
-    //   continue;
-    // }
 
     // apply trigger
     if (!event.getJetTrigger(39) && !event.getJetTrigger(40)) {
