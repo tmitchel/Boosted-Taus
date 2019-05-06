@@ -67,11 +67,15 @@ int main(int argc, char **argv) {
         // Event Selection //
         /////////////////////
 
+        if (jets->size() == 0) {
+          continue;
+        }
+
         // just skim selection for now
         hists->Fill("cutflow", 1., evtwt);
 
         // get trigger turn on as function of jet pT
-        for (auto pt = 300; pt < 1000; pt += 5) {
+        for (auto pt = 0; pt < 1500; pt += 5) {
             if (jets->at(0).getPt() > pt) {
                 hists->Fill("pt_turnon_den", pt, evtwt);
                 if (event.getJetTrigger(40)) {
@@ -81,7 +85,7 @@ int main(int argc, char **argv) {
         }
 
         // get trigger turn on as function of met
-        for (auto mass = 0; mass < 200; mass += 5) {
+        for (auto mass = 0; mass < 400; mass += 5) {
             if (jets->at(0).getPrunedMass() > mass) {
                 hists->Fill("mass_turnon_den", mass, evtwt);
                 if (event.getJetTrigger(40)) {

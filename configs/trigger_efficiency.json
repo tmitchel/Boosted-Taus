@@ -1,7 +1,7 @@
 {
     "cutflow": [1, 0.5, 1.5],
-    "pt_turnon": [140, 300, 1000],
-    "mass_turnon": [40, 0, 200],
-    "pt_turnon_den": [140, 300, 1000],
-    "mass_turnon_den": [40, 0, 200]
+    "pt_turnon": [300, 0, 1500],
+    "mass_turnon": [80, 0, 400],
+    "pt_turnon_den": [300, 0, 1500],
+    "mass_turnon_den": [80, 0, 400]
 }

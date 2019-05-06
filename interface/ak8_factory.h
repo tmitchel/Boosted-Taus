@@ -54,7 +54,7 @@ AK8_Factory::AK8_Factory(TTree *tree, bool is_data_)
       jetNNP(nullptr),
       jetMUF(nullptr),
       AK8JetPrunedMass(nullptr) {
-    tree->SetBranchAddress("nJet", &nJet);
+    tree->SetBranchAddress("nAK8Jet", &nJet);
     tree->SetBranchAddress("AK8JetPt", &jetPt);
     tree->SetBranchAddress("AK8JetEn", &jetEn);
     tree->SetBranchAddress("AK8JetEta", &jetEta);
