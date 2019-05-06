@@ -31,7 +31,7 @@ class AK8_Factory {
   std::vector<Float_t> *jetPt, *jetEta, *jetPhi, *jetEn, *jetRawPt, *jetRawEn, *jetMt, *jetArea, *jetLeadTrackPt, *jetLeadTrackEta, *jetLeadTrackPhi,
       *jetLepTrackPt, *jetLepTrackEta, *jetLepTrackPhi, *jetCSV2BJetTags, *jetDeepCSVTags_b, *jetDeepCSVTags_bb, *jetDeepCSVTags_c, *jetDeepCSVTags_udsg,
       *jetP4Smear, *jetP4SmearUp, *jetP4SmearDo, *jetPUID, *jetJECUnc, *jetCHF, *jetNHF, *jetCEF, *jetNEF, *jetMUF, *jetVtxPt, *jetVtxMass,
-      *jetVtxNtrks, *jetVtx3DVal, *jetVtx3DSig;
+      *jetVtxNtrks, *jetVtx3DVal, *jetVtx3DSig, *AK8JetPrunedMass;
 };
 
 AK8_Factory::AK8_Factory(TTree *tree, bool is_data_)
@@ -78,7 +78,8 @@ AK8_Factory::AK8_Factory(TTree *tree, bool is_data_)
       jetVtxMass(nullptr),
       jetVtxNtrks(nullptr),
       jetVtx3DVal(nullptr),
-      jetVtx3DSig(nullptr) {
+      jetVtx3DSig(nullptr),
+      AK8JetPrunedMass(nullptr) {
   tree->SetBranchAddress("nJet", &nJet);
   tree->SetBranchAddress("jetPt", &jetPt);
   tree->SetBranchAddress("jetEn", &jetEn);
@@ -125,6 +126,7 @@ AK8_Factory::AK8_Factory(TTree *tree, bool is_data_)
   tree->SetBranchAddress("jetVtxNtrks", &jetVtxNtrks);
   tree->SetBranchAddress("jetVtx3DVal", &jetVtx3DVal);
   tree->SetBranchAddress("jetVtx3DSig", &jetVtx3DSig);
+  tree->SetBranchAddress("AK8JetPrunedMass", &AK8JetPrunedMass);
 }
 
 void AK8_Factory::Run_Factory() {
@@ -167,6 +169,7 @@ void AK8_Factory::Run_Factory() {
     jet.NCH = jetNCH->at(i);
     jet.NNP = jetNNP->at(i);
     jet.MUF = jetMUF->at(i);
+    jet.PrunedMass = AK8JetPrunedMass->at(i);
     jets.push_back(jet);
   }
 

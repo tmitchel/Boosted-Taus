@@ -7,7 +7,7 @@
 #include "../interface/CLParser.h"
 #include "../interface/event_factory.h"
 #include "../interface/histManager.h"
-#include "../interface/jets_factory.h"
+#include "../interface/ak8_factory.h"
 #include "../interface/util.h"
 #include "TFile.h"
 #include "TH1F.h"
@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
     hists->load_histograms(histograms);
     auto tree = reinterpret_cast<TTree *>(fin->Get(tree_name.c_str()));
     // construct our object factories
-    auto jet_factory = Jets_Factory(tree, is_data);
+    auto jet_factory = AK8_Factory(tree, is_data);
     auto event = Event_Factory(tree);
     auto nevt_hist = reinterpret_cast<TH1F *>(fin->Get("hcount"));
 
@@ -61,49 +61,31 @@ int main(int argc, char **argv) {
         // run all the factories to fill variables
         jet_factory.Run_Factory();
         event.Run_Factory();
-        auto jets = jet_factory.getJets();
-        auto MET = event.getMET();
+        auto jets = jet_factory.getAK8();
 
         /////////////////////
         // Event Selection //
         /////////////////////
 
         // just skim selection for now
-
-        // calculate MHT
-        TLorentzVector MHT;
-        for (auto jet : *jets) {
-            MHT += jet.getP4();
-        }
-
         hists->Fill("cutflow", 1., evtwt);
 
         // get trigger turn on as function of jet pT
         for (auto pt = 300; pt < 1000; pt += 5) {
             if (jets->at(0).getPt() > pt) {
                 hists->Fill("pt_turnon_den", pt, evtwt);
-                if ((event.getJetTrigger(39) || event.getJetTrigger(40))) {
+                if (event.getJetTrigger(40)) {
                     hists->Fill("pt_turnon", pt, evtwt);
                 }
             }
         }
 
         // get trigger turn on as function of met
-        for (auto met = 50; met < 800; met += 5) {
-            if (MET.Pt() > met) {
-                hists->Fill("met_turnon_den", met, evtwt);
-                if ((event.getJetTrigger(39) || event.getJetTrigger(40))) {
-                    hists->Fill("met_turnon", met, evtwt);
-                }
-            }
-        }
-
-        // get trigger turn on as function of mht
-        for (auto mht = 0; mht < 800; mht++) {
-            if (MHT.Pt() > mht) {
-                hists->Fill("mht_turnon_den", mht, evtwt);
-                if ((event.getJetTrigger(39) || event.getJetTrigger(40))) {
-                    hists->Fill("mht_turnon", mht, evtwt);
+        for (auto mass = 0; mass < 200; mass += 5) {
+            if (jets->at(0).getPrunedMass() > mass) {
+                hists->Fill("mass_turnon_den", mass, evtwt);
+                if (event.getJetTrigger(40)) {
+                    hists->Fill("mass_turnon", mass, evtwt);
                 }
             }
         }
