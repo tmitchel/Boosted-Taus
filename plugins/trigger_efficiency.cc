@@ -8,6 +8,7 @@
 #include "../interface/event_factory.h"
 #include "../interface/histManager.h"
 #include "../interface/ak8_factory.h"
+#include "../interface/boosted_factory.h"
 #include "../interface/util.h"
 #include "TFile.h"
 #include "TH1F.h"
@@ -33,6 +34,7 @@ int main(int argc, char **argv) {
     auto tree = reinterpret_cast<TTree *>(fin->Get(tree_name.c_str()));
     // construct our object factories
     auto jet_factory = AK8_Factory(tree, is_data);
+    auto boost_factory = Boosted_Factory(tree);
     auto event = Event_Factory(tree);
     auto nevt_hist = reinterpret_cast<TH1F *>(fin->Get("hcount"));
 
@@ -60,8 +62,10 @@ int main(int argc, char **argv) {
 
         // run all the factories to fill variables
         jet_factory.Run_Factory();
+        boost_factory.Run_Factory();
         event.Run_Factory();
         auto jets = jet_factory.getAK8();
+        auto boost = boost_factory.getTaus();
 
         /////////////////////
         // Event Selection //
@@ -69,6 +73,10 @@ int main(int argc, char **argv) {
 
         if (jets->size() == 0) {
           continue;
+        }
+
+        if (boost->size() == 0 || !boost->at(0).getIso(loose)) {
+            continue;
         }
 
         // just skim selection for now
