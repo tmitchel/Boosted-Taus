@@ -5,11 +5,13 @@
 #include <utility>
 #include <vector>
 #include "../interface/CLParser.h"
+#include "../interface/ak8_factory.h"
 #include "../interface/boosted_factory.h"
 #include "../interface/event_factory.h"
 #include "../interface/histManager.h"
 #include "../interface/jets_factory.h"
 #include "../interface/muon_factory.h"
+#include "../interface/trigger_sf.h"
 #include "TFile.h"
 #include "TH1F.h"
 #include "TLorentzVector.h"
@@ -32,13 +34,16 @@ int main(int argc, char** argv) {
   auto hists = std::make_shared<histManager>(output_name);
   hists->load_histograms(histograms);
   auto tree = reinterpret_cast<TTree*>(fin->Get(tree_name.c_str()));
+
   // construct our object factories
+  auto ak8_factory = AK8_Factory(tree, is_data);
   auto boost_factory = Boosted_Factory(tree);
   auto jet_factory = Jets_Factory(tree, is_data);
   auto muon_factory = Muon_Factory(tree);
   auto event = Event_Factory(tree);
   auto nevt_hist = reinterpret_cast<TH1F*>(fin->Get("hcount"));
 
+  // initilize scale factor classes
   std::string sample_name = input_name.substr(input_name.rfind("/") + 1, std::string::npos);
   sample_name = sample_name.substr(0, sample_name.rfind(".root"));
   if (input_name.find("WJetsToLNu_HT-2500ToInf") != std::string::npos) {
@@ -52,6 +57,8 @@ int main(int argc, char** argv) {
     evtwt = 1.;
   }
 
+  auto trigger_sf_factory = new trigger_sf("data/trigger_efficiency.root");
+
   auto nevts = tree->GetEntries();
   int progress(0), fraction((nevts - 1) / 10);
   for (auto i = 0; i < nevts; i++) {
@@ -64,10 +71,12 @@ int main(int argc, char** argv) {
     hists->FillBin("cutflow", 1., evtwt);
 
     // run all the factories to fill variables
+    ak8_factory.Run_Factory();
     boost_factory.Run_Factory();
     jet_factory.Run_Factory();
     muon_factory.Run_Factory();
     event.Run_Factory();
+    auto ak8s = ak8_factory.getAK8();
     auto boosts = boost_factory.getTaus();
     auto jets = jet_factory.getJets();
     auto muons = muon_factory.getMuons();
@@ -141,6 +150,21 @@ int main(int argc, char** argv) {
       continue;
     }
     hists->FillBin("cutflow", 7., evtwt);
+
+    /////////////////////////////
+    // Apply the scale factors //
+    /////////////////////////////
+
+    // get the ak8 jet that contains the boosted taus
+    AK8 parent(0, 0, 0, 0);
+    for (auto jet : *ak8s) {
+      if (jet.getP4().DeltaR(muons->at(0).getP4()) < 0.8) {
+        parent = jet;
+        break;
+      }
+    }
+
+    evtwt *= trigger_sf_factory->get_sf(parent.getSoftDropMass(), parent.getPt());
 
     ///////////////////////////////
     // Calculate other variables //
