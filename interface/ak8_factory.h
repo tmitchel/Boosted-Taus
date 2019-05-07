@@ -28,7 +28,7 @@ class AK8_Factory {
     std::vector<Bool_t> *jetPFLooseId;
     std::vector<Int_t> *jetPartonID, *jetHadFlvr, *jetNCH, *jetNNP;
     std::vector<Float_t> *jetPt, *jetEta, *jetPhi, *jetEn, *jetRawPt, *jetRawEn, *jetP4Smear, *jetP4SmearUp,
-        *jetP4SmearDo, *jetJECUnc, *jetCHF, *jetNHF, *jetCEF, *jetNEF, *jetMUF, *AK8JetPrunedMass;
+        *jetP4SmearDo, *jetJECUnc, *jetCHF, *jetNHF, *jetCEF, *jetNEF, *jetMUF, *AK8JetPrunedMass, *AK8JetSoftDropMass;
 };
 
 AK8_Factory::AK8_Factory(TTree *tree, bool is_data_)
@@ -53,7 +53,8 @@ AK8_Factory::AK8_Factory(TTree *tree, bool is_data_)
       jetNCH(nullptr),
       jetNNP(nullptr),
       jetMUF(nullptr),
-      AK8JetPrunedMass(nullptr) {
+      AK8JetPrunedMass(nullptr),
+      AK8JetSoftDropMass(nullptr) {
     tree->SetBranchAddress("nAK8Jet", &nJet);
     tree->SetBranchAddress("AK8JetPt", &jetPt);
     tree->SetBranchAddress("AK8JetEn", &jetEn);
@@ -78,6 +79,7 @@ AK8_Factory::AK8_Factory(TTree *tree, bool is_data_)
     tree->SetBranchAddress("AK8JetNNP", &jetNNP);
     tree->SetBranchAddress("AK8JetMUF", &jetMUF);
     tree->SetBranchAddress("AK8JetPrunedMass", &AK8JetPrunedMass);
+    tree->SetBranchAddress("AK8JetSoftDropMass", &AK8JetSoftDropMass);
 }
 
 void AK8_Factory::Run_Factory() {
@@ -104,6 +106,7 @@ void AK8_Factory::Run_Factory() {
         jet.NNP = jetNNP->at(i);
         jet.MUF = jetMUF->at(i);
         jet.PrunedMass = AK8JetPrunedMass->at(i);
+        jet.SoftDropMass = AK8JetSoftDropMass->at(i);
         jets.push_back(jet);
     }
 

@@ -21,6 +21,7 @@ class AK8 {
   Int_t getNNP() { return NNP; }
   ULong64_t getjetFiredTrgs() { return jetFiredTrgs; }
   Float_t getPrunedMass() { return PrunedMass; }
+  Float_t getSoftDropMass() { return SoftDropMass; }
   Float_t getPt() { return p4.Pt(); }
   Float_t getEta() { return p4.Eta(); }
   Float_t getPhi() { return p4.Phi(); }
@@ -64,7 +65,7 @@ class AK8 {
   ULong64_t jetFiredTrgs;
   Float_t RawPt, RawEn, Mt, Area, LeadTrackPt, LeadTrackEta, LeadTrackPhi, LepTrackPt, LepTrackEta, LepTrackPhi,
       CSV2BJetTags, DeepCSVTags_b, DeepCSVTags_bb, DeepCSVTags_c, DeepCSVTags_udsg, P4Smear, P4SmearUp, P4SmearDo, PUID, JECUnc, FiredTrgs, CHF, NHF, CEF, NEF,
-      MUF, VtxPt, VtxMass, VtxNtrks, Vtx3DVal, Vtx3DSig, PrunedMass;
+      MUF, VtxPt, VtxMass, VtxNtrks, Vtx3DVal, Vtx3DSig, PrunedMass, SoftDropMass;
 };
 
 AK8::AK8(Float_t pt, Float_t eta, Float_t phi, Float_t energy) {

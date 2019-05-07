@@ -9,6 +9,7 @@
 #include "../interface/histManager.h"
 #include "../interface/ak8_factory.h"
 #include "../interface/boosted_factory.h"
+#include "../interface/muon_factory.h"
 #include "../interface/util.h"
 #include "TFile.h"
 #include "TH1F.h"
@@ -35,6 +36,7 @@ int main(int argc, char **argv) {
     // construct our object factories
     auto jet_factory = AK8_Factory(tree, is_data);
     auto boost_factory = Boosted_Factory(tree);
+    auto muon_factory = Muon_Factory(tree);
     auto event = Event_Factory(tree);
     auto nevt_hist = reinterpret_cast<TH1F *>(fin->Get("hcount"));
 
@@ -63,20 +65,41 @@ int main(int argc, char **argv) {
         // run all the factories to fill variables
         jet_factory.Run_Factory();
         boost_factory.Run_Factory();
+        muon_factory.Run_Factory();
         event.Run_Factory();
         auto jets = jet_factory.getAK8();
         auto boost = boost_factory.getTaus();
+        auto muons = muon_factory.getMuons();
 
         /////////////////////
         // Event Selection //
         /////////////////////
 
-        if (jets->size() == 0) {
+        if (jets->size() == 0 || muons->size() != 1 || boost->size() < 2) {
           continue;
         }
 
-        if (boost->size() == 0 || !boost->at(0).getIso(loose)) {
-            continue;
+        bool pass(false), matched(false);
+        for (auto b : *boost) {
+          if (b.getIso(loose)) {
+            pass = true;
+          }
+          if (b.getP4().DeltaR(muons->at(0).getP4()) < 0.8) {
+            matched = true;
+          }
+        }
+        if (pass || !matched) {
+          continue;
+        }
+
+        for (auto jet : *jets) {
+          hists->Fill("pt", jet.getPt(), evtwt);
+          hists->Fill("mass", jet.getSoftDropMass(), evtwt);
+          if (jet.getP4().DeltaR(muons->at(0).getP4()) < 0.8) {
+            hists->Fill("matched_pt", jet.getPt(), evtwt);
+            hists->Fill("matched_pr_mass", jet.getPrunedMass(), evtwt);
+            hists->Fill("matched_sd_mass", jet.getSoftDropMass(), evtwt);
+          }
         }
 
         // just skim selection for now
@@ -84,22 +107,26 @@ int main(int argc, char **argv) {
 
         // get trigger turn on as function of jet pT
         for (auto pt = 0; pt < 1500; pt += 5) {
-            if (jets->at(0).getPt() > pt) {
-                hists->Fill("pt_turnon_den", pt, evtwt);
-                if (event.getJetTrigger(40)) {
-                    hists->Fill("pt_turnon", pt, evtwt);
-                }
+          for (auto jet : *jets) {
+            if (jet.getPt() > pt && jet.getMass() > 30 && jet.getP4().DeltaR(muons->at(0).getP4()) < 0.8) {
+              hists->Fill("pt_turnon_den", pt, evtwt);
+              if (event.getJetTrigger(40)) {
+                  hists->Fill("pt_turnon", pt, evtwt);
+              }
             }
+          }
         }
 
         // get trigger turn on as function of met
         for (auto mass = 0; mass < 400; mass += 5) {
-            if (jets->at(0).getPrunedMass() > mass) {
-                hists->Fill("mass_turnon_den", mass, evtwt);
-                if (event.getJetTrigger(40)) {
-                    hists->Fill("mass_turnon", mass, evtwt);
-                }
+          for (auto jet : *jets) {
+            if (jet.getPt() > 400 && jet.getSoftDropMass() > mass && jet.getP4().DeltaR(muons->at(0).getP4()) < 0.8) {
+              hists->Fill("mass_turnon_den", mass, evtwt);
+              if (event.getJetTrigger(40)) {
+                  hists->Fill("mass_turnon", mass, evtwt);
+              }
             }
+          }
         }
     }
 

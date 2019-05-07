@@ -3,5 +3,10 @@
     "pt_turnon": [300, 0, 1500],
     "mass_turnon": [80, 0, 400],
     "pt_turnon_den": [300, 0, 1500],
-    "mass_turnon_den": [80, 0, 400]
+    "mass_turnon_den": [80, 0, 400],
+    "pt": [150, 0, 1500],
+    "mass": [30, 0, 300],
+    "matched_pt": [150, 0, 1500],
+    "matched_sd_mass": [30, 0, 300],
+    "matched_pr_mass": [30, 0, 300]
 }
