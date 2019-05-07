@@ -9,8 +9,10 @@ def main(args):
     pt_num = fin.Get('pt_turnon').Clone()
     pt_den = fin.Get('pt_turnon_den').Clone()
 
-    mass_eff = mass_num.Divide(mass_den)
-    pt_eff = pt_num.Divide(pt_den)
+    mass_eff = mass_num.Clone()
+    mass_eff.Divide(mass_den)
+    pt_eff = pt_num.Clone()
+    pt_eff.Divide(pt_den)
 
     mass_bins = mass_eff.GetNbinsX()
     pt_bins = pt_eff.GetNbinsX()
