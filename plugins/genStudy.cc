@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
   hists->load_histograms(histograms);
   auto tree = reinterpret_cast<TTree*>(fin->Get(tree_name.c_str()));
   // construct our object factories
-  auto gen_factory = Gen_Factory(tree, comp0::mass);
+  auto gen_factory = Gen_Factory(tree, false);
 
   auto nevts = tree->GetEntries();
   int progress(1), fraction((nevts-1)/10);
