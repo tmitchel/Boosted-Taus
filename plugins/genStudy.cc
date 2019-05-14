@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
   hists->load_histograms(histograms);
   auto tree = reinterpret_cast<TTree*>(fin->Get(tree_name.c_str()));
   // construct our object factories
-  auto gen_factory = Gen_Factory(tree, false);
+  auto gen_factory = Gen_Factory(tree, comp0::mass);
 
   auto nevts = tree->GetEntries();
   int progress(1), fraction((nevts-1)/10);
@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
 
     // loop over all gen particles
     VGen all_gen_higgs, all_gen_taus, all_gen_jets;
-    for (auto const &gen : *gens) {
+    for (auto &gen : *gens) {
       if (fabs(gen.getPID()) == 25) {
         all_gen_higgs.push_back(gen);
       } else if (fabs(gen.getPID()) == 15) {
@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
       continue;
     }
 
-    for (auto const &jet : all_gen_jets) {
+    for (auto &jet : all_gen_jets) {
       // switch gluon pdg ID to be 7
       auto pid = fabs(jet.getPID());
       if (pid == 21) {
