@@ -19,12 +19,13 @@ class Jets_Factory {
   // getters
   Int_t getNTotalJets() { return nJet; }
   Int_t getNGoodJets() { return nGoodJet; }
+  Int_t getNBTags() { return nBTag; }
   std::shared_ptr<VJets> getJets() { return std::make_shared<VJets>(jets); }
 
  private:
   Bool_t is_data;
-  Int_t nJet, nGoodJet;
-  VJets jets;
+  Int_t nJet, nGoodJet, nBTag;
+  VJets jets, btags;
   std::vector<Bool_t> *jetPFLooseId;
   std::vector<ULong64_t> *jetFiredTrgs;
   std::vector<Int_t> *jetLepTrackPID, *jetPartonID, *jetHadFlvr, *jetID, *jetPUFullID, *jetNCH, *jetNNP;
@@ -129,6 +130,7 @@ Jets_Factory::Jets_Factory(TTree *tree, bool is_data_)
 
 void Jets_Factory::Run_Factory() {
   jets.clear();
+  btags.clear();
   for (auto i = 0; i < nJet; i++) {
     if (jetPt->at(i) < 30 || fabs(jetEta->at(i)) > 3) {
       continue;
@@ -168,11 +170,17 @@ void Jets_Factory::Run_Factory() {
     jet.NNP = jetNNP->at(i);
     jet.MUF = jetMUF->at(i);
     jets.push_back(jet);
+
+    if (jetCSV2BJetTags->at(i)> 0.4941) {
+      btags.push_back(jet);
+    }
   }
 
   // sort by pT
   std::sort(jets.begin(), jets.end(), [](Jets &p1, Jets &p2) -> bool { return p1.getPt() > p2.getPt(); });
+  std::sort(btags.begin(), btags.end(), [](Jets &p1, Jets &p2) -> bool { return p1.getPt() > p2.getPt(); });
   nGoodJet = jets.size();
+  nBTag = btags.size();
 }
 
 #endif  // INTERFACE_JETS_FACTORY_H_
