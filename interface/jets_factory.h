@@ -31,8 +31,7 @@ class Jets_Factory {
   std::vector<Int_t> *jetLepTrackPID, *jetPartonID, *jetHadFlvr, *jetID, *jetPUFullID, *jetNCH, *jetNNP;
   std::vector<Float_t> *jetPt, *jetEta, *jetPhi, *jetEn, *jetRawPt, *jetRawEn, *jetMt, *jetArea, *jetLeadTrackPt, *jetLeadTrackEta, *jetLeadTrackPhi,
       *jetLepTrackPt, *jetLepTrackEta, *jetLepTrackPhi, *jetCSV2BJetTags, *jetDeepCSVTags_b, *jetDeepCSVTags_bb, *jetDeepCSVTags_c, *jetDeepCSVTags_udsg,
-      *jetP4Smear, *jetP4SmearUp, *jetP4SmearDo, *jetPUID, *jetJECUnc, *jetCHF, *jetNHF, *jetCEF, *jetNEF, *jetMUF, *jetVtxPt, *jetVtxMass,
-      *jetVtxNtrks, *jetVtx3DVal, *jetVtx3DSig;
+      *jetPUID, *jetJECUnc, *jetCHF, *jetNHF, *jetCEF, *jetNEF, *jetMUF;
 };
 
 Jets_Factory::Jets_Factory(TTree *tree, bool is_data_)
@@ -59,9 +58,6 @@ Jets_Factory::Jets_Factory(TTree *tree, bool is_data_)
       jetDeepCSVTags_udsg(nullptr),
       jetPartonID(nullptr),
       jetHadFlvr(nullptr),
-      jetP4Smear(nullptr),
-      jetP4SmearUp(nullptr),
-      jetP4SmearDo(nullptr),
       jetPFLooseId(nullptr),
       jetID(nullptr),
       jetPUID(nullptr),
@@ -74,12 +70,7 @@ Jets_Factory::Jets_Factory(TTree *tree, bool is_data_)
       jetNEF(nullptr),
       jetNCH(nullptr),
       jetNNP(nullptr),
-      jetMUF(nullptr),
-      jetVtxPt(nullptr),
-      jetVtxMass(nullptr),
-      jetVtxNtrks(nullptr),
-      jetVtx3DVal(nullptr),
-      jetVtx3DSig(nullptr) {
+      jetMUF(nullptr) {
   tree->SetBranchAddress("nJet", &nJet);
   tree->SetBranchAddress("jetPt", &jetPt);
   tree->SetBranchAddress("jetEn", &jetEn);
@@ -104,9 +95,6 @@ Jets_Factory::Jets_Factory(TTree *tree, bool is_data_)
   if (!is_data) {
     tree->SetBranchAddress("jetPartonID", &jetPartonID);
     tree->SetBranchAddress("jetHadFlvr", &jetHadFlvr);
-    tree->SetBranchAddress("jetP4Smear", &jetP4Smear);
-    tree->SetBranchAddress("jetP4SmearUp", &jetP4SmearUp);
-    tree->SetBranchAddress("jetP4SmearDo", &jetP4SmearDo);
   }
   tree->SetBranchAddress("jetPFLooseId", &jetPFLooseId);
   tree->SetBranchAddress("jetID", &jetID);
@@ -121,11 +109,6 @@ Jets_Factory::Jets_Factory(TTree *tree, bool is_data_)
   tree->SetBranchAddress("jetNCH", &jetNCH);
   tree->SetBranchAddress("jetNNP", &jetNNP);
   tree->SetBranchAddress("jetMUF", &jetMUF);
-  tree->SetBranchAddress("jetVtxPt", &jetVtxPt);
-  tree->SetBranchAddress("jetVtxMass", &jetVtxMass);
-  tree->SetBranchAddress("jetVtxNtrks", &jetVtxNtrks);
-  tree->SetBranchAddress("jetVtx3DVal", &jetVtx3DVal);
-  tree->SetBranchAddress("jetVtx3DSig", &jetVtx3DSig);
 }
 
 void Jets_Factory::Run_Factory() {
