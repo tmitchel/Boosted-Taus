@@ -60,6 +60,10 @@ int main(int argc, char** argv) {
         electron_factory.Run_Factory();
         event.Run_Factory();
 
+        if (!event.getLepTrigger(21)) {
+            continue;
+        }
+
         // general selection
         if (!pass_electron_veto(electron_factory.getElectrons())) {
             continue;  // found electrons in the event
