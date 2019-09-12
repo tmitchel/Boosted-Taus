@@ -1,5 +1,8 @@
 // Copyright [2019] Tyler Mitchell
 
+#include <fstream>
+#include <iostream>
+
 #include "TTree.h"
 
 // utilities
@@ -29,6 +32,17 @@ int main(int argc, char** argv) {
     auto output_name = parser->Option("-o");
     auto tree_name = parser->Option("-t", "ggNtuplizer/EventTree");
     auto histograms = parser->Option("-j", "test.json");
+    auto logname = parser->Option("-l");
+
+    // create the log file
+    std::ofstream logfile;
+    logfile.open(logname, std::ios::out | std::ios::trunc);
+    logfile << "Processing file: " << input_name <<std::endl;
+    logfile << "Using options:" << std::endl;
+    logfile << "\t is_data:     " << is_data << std::endl;
+    logfile << "\t output_name: " << output_name << std::endl;
+    logfile << "\t tree_name:   " << tree_name << std::endl;
+    logfile << "\t histograms:  " << histograms << std::endl;
 
     // read the input TFile/TTree
     auto fin = std::shared_ptr<TFile>(TFile::Open(input_name.c_str()));
@@ -51,7 +65,7 @@ int main(int argc, char** argv) {
     for (auto i = 0; i < nevts; i++) {
         tree->GetEntry(i);
         if (i == progress * fraction && verbose) {
-            std::cout << "\t" << progress * 10 << "% complete. (" << nevts << " total events)\r" << std::flush;
+            logfile << "\t" << progress * 10 << "% complete. (" << nevts << " total events)" << std::endl;
             progress++;
         }
 
