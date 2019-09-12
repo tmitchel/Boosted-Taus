@@ -62,6 +62,10 @@ int main(int argc, char** argv) {
         electron_factory.Run_Factory();
         event.Run_Factory();
 
+        if (!event.getLepTrigger(21)) {  // Mu50 trigger
+            continue;
+        }
+
         // general selection
         if (!pass_electron_veto(electron_factory.getElectrons())) {
             continue;  // found electrons in the event
@@ -77,19 +81,33 @@ int main(int argc, char** argv) {
         auto good_muon_pair = get_control_muons(muon_factory.getMuons());
 
         // construct signal region
-        if (good_muon.getPt() > 0 && good_tau.getPt() > 0 && good_muon.getP4().DeltaR(good_tau.getP4()) < 0.8) {
+        if (good_muon.getPt() > 0 && good_tau.getPt() > 0
+            && good_muon.getP4().DeltaR(good_tau.getP4()) > 0.1
+            && good_muon.getP4().DeltaR(good_tau.getP4()) < 0.8) {
             if (good_tau.getIso(medium)) {
                 // tau pass region
-                hists->Fill("pass", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
+                if (good_muon.getCharge() * good_tau.getCharge() < 0) {
+                    hists->Fill("OS_pass", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
+                } else {
+                    hists->Fill("SS_pass", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
+                }
             } else if (good_tau.getIso(vloose)) {
                 // tau fail region
-                hists->Fill("fail", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
+                if (good_muon.getCharge() * good_tau.getCharge() < 0) {
+                    hists->Fill("OS_fail", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
+                } else {
+                    hists->Fill("SS_fail", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
+                }
             }
         }  // close signal region
 
         // construct control region
         if (good_muon_pair.size() == 2) {
-            hists->Fill("control", (good_muon_pair.at(0).getP4() + good_muon_pair.at(1).getP4()).M(), evtwt);
+            if (good_muon_pair.at(0).getCharge() * good_muon_pair.at(0).getCharge() < 0) {
+                hists->Fill("OS_control", (good_muon_pair.at(0).getP4() + good_muon_pair.at(1).getP4()).M(), evtwt);
+            } else {
+                hists->Fill("SS_control", (good_muon_pair.at(0).getP4() + good_muon_pair.at(1).getP4()).M(), evtwt);
+            }
         }  // close control region
     }      // end event loop
 }
@@ -111,7 +129,7 @@ Muon get_signal_muon(std::shared_ptr<VMuon> all_muons) {
             break;
         }
 
-        if (mu.getPt() > 50 && fabs(mu.getEta()) < 2.4 && mu.getID(medium)) {  // good muon
+        if (mu.getPt() > 55 && fabs(mu.getEta()) < 2.4 && mu.getID(medium)) {  // good muon
             loose_muons++;
             good_muon = mu;
         } else if (mu.getPt() > 10 && fabs(mu.getEta()) < 2.4 && mu.getID(medium) && mu.getIsoTrk() < 0.15) {  // extra muons
@@ -130,21 +148,11 @@ Boosted get_signal_tau(std::shared_ptr<VBoosted> all_taus) {
     int loose_taus(0);
     Boosted good_tau(0, 0, 0, 0);
     for (auto tau : *all_taus) {
-        // need to check whether we veto extra boosted taus
-        // if (loose_taus > 1) {
-        //     break;
-        // }
-
         if (tau.getPt() > 30 && fabs(tau.getEta()) < 2.3) {
             good_tau = tau;
             loose_taus++;
         }
     }
-
-    // need to check whether we veto extra boosted taus
-    // if (loose_taus > 1) {
-    //     good_tau = Boosted(0, 0, 0, 0);
-    // }
     return good_tau;
 }
 
