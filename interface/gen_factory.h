@@ -108,7 +108,7 @@ void Gen_Factory::Run_Factory() {
   // get gen quarks (mc*)
   gen_particles.clear();
   for (auto i = 0; i < nMC; i++) {
-    auto gen = Gen(mcPt->at(i), mcEta->at(i), mcPhi->at(i), mcMass->at(i), false);
+    auto gen = Gen(mcPt->at(i), mcEta->at(i), mcPhi->at(i), mcMass->at(i), comp0::mass);
     gen.PID = mcPID->at(i);
     gen.Vtx = mcVtx->at(i);
     gen.Vty = mcVty->at(i);
@@ -136,7 +136,7 @@ void Gen_Factory::Run_Factory() {
     if (jetGenJetPt->at(i) == -999) {
       continue;
     }
-    gen_jets.push_back(Gen(jetGenJetPt->at(i), jetGenJetEta->at(i), jetGenJetPhi->at(i), jetGenJetEn->at(i), true));
+    gen_jets.push_back(Gen(jetGenJetPt->at(i), jetGenJetEta->at(i), jetGenJetPhi->at(i), jetGenJetEn->at(i), comp0::energy));
   }
 
   // sort by pT

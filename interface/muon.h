@@ -3,22 +3,18 @@
 #ifndef INTERFACE_MUON_H_
 #define INTERFACE_MUON_H_
 
+#include "./object.h"
 #include "TLorentzVector.h"
 
-class Muon {
+class Muon : public PObject {
   friend class Muon_Factory;
 
  public:
-  Muon() {}
+  Muon() : PObject() {}
   Muon(Float_t, Float_t, Float_t, Float_t);
 
   // getters
-  TLorentzVector getP4() { return p4; }
   Bool_t getID(int key) { return (IDbit >> key & 1) == 1; }
-  Float_t getPt() { return p4.Pt(); }
-  Float_t getEta() { return p4.Eta(); }
-  Float_t getPhi() { return p4.Phi(); }
-  Float_t getMass() { return p4.M(); }
   Float_t getFiredTrgs() { return FiredTrgs; }
   Float_t getFiredL1Trgs() { return FiredL1Trgs; }
   Float_t getCharge() { return Charge; }
@@ -50,15 +46,12 @@ class Muon {
   Float_t getBestTrkPt() { return BestTrkPt; }
 
  private:
-  TLorentzVector p4;
   ULong64_t FiredTrgs, FiredL1Trgs;
   Int_t Charge, Type, IDbit, TrkLayers, PixelLayers, PixelHits, MuonHits, Stations, Matches, TrkQuality, BestTrkType;
   Float_t D0, Dz, SIP, Chi2NDF, InnerD0, InnerDz, IsoTrk, PFChIso, PFPhoIso, PFNeuIso, PFPUIso, InnervalidFraction, segmentCompatibility,
       chi2LocalPosition, trkKink, BestTrkPtError, BestTrkPt;
 };
 
-Muon::Muon(Float_t pt, Float_t eta, Float_t phi, Float_t energy) {
-  p4.SetPtEtaPhiE(pt, eta, phi, energy);
-}
+Muon::Muon(Float_t pt, Float_t eta, Float_t phi, Float_t energy) : PObject(pt, eta, phi, energy, comp0::energy) {}
 
 #endif  // INTERFACE_MUON_H_

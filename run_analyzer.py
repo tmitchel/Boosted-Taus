@@ -13,7 +13,7 @@ def format_command(args, ifile):
     callstring = './{} -i {}{} -o {}/{} -j {} -t {}'.format(args.exe, args.ext, ifile, args.output_dir, output_name, args.json, args.treename)
     if args.verbose:
       callstring += ' -v'
-    if 'JetHT_Run' in ifile or 'muon' in ifile:
+    if 'JetHT_Run' in ifile or 'muon' in ifile or 'data' in ifile:
       callstring += ' --data'
     return callstring
 
