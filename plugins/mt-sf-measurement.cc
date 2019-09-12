@@ -84,16 +84,28 @@ int main(int argc, char** argv) {
             && good_muon.getP4().DeltaR(good_tau.getP4()) < 0.8) {
             if (good_tau.getIso(medium)) {
                 // tau pass region
-                hists->Fill("pass", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
+                if (good_muon.getCharge() * good_tau.getCharge() < 0) {
+                    hists->Fill("OS_pass", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
+                } else {
+                    hists->Fill("SS_pass", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
+                }
             } else if (good_tau.getIso(vloose)) {
                 // tau fail region
-                hists->Fill("fail", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
+                if (good_muon.getCharge() * good_tau.getCharge() < 0) {
+                    hists->Fill("OS_fail", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
+                } else {
+                    hists->Fill("SS_fail", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
+                }
             }
         }  // close signal region
 
         // construct control region
         if (good_muon_pair.size() == 2) {
-            hists->Fill("control", (good_muon_pair.at(0).getP4() + good_muon_pair.at(1).getP4()).M(), evtwt);
+            if (good_muon_pair.at(0).getCharge() * good_muon_pair.at(0).getCharge() < 0) {
+                hists->Fill("OS_control", (good_muon_pair.at(0).getP4() + good_muon_pair.at(1).getP4()).M(), evtwt);
+            } else {
+                hists->Fill("SS_control", (good_muon_pair.at(0).getP4() + good_muon_pair.at(1).getP4()).M(), evtwt);
+            }
         }  // close control region
     }      // end event loop
 }
