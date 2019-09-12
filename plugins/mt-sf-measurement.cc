@@ -1,5 +1,7 @@
 // Copyright [2019] Tyler Mitchell
 
+#include "TTree.h"
+
 // utilities
 #include "../interface/CLParser.h"
 #include "../interface/histManager.h"
