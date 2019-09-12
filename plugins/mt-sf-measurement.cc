@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
         electron_factory.Run_Factory();
         event.Run_Factory();
 
-        if (!event.getLepTrigger(21)) {
+        if (!event.getLepTrigger(21)) { // Mu50 trigger
             continue;
         }
 
