@@ -41,9 +41,6 @@ AK8_Factory::AK8_Factory(TTree *tree, bool is_data_)
       jetRawEn(nullptr),
       jetPartonID(nullptr),
       jetHadFlvr(nullptr),
-      jetP4Smear(nullptr),
-      jetP4SmearUp(nullptr),
-      jetP4SmearDo(nullptr),
       jetPFLooseId(nullptr),
       jetJECUnc(nullptr),
       jetCHF(nullptr),
@@ -65,9 +62,6 @@ AK8_Factory::AK8_Factory(TTree *tree, bool is_data_)
     if (!is_data) {
         tree->SetBranchAddress("AK8JetPartonID", &jetPartonID);
         tree->SetBranchAddress("AK8JetHadFlvr", &jetHadFlvr);
-        tree->SetBranchAddress("AK8JetP4Smear", &jetP4Smear);
-        tree->SetBranchAddress("AK8JetP4SmearUp", &jetP4SmearUp);
-        tree->SetBranchAddress("AK8JetP4SmearDo", &jetP4SmearDo);
     }
     tree->SetBranchAddress("AK8JetPFLooseId", &jetPFLooseId);
     tree->SetBranchAddress("AK8JetJECUnc", &jetJECUnc);
