@@ -21,21 +21,24 @@ def get_histos(fout, fileList, variable, rebin=None):
     for ifile in fileList:
         fin = ROOT.TFile(ifile, 'READ')
         fout.cd()
-        hists[ifile.split('/')[-1].replace('.root', '')] = grab(fin, '', variable, rebin)
-        os_id_iso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_pass', variable, rebin)
-        ss_id_iso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_pass', variable, rebin)
-        os_antiid_antiiso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_anti_fail', variable, rebin)
-        ss_antiid_antiiso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_anti_fail', variable, rebin)
-        os_antiid_iso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_anti_pass', variable, rebin)
-        ss_antiid_iso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_anti_pass', variable, rebin)
-        os_id_antiiso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_fail', variable, rebin)
-        ss_id_antiiso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_fail', variable, rebin)
 
-        os_id_ctr[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_pass', variable, rebin)
-        ss_id_ctr[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_pass', variable, rebin)
-        os_antiid_ctr[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_anti_fail', variable, rebin)
-        ss_antiid_ctr[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_anti_fail', variable, rebin)
-
+        name = ifile.split('/')[-1].replace('.root', '')
+        if name == 'Data_output':
+          name = 'Data'
+        print name
+        hists[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_pass', variable, rebin)
+        os_id_iso[name] = grab(fin, 'OS_pass', variable, rebin)
+        ss_id_iso[name] = grab(fin, 'SS_pass', variable, rebin)
+        os_antiid_antiiso[name] = grab(fin, 'OS_anti_fail', variable, rebin)
+        ss_antiid_antiiso[name] = grab(fin, 'SS_anti_fail', variable, rebin)
+        os_antiid_iso[name] = grab(fin, 'OS_anti_pass', variable, rebin)
+        ss_antiid_iso[name] = grab(fin, 'SS_anti_pass', variable, rebin)
+        os_id_antiiso[name] = grab(fin, 'OS_fail', variable, rebin)
+        ss_id_antiiso[name] = grab(fin, 'SS_fail', variable, rebin)
+        os_id_ctr[name] = grab(fin, 'OS_control', variable, rebin)
+        ss_id_ctr[name] = grab(fin, 'SS_control', variable, rebin)
+        os_antiid_ctr[name] = grab(fin, 'OS_anti_control', variable, rebin)
+        ss_antiid_ctr[name] = grab(fin, 'SS_anti_control', variable, rebin)
         fin.Close()
     return hists, {
         'os_id_iso': os_id_iso,
