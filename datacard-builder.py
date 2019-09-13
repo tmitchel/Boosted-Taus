@@ -17,6 +17,7 @@ def get_histos(fout, fileList, variable, rebin=None):
     hists = {}
     os_id_iso, ss_id_iso, os_antiid_antiiso, ss_antiid_antiiso = {}, {}, {}, {}
     os_antiid_iso, ss_antiid_iso, os_id_antiiso, ss_id_antiiso = {}, {}, {}, {}
+    os_id_ctr, ss_id_ctr, os_antiid_ctr, ss_antiid_ctr = {}, {}, {}, {}
     for ifile in fileList:
         fin = ROOT.TFile(ifile, 'READ')
         fout.cd()
@@ -25,10 +26,16 @@ def get_histos(fout, fileList, variable, rebin=None):
         ss_id_iso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_pass', variable, rebin)
         os_antiid_antiiso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_anti_fail', variable, rebin)
         ss_antiid_antiiso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_anti_fail', variable, rebin)
-        os_antiid_iso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_anti_pass_', variable, rebin)
-        ss_antiid_iso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_anti_pass_', variable, rebin)
-        os_id_antiiso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_fail_', variable, rebin)
-        ss_id_antiiso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_fail_', variable, rebin)
+        os_antiid_iso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_anti_pass', variable, rebin)
+        ss_antiid_iso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_anti_pass', variable, rebin)
+        os_id_antiiso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_fail', variable, rebin)
+        ss_id_antiiso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_fail', variable, rebin)
+
+        os_id_ctr[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_pass', variable, rebin)
+        ss_id_ctr[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_pass', variable, rebin)
+        os_antiid_ctr[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_anti_fail', variable, rebin)
+        ss_antiid_ctr[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_anti_fail', variable, rebin)
+
         fin.Close()
     return hists, {
         'os_id_iso': os_id_iso,
@@ -94,7 +101,7 @@ def main(args):
     # get the input files
     filelist = [ifile for ifile in glob('{}/*.root'.format(args.input_dir))]
     fout = ROOT.TFile('out.root', 'RECREATE')
-    histos, osss_histos = get_histos(fout, filelist, 'Z_mass')
+    histos, osss_histos = get_histos(fout, filelist, '')
     histos['QCD'], osss_histos['os_id_antiiso']['QCD'] = build_qcd(osss_histos)
     fout.mkdir('pass')
     fout.cd('pass')
