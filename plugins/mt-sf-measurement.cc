@@ -109,7 +109,7 @@ int main(int argc, char** argv) {
 
 
         // construct signal region
-        if (good_muon != nullptr
+        if (good_muon.getPt() > 0 && good_tau.getPt() > 0
             && good_muon.getP4().DeltaR(good_tau.getP4()) > 0.1
             && good_muon.getP4().DeltaR(good_tau.getP4()) < 0.8) {
             if (good_tau.getIso(medium)) {
