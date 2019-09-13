@@ -179,8 +179,8 @@ Muon* get_signal_muon(std::shared_ptr<VMuon> all_muons) {
 
         temp = &all_muons->at(i);
         if (temp->getPt() > 55 && fabs(temp->getEta()) < 2.4 && temp->getID(medium)) {  // good muon
-            loose_muons++;
             mu = &all_muons->at(i);
+            loose_muons++;
         } else if (temp->getPt() > 10 && fabs(temp->getEta()) < 2.4 && temp->getID(medium) && temp->getIsoTrk() < 0.15) {  // extra muons
             loose_muons++;
         }
@@ -195,37 +195,35 @@ Muon* get_signal_muon(std::shared_ptr<VMuon> all_muons) {
 
 Muon* get_antiid_muon(std::shared_ptr<VMuon> all_muons) {
     int loose_muons(0);
-    Muon* good_muon;
-    for (Muon mu : *all_muons) {
+    Muon *mu, *temp;
+    for (unsigned i = 0; i < all_muons->size(); i++) {
         if (loose_muons > 1) {  // exactly 1 muon in the event
             return nullptr;
         }
 
-        if (mu.getPt() > 55 && fabs(mu.getEta()) < 2.4 && !mu.getID(medium)) {  // good muon
+        temp = &all_muons->at(i);
+        if (temp->getPt() > 55 && fabs(temp->getEta()) < 2.4 && !temp->getID(medium)) {  // good muon
+            mu = &all_muons->at(i);
             loose_muons++;
-            good_muon = &mu;
-        } else if (mu.getPt() > 10 && fabs(mu.getEta()) < 2.4 && !(mu.getID(medium) && mu.getIsoTrk() < 0.15)) {  // extra muons
+        } else if (temp->getPt() > 10 && fabs(temp->getEta()) < 2.4 && !(temp->getID(medium) && temp->getIsoTrk() < 0.15)) {  // extra muons
             loose_muons++;
         }
     }
 
     // if there were multiple muons, reset the good muon
     if (loose_muons > 1) {
-        good_muon = &Muon(0, 0, 0, 0);
+        nullptr;
     }
-    return good_muon;
+    return mu;
 }
 
 Boosted* get_signal_tau(std::shared_ptr<VBoosted> all_taus) {
-    int loose_taus(0);
-    Boosted good_tau(0, 0, 0, 0);
-    for (auto tau : *all_taus) {
-        if (tau.getPt() > 30 && fabs(tau.getEta()) < 2.3) {
-            good_tau = tau;
-            loose_taus++;
+    for (unsigned i = 0; i < all_taus->size(); i++) {
+        if (all_taus->at(i).getPt() > 30 && fabs(all_taus->at(i).getEta()) < 2.3) {
+            return &all_taus->at(i);
         }
     }
-    return &good_tau;
+    return nullptr;
 }
 
 vector<Muon*> get_control_muons(std::shared_ptr<VMuon> all_muons) {
