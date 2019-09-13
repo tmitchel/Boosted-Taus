@@ -196,7 +196,7 @@ Muon* get_signal_muon(std::shared_ptr<VMuon> all_muons) {
 Muon* get_antiid_muon(std::shared_ptr<VMuon> all_muons) {
     int loose_muons(0);
     Muon* good_muon;
-    for (Muon* mu : *all_muons) {
+    for (Muon mu : *all_muons) {
         if (loose_muons > 1) {  // exactly 1 muon in the event
             return nullptr;
         }
@@ -211,9 +211,9 @@ Muon* get_antiid_muon(std::shared_ptr<VMuon> all_muons) {
 
     // if there were multiple muons, reset the good muon
     if (loose_muons > 1) {
-        good_muon = Muon(0, 0, 0, 0);
+        good_muon = &Muon(0, 0, 0, 0);
     }
-    return &good_muon;
+    return good_muon;
 }
 
 Boosted* get_signal_tau(std::shared_ptr<VBoosted> all_taus) {
