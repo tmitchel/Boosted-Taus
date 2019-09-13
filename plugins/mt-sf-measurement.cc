@@ -129,7 +129,7 @@ int main(int argc, char** argv) {
 
         // construct control region
         if (nloose < 3 && good_muon_pair.size() == 2) {
-            if (good_muon_pair.at(0).getCharge() * good_muon_pair.at(0).getCharge() < 0) {
+            if (good_muon_pair.at(0).getCharge() * good_muon_pair.at(1).getCharge() < 0) {
                 hists->Fill("OS_control", (good_muon_pair.at(0).getP4() + good_muon_pair.at(1).getP4()).M(), evtwt);
             } else {
                 hists->Fill("SS_control", (good_muon_pair.at(0).getP4() + good_muon_pair.at(1).getP4()).M(), evtwt);
@@ -158,7 +158,7 @@ int main(int argc, char** argv) {
 
         // construct anti-id control region
         if (nloose < 3 && anti_muon_pair.size() == 2) {
-            if (anti_muon_pair.at(0).getCharge() * anti_muon_pair.at(0).getCharge() < 0) {
+            if (anti_muon_pair.at(0).getCharge() * anti_muon_pair.at(1).getCharge() < 0) {
                 hists->Fill("OS_anti_control", (anti_muon_pair.at(0).getP4() + anti_muon_pair.at(1).getP4()).M(), evtwt);
             } else {
                 hists->Fill("SS_anti_control", (anti_muon_pair.at(0).getP4() + anti_muon_pair.at(1).getP4()).M(), evtwt);
