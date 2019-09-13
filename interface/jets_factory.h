@@ -114,11 +114,12 @@ Jets_Factory::Jets_Factory(TTree *tree, bool is_data_)
 void Jets_Factory::Run_Factory() {
   jets.clear();
   btags.clear();
+  Jets jet;
   for (auto i = 0; i < nJet; i++) {
     if (jetPt->at(i) < 30 || fabs(jetEta->at(i)) > 3) {
       continue;
     }
-    auto jet = Jets(jetPt->at(i), jetEta->at(i), jetPhi->at(i), jetEn->at(i));
+    jet = Jets(jetPt->at(i), jetEta->at(i), jetPhi->at(i), jetEn->at(i));
     jet.RawPt = jetRawPt->at(i);
     jet.RawEn = jetRawEn->at(i);
     jet.Mt = jetMt->at(i);

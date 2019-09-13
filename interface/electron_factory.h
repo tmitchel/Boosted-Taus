@@ -99,6 +99,9 @@ Electron_Factory::Electron_Factory(TTree *tree)
 void Electron_Factory::Run_Factory() {
   electrons.clear();
   for (auto i = 0; i < nEle; i++) {
+    if (elePt->at(i) < 10 || fabs(eleEta->at(i)) > 2.1) {
+      continue;
+    }
     auto electron = Electron(elePt->at(i), eleEta->at(i), elePhi->at(i), eleEn->at(i));
     electron.SCEn = eleSCEn->at(i);
     electron.EcalEn = eleEcalEn->at(i);
