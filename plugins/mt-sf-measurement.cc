@@ -99,7 +99,7 @@ int main(int argc, char** argv) {
         auto anti_muon_pair = get_antiid_control_muons(muon_factory.getMuons());
 
         // construct signal region
-        if (good_muon->getPt() > 0 && good_tau->getPt() > 0
+        if (good_muon != nullptr
             && good_muon->getP4().DeltaR(good_tau->getP4()) > 0.1
             && good_muon->getP4().DeltaR(good_tau->getP4()) < 0.8) {
             if (good_tau->getIso(medium)) {
