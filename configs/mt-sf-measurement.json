@@ -4,5 +4,11 @@
     "OS_fail": [30, 50, 140],
     "SS_fail": [30, 50, 140],
     "OS_control": [30, 50, 140],
-    "SS_control": [30, 50, 140]
+    "SS_control": [30, 50, 140],
+    "OS_anti_pass": [30, 50, 140],
+    "SS_anti_pass": [30, 50, 140],
+    "OS_anti_fail": [30, 50, 140],
+    "SS_anti_fail": [30, 50, 140],
+    "OS_anti_control": [30, 50, 140],
+    "SS_anti_control": [30, 50, 140]
 }
