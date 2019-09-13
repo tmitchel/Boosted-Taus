@@ -20,15 +20,19 @@ def get_histos(fout, fileList, variable, rebin=None):
     for ifile in fileList:
         fin = ROOT.TFile(ifile, 'READ')
         fout.cd()
-        hists[ifile.split('/')[-1].replace('.root', '')] = grab(fin, '', variable, rebin)
-        os_id_iso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_pass', variable, rebin)
-        ss_id_iso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_pass', variable, rebin)
-        os_antiid_antiiso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_anti_fail', variable, rebin)
-        ss_antiid_antiiso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_anti_fail', variable, rebin)
-        os_antiid_iso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_anti_pass_', variable, rebin)
-        ss_antiid_iso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_anti_pass_', variable, rebin)
-        os_id_antiiso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_fail_', variable, rebin)
-        ss_id_antiiso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'SS_fail_', variable, rebin)
+        name = ifile.split('/')[-1].replace('.root', '')
+        if name == 'Data_output':
+          name = 'Data'
+        print name
+        hists[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_pass', variable, rebin)
+        os_id_iso[name] = grab(fin, 'OS_pass', variable, rebin)
+        ss_id_iso[name] = grab(fin, 'SS_pass', variable, rebin)
+        os_antiid_antiiso[name] = grab(fin, 'OS_anti_fail', variable, rebin)
+        ss_antiid_antiiso[name] = grab(fin, 'SS_anti_fail', variable, rebin)
+        os_antiid_iso[name] = grab(fin, 'OS_anti_pass', variable, rebin)
+        ss_antiid_iso[name] = grab(fin, 'SS_anti_pass', variable, rebin)
+        os_id_antiiso[name] = grab(fin, 'OS_fail', variable, rebin)
+        ss_id_antiiso[name] = grab(fin, 'SS_fail', variable, rebin)
         fin.Close()
     return hists, {
         'os_id_iso': os_id_iso,
@@ -94,7 +98,7 @@ def main(args):
     # get the input files
     filelist = [ifile for ifile in glob('{}/*.root'.format(args.input_dir))]
     fout = ROOT.TFile('out.root', 'RECREATE')
-    histos, osss_histos = get_histos(fout, filelist, 'Z_mass')
+    histos, osss_histos = get_histos(fout, filelist, '')
     histos['QCD'], osss_histos['os_id_antiiso']['QCD'] = build_qcd(osss_histos)
     fout.mkdir('pass')
     fout.cd('pass')
