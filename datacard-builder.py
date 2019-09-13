@@ -1,4 +1,4 @@
-import ROOT as r
+import ROOT
 from glob import glob
 from pprint import pprint
 
@@ -18,7 +18,7 @@ def get_histos(fout, fileList, variable, rebin=None):
     os_id_iso, ss_id_iso, os_antiid_antiiso, ss_antiid_antiiso = {}, {}, {}, {}
     os_antiid_iso, ss_antiid_iso, os_id_antiiso, ss_id_antiiso = {}, {}, {}, {}
     for ifile in fileList:
-        fin = r.TFile(ifile, 'READ')
+        fin = ROOT.TFile(ifile, 'READ')
         fout.cd()
         hists[ifile.split('/')[-1].replace('.root', '')] = grab(fin, '', variable, rebin)
         os_id_iso[ifile.split('/')[-1].replace('.root', '')] = grab(fin, 'OS_id_iso_', variable, rebin)
@@ -93,7 +93,7 @@ def build_qcd(osss_histos):
 def main(args):
     # get the input files
     filelist = [ifile for ifile in glob('{}/*.root'.format(args.input_dir))]
-    fout = r.TFile('out.root', 'RECREATE')
+    fout = ROOT.TFile('out.root', 'RECREATE')
     histos, osss_histos = get_histos(fout, filelist, 'Z_mass')
     histos['QCD'], osss_histos['os_id_antiiso']['QCD'] = build_qcd(osss_histos)
     fout.mkdir('pass')
