@@ -19,11 +19,11 @@
 using std::string;
 using std::vector;
 
-Muon* get_signal_muon(std::shared_ptr<VMuon>);
-Muon* get_antiid_muon(std::shared_ptr<VMuon>);
-Boosted* get_signal_tau(std::shared_ptr<VBoosted>);
-vector<Muon*> get_control_muons(std::shared_ptr<VMuon>);
-vector<Muon*> get_antiid_control_muons(std::shared_ptr<VMuon>);
+int get_signal_muon(std::shared_ptr<VMuon>);
+int get_antiid_muon(std::shared_ptr<VMuon>);
+int get_signal_tau(std::shared_ptr<VBoosted>);
+vector<int> get_control_muons(std::shared_ptr<VMuon>);
+vector<int> get_antiid_control_muons(std::shared_ptr<VMuon>);
 bool pass_electron_veto(std::shared_ptr<VElectron>);
 
 int main(int argc, char** argv) {
@@ -91,70 +91,80 @@ int main(int argc, char** argv) {
             continue;                       // b-jet veto
         }
 
+        auto muons = muon_factory.getMuons();
+        auto taus = boost_factory.getTaus();
+
         // get necessary objects
-        auto good_muon = get_signal_muon(muon_factory.getMuons());
-        auto anti_muon = get_antiid_muon(muon_factory.getMuons());
-        auto good_tau = get_signal_tau(boost_factory.getTaus());
-        auto good_muon_pair = get_control_muons(muon_factory.getMuons());
-        auto anti_muon_pair = get_antiid_control_muons(muon_factory.getMuons());
+        auto good_muon_idx = get_signal_muon(muons);
+        auto anti_muon_idx = get_antiid_muon(muons);
+        auto good_tau_idx = get_signal_tau(taus);
+        auto good_muon_pair_idxs = get_control_muons(muons);
+        auto anti_muon_pair_idxs = get_antiid_control_muons(muons);
+
+        auto good_muon = muons->at(good_muon_idx);
+        auto anti_muon = muons->at(anti_muon_idx);
+        auto good_tau = taus->at(good_tau_idx);
+        std::vector<Muon> good_muon_pair = {muons->at(good_muon_pair_idxs.at(0)), muons->at(good_muon_pair_idxs.at(1))};
+        std::vector<Muon> anti_muon_pair = {muons->at(anti_muon_pair_idxs.at(0)), muons->at(anti_muon_pair_idxs.at(1))};
+
 
         // construct signal region
         if (good_muon != nullptr
-            && good_muon->getP4().DeltaR(good_tau->getP4()) > 0.1
-            && good_muon->getP4().DeltaR(good_tau->getP4()) < 0.8) {
-            if (good_tau->getIso(medium)) {
+            && good_muon.getP4().DeltaR(good_tau.getP4()) > 0.1
+            && good_muon.getP4().DeltaR(good_tau.getP4()) < 0.8) {
+            if (good_tau.getIso(medium)) {
                 // tau pass region
-                if (good_muon->getCharge() * good_tau->getCharge() < 0) {
-                    hists->Fill("OS_pass", (good_muon->getP4() + good_tau->getP4()).M(), evtwt);
+                if (good_muon.getCharge() * good_tau.getCharge() < 0) {
+                    hists->Fill("OS_pass", (good_muon.getP4() + good_tau->getP4()).M(), evtwt);
                 } else {
-                    hists->Fill("SS_pass", (good_muon->getP4() + good_tau->getP4()).M(), evtwt);
+                    hists->Fill("SS_pass", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
                 }
-            } else if (good_tau->getIso(vloose)) {
+            } else if (good_tau.getIso(vloose)) {
                 // tau fail region
-                if (good_muon->getCharge() * good_tau->getCharge() < 0) {
-                    hists->Fill("OS_fail", (good_muon->getP4() + good_tau->getP4()).M(), evtwt);
+                if (good_muon.getCharge() * good_tau.getCharge() < 0) {
+                    hists->Fill("OS_fail", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
                 } else {
-                    hists->Fill("SS_fail", (good_muon->getP4() + good_tau->getP4()).M(), evtwt);
+                    hists->Fill("SS_fail", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
                 }
             }
         }  // close signal region
 
         // construct control region
         if (good_muon_pair.size() == 2) {
-            if (good_muon_pair.at(0)->getCharge() * good_muon_pair.at(0)->getCharge() < 0) {
-                hists->Fill("OS_control", (good_muon_pair.at(0)->getP4() + good_muon_pair.at(1)->getP4()).M(), evtwt);
+            if (good_muon_pair.at(0).getCharge() * good_muon_pair.at(0).getCharge() < 0) {
+                hists->Fill("OS_control", (good_muon_pair.at(0).getP4() + good_muon_pair.at(1).getP4()).M(), evtwt);
             } else {
-                hists->Fill("SS_control", (good_muon_pair.at(0)->getP4() + good_muon_pair.at(1)->getP4()).M(), evtwt);
+                hists->Fill("SS_control", (good_muon_pair.at(0).getP4() + good_muon_pair.at(1).getP4()).M(), evtwt);
             }
         }  // close control region
 
         // construct anti-id signal region
-        if (anti_muon->getPt() > 0 && good_tau->getPt() > 0
-            && anti_muon->getP4().DeltaR(good_tau->getP4()) > 0.1
-            && anti_muon->getP4().DeltaR(good_tau->getP4()) < 0.8) {
-            if (good_tau->getIso(medium)) {
+        if (anti_muon.getPt() > 0 && good_tau.getPt() > 0
+            && anti_muon.getP4().DeltaR(good_tau.getP4()) > 0.1
+            && anti_muon.getP4().DeltaR(good_tau.getP4()) < 0.8) {
+            if (good_tau.getIso(medium)) {
                 // tau pass region
-                if (anti_muon->getCharge() * good_tau->getCharge() < 0) {
-                    hists->Fill("OS_anti_pass", (anti_muon->getP4() + good_tau->getP4()).M(), evtwt);
+                if (anti_muon.getCharge() * good_tau.getCharge() < 0) {
+                    hists->Fill("OS_anti_pass", (anti_muon.getP4() + good_tau.getP4()).M(), evtwt);
                 } else {
-                    hists->Fill("SS_anti_pass", (anti_muon->getP4() + good_tau->getP4()).M(), evtwt);
+                    hists->Fill("SS_anti_pass", (anti_muon.getP4() + good_tau.getP4()).M(), evtwt);
                 }
-            } else if (good_tau->getIso(vloose)) {
+            } else if (good_tau.getIso(vloose)) {
                 // tau fail region
-                if (anti_muon->getCharge() * good_tau->getCharge() < 0) {
-                    hists->Fill("OS_anti_fail", (anti_muon->getP4() + good_tau->getP4()).M(), evtwt);
+                if (anti_muon.getCharge() * good_tau.getCharge() < 0) {
+                    hists->Fill("OS_anti_fail", (anti_muon.getP4() + good_tau.getP4()).M(), evtwt);
                 } else {
-                    hists->Fill("SS_anti_fail", (anti_muon->getP4() + good_tau->getP4()).M(), evtwt);
+                    hists->Fill("SS_anti_fail", (anti_muon.getP4() + good_tau.getP4()).M(), evtwt);
                 }
             }
         }  // close anti-id signal region
 
         // construct anti-id control region
         if (anti_muon_pair.size() == 2) {
-            if (anti_muon_pair.at(0)->getCharge() * anti_muon_pair.at(0)->getCharge() < 0) {
-                hists->Fill("OS_anti_control", (anti_muon_pair.at(0)->getP4() + anti_muon_pair.at(1)->getP4()).M(), evtwt);
+            if (anti_muon_pair.at(0).getCharge() * anti_muon_pair.at(0).getCharge() < 0) {
+                hists->Fill("OS_anti_control", (anti_muon_pair.at(0).getP4() + anti_muon_pair.at(1).getP4()).M(), evtwt);
             } else {
-                hists->Fill("SS_anti_control", (anti_muon_pair.at(0)->getP4() + anti_muon_pair.at(1)->getP4()).M(), evtwt);
+                hists->Fill("SS_anti_control", (anti_muon_pair.at(0).getP4() + anti_muon_pair.at(1).getP4()).M(), evtwt);
             }
         }  // close anti-id control region
     }      // end event loop
@@ -169,66 +179,58 @@ bool pass_electron_veto(std::shared_ptr<VElectron> all_electrons) {
     return true;
 }
 
-Muon* get_signal_muon(std::shared_ptr<VMuon> all_muons) {
-    int loose_muons(0);
-    Muon *mu, *temp;
+int get_signal_muon(std::shared_ptr<VMuon> all_muons) {
+    Muon* mu;
+    int loose_muons(0), idx(-1);
     for (unsigned i = 0; i < all_muons->size(); i++) {
-        if (loose_muons > 1) {  // exactly 1 muon in the event
-            return nullptr;
-        }
-
-        temp = &all_muons->at(i);
-        if (temp->getPt() > 55 && fabs(temp->getEta()) < 2.4 && temp->getID(medium)) {  // good muon
-            mu = &all_muons->at(i);
+        mu = &all_muons->at(i);
+        if (mu->getPt() > 55 && fabs(mu->getEta()) < 2.4 && mu->getID(medium)) {  // good muon
+            idx = i;
             loose_muons++;
-        } else if (temp->getPt() > 10 && fabs(temp->getEta()) < 2.4 && temp->getID(medium) && temp->getIsoTrk() < 0.15) {  // extra muons
+        } else if (mu->getPt() > 10 && fabs(mu->getEta()) < 2.4 && mu->getID(medium) && mu->getIsoTrk() < 0.15) {  // extra muons
             loose_muons++;
         }
-    }
 
-    // if there were multiple muons, reset the good muon
-    if (loose_muons > 1) {
-        return nullptr;
+        // exactly 1 muon in the event
+        if (loose_muons > 1) {
+            return -1;
+        }
     }
-    return mu;
+    return idx;
 }
 
-Muon* get_antiid_muon(std::shared_ptr<VMuon> all_muons) {
-    int loose_muons(0);
-    Muon *mu, *temp;
+int get_antiid_muon(std::shared_ptr<VMuon> all_muons) {
+    Muon *mu;
+    int loose_muons(0), idx(-1);
     for (unsigned i = 0; i < all_muons->size(); i++) {
-        if (loose_muons > 1) {  // exactly 1 muon in the event
-            return nullptr;
-        }
-
-        temp = &all_muons->at(i);
-        if (temp->getPt() > 55 && fabs(temp->getEta()) < 2.4 && !temp->getID(medium)) {  // good muon
-            mu = &all_muons->at(i);
+        mu = &all_muons->at(i);
+        if (mu->getPt() > 55 && fabs(mu->getEta()) < 2.4 && !mu->getID(medium)) {  // good muon
+            idx = 9;
             loose_muons++;
-        } else if (temp->getPt() > 10 && fabs(temp->getEta()) < 2.4 && !(temp->getID(medium) && temp->getIsoTrk() < 0.15)) {  // extra muons
+        } else if (mu->getPt() > 10 && fabs(mu->getEta()) < 2.4 && !(mu->getID(medium) && mu->getIsoTrk() < 0.15)) {  // extra muons
             loose_muons++;
         }
-    }
 
-    // if there were multiple muons, reset the good muon
-    if (loose_muons > 1) {
-        nullptr;
+        // exactly 1 muon in the event
+        if (loose_muons > 1) {
+            return -1;
+        }
     }
-    return mu;
+    return idx;
 }
 
-Boosted* get_signal_tau(std::shared_ptr<VBoosted> all_taus) {
+int get_signal_tau(std::shared_ptr<VBoosted> all_taus) {
     for (unsigned i = 0; i < all_taus->size(); i++) {
         if (all_taus->at(i).getPt() > 30 && fabs(all_taus->at(i).getEta()) < 2.3) {
-            return &all_taus->at(i);
+            return i;
         }
     }
-    return nullptr;
+    return -1;
 }
 
-vector<Muon*> get_control_muons(std::shared_ptr<VMuon> all_muons) {
-    int loose_muons(0);
-    vector<Muon*> good_pair;
+vector<int> get_control_muons(std::shared_ptr<VMuon> all_muons) {
+    int loose_muons(0), i(0);
+    vector<int> good_pair;
     for (auto mu : *all_muons) {  // tighter muon
         if (loose_muons > 2) {    // veto on 3+ muons in event
             break;
@@ -241,20 +243,23 @@ vector<Muon*> get_control_muons(std::shared_ptr<VMuon> all_muons) {
 
         // find a good match
         if (mu.getPt() > 50 && fabs(mu.getEta()) < 2.4 && mu.getID(medium) && mu.getIsoTrk() < 0.15) {
+            int j(0);
             for (auto mu2 : *all_muons) {  // looser muon
                 if (mu2.getPt() > 10 && fabs(mu2.getEta()) < 2.4 && mu2.getID(medium) && mu2.getIsoTrk() < 0.15 &&
                     (mu.getP4() + mu2.getP4()).M() > 60 && (mu.getP4() + mu2.getP4()).M() < 120) {
-                    good_pair = {&mu, &mu2};
+                    good_pair = {i, j};
                 }
+                j++;
             }
         }
+        i++;
     }
     return good_pair;
 }
 
-vector<Muon*> get_antiid_control_muons(std::shared_ptr<VMuon> all_muons) {
-    int loose_muons(0);
-    vector<Muon*> good_pair;
+vector<int> get_antiid_control_muons(std::shared_ptr<VMuon> all_muons) {
+    int loose_muons(0), i(0);
+    vector<int> good_pair;
     for (auto mu : *all_muons) {  // tighter muon
         if (loose_muons > 2) {    // veto on 3+ muons in event
             break;
@@ -267,13 +272,16 @@ vector<Muon*> get_antiid_control_muons(std::shared_ptr<VMuon> all_muons) {
 
         // find a good match
         if (mu.getPt() > 50 && fabs(mu.getEta()) < 2.4 && mu.getID(medium) && mu.getIsoTrk() < 0.15) {
+            int j(0);
             for (auto mu2 : *all_muons) {  // looser muon
                 if (mu2.getPt() > 10 && fabs(mu2.getEta()) < 2.4 && !(mu2.getID(medium) && mu2.getIsoTrk() < 0.15) &&
                     (mu.getP4() + mu2.getP4()).M() > 60 && (mu.getP4() + mu2.getP4()).M() < 120) {
-                    good_pair = {&mu, &mu2};
+                    good_pair = {i, j};
                 }
+                j++;
             }
         }
+        i++;
     }
     return good_pair;
 }
