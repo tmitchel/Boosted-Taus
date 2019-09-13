@@ -171,38 +171,39 @@ bool pass_electron_veto(std::shared_ptr<VElectron> all_electrons) {
 
 Muon* get_signal_muon(std::shared_ptr<VMuon> all_muons) {
     int loose_muons(0);
-    Muon good_muon(0, 0, 0, 0);
-    for (auto mu : *all_muons) {
+    Muon *mu, *temp;
+    for (unsigned i = 0; i < all_muons->size(); i++) {
         if (loose_muons > 1) {  // exactly 1 muon in the event
-            break;
+            return nullptr;
         }
 
-        if (mu.getPt() > 55 && fabs(mu.getEta()) < 2.4 && mu.getID(medium)) {  // good muon
+        temp = &all_muons->at(i);
+        if (temp->getPt() > 55 && fabs(temp->getEta()) < 2.4 && temp->getID(medium)) {  // good muon
             loose_muons++;
-            good_muon = mu;
-        } else if (mu.getPt() > 10 && fabs(mu.getEta()) < 2.4 && mu.getID(medium) && mu.getIsoTrk() < 0.15) {  // extra muons
+            mu = &all_muons->at(i);
+        } else if (temp->getPt() > 10 && fabs(temp->getEta()) < 2.4 && temp->getID(medium) && temp->getIsoTrk() < 0.15) {  // extra muons
             loose_muons++;
         }
     }
 
     // if there were multiple muons, reset the good muon
     if (loose_muons > 1) {
-        good_muon = Muon(0, 0, 0, 0);
+        return nullptr;
     }
-    return &good_muon;
+    return mu;
 }
 
 Muon* get_antiid_muon(std::shared_ptr<VMuon> all_muons) {
     int loose_muons(0);
-    Muon good_muon(0, 0, 0, 0);
-    for (auto mu : *all_muons) {
+    Muon* good_muon;
+    for (Muon* mu : *all_muons) {
         if (loose_muons > 1) {  // exactly 1 muon in the event
-            break;
+            return nullptr;
         }
 
         if (mu.getPt() > 55 && fabs(mu.getEta()) < 2.4 && !mu.getID(medium)) {  // good muon
             loose_muons++;
-            good_muon = mu;
+            good_muon = &mu;
         } else if (mu.getPt() > 10 && fabs(mu.getEta()) < 2.4 && !(mu.getID(medium) && mu.getIsoTrk() < 0.15)) {  // extra muons
             loose_muons++;
         }
