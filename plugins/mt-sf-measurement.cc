@@ -65,7 +65,10 @@ int main(int argc, char** argv) {
     auto event = Event_Factory(tree);
     auto nevt_hist = reinterpret_cast<TH1F*>(fin->Get("hcount"));
     auto cross_section = cross_sections[sample_name];
-    Double_t evtwt(1.);
+    Double_t init_weight(cross_section * lumi["2017"] / nevt_hist->GetBinContent(2));
+    if (is_data) {
+      init_weight = 1.;
+    }
 
     auto nevts = tree->GetEntries();
     int progress(0), fraction((nevts - 1) / 10);
@@ -76,7 +79,7 @@ int main(int argc, char** argv) {
             progress++;
         }
 
-        evtwt = 1.;
+        auto evtwt = init_weight;
         boost_factory.Run_Factory();
         jet_factory.Run_Factory();
         muon_factory.Run_Factory();
