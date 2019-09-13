@@ -15,6 +15,7 @@
 #include "../interface/event_factory.h"
 #include "../interface/jets_factory.h"
 #include "../interface/muon_factory.h"
+#include "../interface/util.h"
 
 using std::string;
 using std::vector;
@@ -36,6 +37,9 @@ int main(int argc, char** argv) {
     auto tree_name = parser->Option("-t", "ggNtuplizer/EventTree");
     auto histograms = parser->Option("-j", "test.json");
     auto logname = parser->Option("-l");
+
+    std::string sample_name = input_name.substr(input_name.rfind("/") + 1, std::string::npos);
+    sample_name = sample_name.substr(0, sample_name.rfind(".root"));
 
     // create the log file
     std::ofstream logfile;
@@ -60,7 +64,7 @@ int main(int argc, char** argv) {
     auto electron_factory = Electron_Factory(tree);
     auto event = Event_Factory(tree);
     auto nevt_hist = reinterpret_cast<TH1F*>(fin->Get("hcount"));
-
+    auto cross_section = cross_sections[sample_name];
     Double_t evtwt(1.);
 
     auto nevts = tree->GetEntries();
@@ -163,6 +167,7 @@ int main(int argc, char** argv) {
     }      // end event loop
     fin->Close();
     hists->Write();
+    logfile.close();
 }
 
 bool pass_electron_veto(std::shared_ptr<VElectron> all_electrons) {

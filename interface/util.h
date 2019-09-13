@@ -31,13 +31,13 @@ std::map<std::string, double> cross_sections = {
   {"DYJetsToLL_M-50_HT-2500toInf", 0.003647},
   {"DYJetsToLL_M-50_v1", 0.},  // don't use inclusive yet
 
-  {"WJetsToLNu_HT-100To200", 148.},
-  {"WJetsToLNu_HT-200To400", 40.94},
-  {"WJetsToLNu_HT-400To600", 5.497},
-  {"WJetsToLNu_HT-600To800", 1.354},
-  {"WJetsToLNu_HT-800To1200", 0.625},
-  {"WJetsToLNu_HT-1200To2500", 0.151},
-  {"WJetsToLNu_HT-2500ToInf", 0.003647},
+  {"WJetsToLNu_HT-100To200", 1343.},
+  {"WJetsToLNu_HT-200To400", 359.6},
+  {"WJetsToLNu_HT-400To600", 48.85},
+  {"WJetsToLNu_HT-600To800", 12.05},
+  {"WJetsToLNu_HT-800To1200", 5.501},
+  {"WJetsToLNu_HT-1200To2500", 1.329},
+  {"WJetsToLNu_HT-2500ToInf", 0.03216},
   {"WJetsToLNu_Inc", 0.},  // don't use inclusive yet
 
   {"ST_s-channel_4f_leptonDecays", 3.36},
@@ -45,6 +45,11 @@ std::map<std::string, double> cross_sections = {
   {"ST_t-channel_top_4f_inclusiveDecays", 44.07},
   {"ST_tW_antitop_5f_inclusiveDecays", 35.6},
   {"ST_tW_top_5f_inclusiveDecays", 35.6},
+  {"ST_s-channel_4f_leptonDecays", 3.36},
+  {"ST_t-channel_antitop", 26.23},
+  {"ST_t-channel_top", 44.07},
+  {"ST_tW_antitop", 35.6},
+  {"ST_tW_top", 35.6},
   {"TTTo2L2Nu", 88.29},
   {"TTToHadronic", 377.96},
   {"TTToSemiLeptonic", 365.35},
@@ -66,6 +71,7 @@ std::map<std::string, double> cross_sections = {
   {"JetHT_Run2017D-31Mar2018", 1.},
   {"JetHT_Run2017E-31Mar2018", 1.},
   {"JetHT_Run2017F-31Mar2018", 1.},
+  {"Data", 1.}
 
 };
 
