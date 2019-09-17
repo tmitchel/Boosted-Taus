@@ -24,7 +24,8 @@ class histManager {
   void FillPrevBins(std::string, double, double);
   void Write();
 
- private:
+  // I'll make this public in case you want to handle
+  // things directly. (Don't make me regret it!)
   std::map<std::string, TH1F*> hists_1d;
   std::map<std::string, TH2F*> hists_2d;
   std::shared_ptr<TFile> fout;
