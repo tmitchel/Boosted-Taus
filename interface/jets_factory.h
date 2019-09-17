@@ -30,8 +30,8 @@ class Jets_Factory {
   std::vector<ULong64_t> *jetFiredTrgs;
   std::vector<Int_t> *jetLepTrackPID, *jetPartonID, *jetHadFlvr, *jetID, *jetPUFullID, *jetNCH, *jetNNP;
   std::vector<Float_t> *jetPt, *jetEta, *jetPhi, *jetEn, *jetRawPt, *jetRawEn, *jetMt, *jetArea, *jetLeadTrackPt, *jetLeadTrackEta, *jetLeadTrackPhi,
-      *jetLepTrackPt, *jetLepTrackEta, *jetLepTrackPhi, *jetCSV2BJetTags, *jetDeepCSVTags_b, *jetDeepCSVTags_bb, *jetDeepCSVTags_c, *jetDeepCSVTags_udsg,
-      *jetPUID, *jetJECUnc, *jetCHF, *jetNHF, *jetCEF, *jetNEF, *jetMUF;
+      *jetLepTrackPt, *jetLepTrackEta, *jetLepTrackPhi, *jetCSV2BJetTags, *jetDeepCSVTags_b, *jetDeepCSVTags_bb, *jetDeepCSVTags_c,
+      *jetDeepCSVTags_udsg, *jetPUID, *jetJECUnc, *jetCHF, *jetNHF, *jetCEF, *jetNEF, *jetMUF;
 };
 
 Jets_Factory::Jets_Factory(TTree *tree, bool is_data_)
@@ -92,10 +92,6 @@ Jets_Factory::Jets_Factory(TTree *tree, bool is_data_)
   tree->SetBranchAddress("jetDeepCSVTags_bb", &jetDeepCSVTags_bb);
   tree->SetBranchAddress("jetDeepCSVTags_c", &jetDeepCSVTags_c);
   tree->SetBranchAddress("jetDeepCSVTags_udsg", &jetDeepCSVTags_udsg);
-  if (!is_data) {
-    tree->SetBranchAddress("jetPartonID", &jetPartonID);
-    tree->SetBranchAddress("jetHadFlvr", &jetHadFlvr);
-  }
   tree->SetBranchAddress("jetPFLooseId", &jetPFLooseId);
   tree->SetBranchAddress("jetID", &jetID);
   tree->SetBranchAddress("jetPUID", &jetPUID);
@@ -109,6 +105,10 @@ Jets_Factory::Jets_Factory(TTree *tree, bool is_data_)
   tree->SetBranchAddress("jetNCH", &jetNCH);
   tree->SetBranchAddress("jetNNP", &jetNNP);
   tree->SetBranchAddress("jetMUF", &jetMUF);
+  if (!is_data) {
+    tree->SetBranchAddress("jetPartonID", &jetPartonID);
+    tree->SetBranchAddress("jetHadFlvr", &jetHadFlvr);
+  }
 }
 
 void Jets_Factory::Run_Factory() {
@@ -136,10 +136,6 @@ void Jets_Factory::Run_Factory() {
     jet.DeepCSVTags_bb = jetDeepCSVTags_bb->at(i);
     jet.DeepCSVTags_c = jetDeepCSVTags_c->at(i);
     jet.DeepCSVTags_udsg = jetDeepCSVTags_udsg->at(i);
-    if (!is_data) {
-      jet.PartonID = jetPartonID->at(i);
-      jet.HadFlvr = jetHadFlvr->at(i);
-    }
     jet.PFLooseId = jetPFLooseId->at(i);
     jet.ID = jetID->at(i);
     jet.PUID = jetPUID->at(i);
@@ -153,6 +149,10 @@ void Jets_Factory::Run_Factory() {
     jet.NCH = jetNCH->at(i);
     jet.NNP = jetNNP->at(i);
     jet.MUF = jetMUF->at(i);
+    if (!is_data) {
+      jet.PartonID = jetPartonID->at(i);
+      jet.HadFlvr = jetHadFlvr->at(i);
+    }
     jets.push_back(jet);
 
     if (jetCSV2BJetTags->at(i)> 0.4941) {
