@@ -4,7 +4,6 @@
 #define INTERFACE_ELECTRON_H_
 
 #include <vector>
-#include "./object.h"
 #include "TLorentzVector.h"
 
 class Electron {

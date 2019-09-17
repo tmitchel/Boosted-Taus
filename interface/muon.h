@@ -3,7 +3,6 @@
 #ifndef INTERFACE_MUON_H_
 #define INTERFACE_MUON_H_
 
-#include "./object.h"
 #include "TLorentzVector.h"
 
 class Muon {

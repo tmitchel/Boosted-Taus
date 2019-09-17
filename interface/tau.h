@@ -4,7 +4,6 @@
 #define INTERFACE_TAU_H_
 
 #include <stdexcept>
-#include "./object.h"
 #include "./util.h"
 #include "TLorentzVector.h"
 

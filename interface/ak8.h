@@ -3,7 +3,6 @@
 #ifndef INTERFACE_AK8_H_
 #define INTERFACE_AK8_H_
 
-#include "./object.h"
 #include "TLorentzVector.h"
 
 class AK8 {

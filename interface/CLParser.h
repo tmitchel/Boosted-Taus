@@ -42,6 +42,7 @@ std::string CLParser::Option(const std::string &flag, const std::string default_
     return empty;
 }
 
+// parse options (multiple parameters for this option)
 std::vector<std::string> CLParser::MultiOption(const std::string &flag, int depth, int first = 1) {
     if (first == 1) {
         opts.clear();

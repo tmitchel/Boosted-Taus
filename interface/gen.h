@@ -3,7 +3,6 @@
 #ifndef INTERFACE_GEN_H_
 #define INTERFACE_GEN_H_
 
-#include "./object.h"
 #include "TLorentzVector.h"
 
 class Gen {

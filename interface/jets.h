@@ -3,7 +3,6 @@
 #ifndef INTERFACE_JETS_H_
 #define INTERFACE_JETS_H_
 
-#include "./object.h"
 #include "TLorentzVector.h"
 
 class Jets {
