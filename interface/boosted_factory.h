@@ -111,37 +111,38 @@ Boosted_Factory::Boosted_Factory(TTree *tree, std::string isoType = "IsolationMV
 void Boosted_Factory::Run_Factory() {
     boosteds.clear();
     for (auto i = 0; i < nBoostedTau; i++) {
-        if (boostedTauPt->at(i) > 30 && fabs(boostedTauEta->at(i)) < 2.3) {
-            auto boosted = Boosted(boostedTauPt->at(i), boostedTauEta->at(i), boostedTauPhi->at(i));
-            boosted.pass_vloose_iso = pass_vloose_iso->at(i);
-            boosted.pass_loose_iso = pass_loose_iso->at(i);
-            boosted.pass_medium_iso = pass_medium_iso->at(i);
-            boosted.pass_tight_iso = pass_tight_iso->at(i);
-            boosted.pass_vtight_iso = pass_vtight_iso->at(i);
-            boosted.pfTausDiscriminationByDecayModeFinding = boostedTaupfTausDiscriminationByDecayModeFinding->at(i);
-            boosted.pfTausDiscriminationByDecayModeFindingNewDMs = boostedTaupfTausDiscriminationByDecayModeFindingNewDMs->at(i);
-            boosted.ByMVA6VLooseElectronRejection = boostedTauByMVA6VLooseElectronRejection->at(i);
-            boosted.ByMVA6LooseElectronRejection = boostedTauByMVA6LooseElectronRejection->at(i);
-            boosted.ByMVA6MediumElectronRejection = boostedTauByMVA6MediumElectronRejection->at(i);
-            boosted.ByMVA6TightElectronRejection = boostedTauByMVA6TightElectronRejection->at(i);
-            boosted.ByMVA6VTightElectronRejection = boostedTauByMVA6VTightElectronRejection->at(i);
-            boosted.ByLooseMuonRejection3 = boostedTauByLooseMuonRejection3->at(i);
-            boosted.ByTightMuonRejection3 = boostedTauByTightMuonRejection3->at(i);
-            boosted.LeadChargedHadronExists = boostedTauLeadChargedHadronExists->at(i);
-            boosted.DecayMode = boostedTauDecayMode->at(i);
-            boosted.NumSignalPFChargedHadrCands = boostedTauNumSignalPFChargedHadrCands->at(i);
-            boosted.NumSignalPFNeutrHadrCands = boostedTauNumSignalPFNeutrHadrCands->at(i);
-            boosted.NumSignalPFGammaCands = boostedTauNumSignalPFGammaCands->at(i);
-            boosted.NumSignalPFCands = boostedTauNumSignalPFCands->at(i);
-            boosted.NumIsolationPFChargedHadrCands = boostedTauNumIsolationPFChargedHadrCands->at(i);
-            boosted.NumIsolationPFNeutrHadrCands = boostedTauNumIsolationPFNeutrHadrCands->at(i);
-            boosted.NumIsolationPFGammaCands = boostedTauNumIsolationPFGammaCands->at(i);
-            boosted.NumIsolationPFCands = boostedTauNumIsolationPFCands->at(i);
-            boosted.Charge = boostedTauCharge->at(i);
-            boosted.dz = boostedTaudz->at(i);
-            boosted.dxy = boostedTaudxy->at(i);
-            boosteds.push_back(boosted);
+        if (boostedTauPt->at(i) < 30 || fabs(boostedTauEta->at(i)) > 2.3) {
+            continue;
         }
+        auto boosted = Boosted(boostedTauPt->at(i), boostedTauEta->at(i), boostedTauPhi->at(i));
+        boosted.pass_vloose_iso = pass_vloose_iso->at(i);
+        boosted.pass_loose_iso = pass_loose_iso->at(i);
+        boosted.pass_medium_iso = pass_medium_iso->at(i);
+        boosted.pass_tight_iso = pass_tight_iso->at(i);
+        boosted.pass_vtight_iso = pass_vtight_iso->at(i);
+        boosted.pfTausDiscriminationByDecayModeFinding = boostedTaupfTausDiscriminationByDecayModeFinding->at(i);
+        boosted.pfTausDiscriminationByDecayModeFindingNewDMs = boostedTaupfTausDiscriminationByDecayModeFindingNewDMs->at(i);
+        boosted.ByMVA6VLooseElectronRejection = boostedTauByMVA6VLooseElectronRejection->at(i);
+        boosted.ByMVA6LooseElectronRejection = boostedTauByMVA6LooseElectronRejection->at(i);
+        boosted.ByMVA6MediumElectronRejection = boostedTauByMVA6MediumElectronRejection->at(i);
+        boosted.ByMVA6TightElectronRejection = boostedTauByMVA6TightElectronRejection->at(i);
+        boosted.ByMVA6VTightElectronRejection = boostedTauByMVA6VTightElectronRejection->at(i);
+        boosted.ByLooseMuonRejection3 = boostedTauByLooseMuonRejection3->at(i);
+        boosted.ByTightMuonRejection3 = boostedTauByTightMuonRejection3->at(i);
+        boosted.LeadChargedHadronExists = boostedTauLeadChargedHadronExists->at(i);
+        boosted.DecayMode = boostedTauDecayMode->at(i);
+        boosted.NumSignalPFChargedHadrCands = boostedTauNumSignalPFChargedHadrCands->at(i);
+        boosted.NumSignalPFNeutrHadrCands = boostedTauNumSignalPFNeutrHadrCands->at(i);
+        boosted.NumSignalPFGammaCands = boostedTauNumSignalPFGammaCands->at(i);
+        boosted.NumSignalPFCands = boostedTauNumSignalPFCands->at(i);
+        boosted.NumIsolationPFChargedHadrCands = boostedTauNumIsolationPFChargedHadrCands->at(i);
+        boosted.NumIsolationPFNeutrHadrCands = boostedTauNumIsolationPFNeutrHadrCands->at(i);
+        boosted.NumIsolationPFGammaCands = boostedTauNumIsolationPFGammaCands->at(i);
+        boosted.NumIsolationPFCands = boostedTauNumIsolationPFCands->at(i);
+        boosted.Charge = boostedTauCharge->at(i);
+        boosted.dz = boostedTaudz->at(i);
+        boosted.dxy = boostedTaudxy->at(i);
+        boosteds.push_back(boosted);
     }
 
     // sort by pT
