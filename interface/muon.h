@@ -6,14 +6,18 @@
 #include "./object.h"
 #include "TLorentzVector.h"
 
-class Muon : public PObject {
+class Muon {
   friend class Muon_Factory;
 
  public:
-  Muon() : PObject() {}
-  Muon(Float_t, Float_t, Float_t, Float_t);
-
+    Muon(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _en) { this->p4.SetPtEtaPhiE(_pt, _eta, _phi, _en); }
+    Muon() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
   // getters
+  TLorentzVector getP4() { return p4; }
+  Float_t getPt() { return p4.Pt(); }
+  Float_t getEta() { return p4.Eta(); }
+  Float_t getPhi() { return p4.Phi(); }
+  Float_t getMass() { return p4.M(); }
   Bool_t getID(int key) { return (IDbit >> key & 1) == 1; }
   Float_t getFiredTrgs() { return FiredTrgs; }
   Float_t getFiredL1Trgs() { return FiredL1Trgs; }
@@ -46,12 +50,11 @@ class Muon : public PObject {
   Float_t getBestTrkPt() { return BestTrkPt; }
 
  private:
+  TLorentzVector p4;
   ULong64_t FiredTrgs, FiredL1Trgs;
   Int_t Charge, Type, IDbit, TrkLayers, PixelLayers, PixelHits, MuonHits, Stations, Matches, TrkQuality, BestTrkType;
   Float_t D0, Dz, SIP, Chi2NDF, InnerD0, InnerDz, IsoTrk, PFChIso, PFPhoIso, PFNeuIso, PFPUIso, InnervalidFraction, segmentCompatibility,
       chi2LocalPosition, trkKink, BestTrkPtError, BestTrkPt;
 };
-
-Muon::Muon(Float_t pt, Float_t eta, Float_t phi, Float_t energy) : PObject(pt, eta, phi, energy, comp0::energy) {}
 
 #endif  // INTERFACE_MUON_H_

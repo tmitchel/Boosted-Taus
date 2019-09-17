@@ -6,14 +6,19 @@
 #include "./object.h"
 #include "TLorentzVector.h"
 
-class Gen : public PObject {
+class Gen {
     friend class Gen_Factory;
 
    public:
-    Gen() : PObject() {}
-    Gen(Float_t, Float_t, Float_t, Float_t, comp0);
+    Gen(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _en) { this->p4.SetPtEtaPhiE(_pt, _eta, _phi, _en); }
+    Gen() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
 
     // getters
+    TLorentzVector getP4() { return p4; }
+    Float_t getPt() { return p4.Pt(); }
+    Float_t getEta() { return p4.Eta(); }
+    Float_t getPhi() { return p4.Phi(); }
+    Float_t getMass() { return p4.M(); }
     Int_t getPID() const { return PID; }
     Int_t getMomPID() const { return MomPID; }
     Int_t getGMomPID() const { return GMomPID; }
@@ -33,12 +38,10 @@ class Gen : public PObject {
     TLorentzVector getMomP4();  // defined below
 
    private:
-    TLorentzVector MomP4;
+    TLorentzVector p4, MomP4;
     Int_t PID, GMomPID, MomPID, Parentage, Status;
     Float_t Vtx, Vty, Vtz, E, Et, MomPt, MomMass, MomEta, MomPhi, CalIsoDR03, TrkIsoDR03, CalIsoDR04, TrkIsoDR04;
 };
-
-Gen::Gen(Float_t pt, Float_t eta, Float_t phi, Float_t energy, comp0 comp) : PObject(pt, eta, phi, energy, comp) {}
 
 TLorentzVector Gen::getMomP4() {
     MomP4.SetPtEtaPhiM(MomPt, MomEta, MomPhi, MomMass);

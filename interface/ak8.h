@@ -6,14 +6,19 @@
 #include "./object.h"
 #include "TLorentzVector.h"
 
-class AK8 : public PObject {
+class AK8 {
     friend class AK8_Factory;
 
    public:
-    AK8() : PObject() {}
-    AK8(Float_t, Float_t, Float_t, Float_t);
+    AK8(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _en) { this->p4.SetPtEtaPhiE(_pt, _eta, _phi, _en); }
+    AK8() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
 
     // getters
+    TLorentzVector getP4() { return p4; }
+    Float_t getPt() { return p4.Pt(); }
+    Float_t getEta() { return p4.Eta(); }
+    Float_t getPhi() { return p4.Phi(); }
+    Float_t getMass() { return p4.M(); }
     Bool_t getJetPFLooseId() { return PFLooseId; }
     Int_t getLepTrackPID() { return LepTrackPID; }
     Int_t getPartonID() { return PartonID; }
@@ -57,6 +62,7 @@ class AK8 : public PObject {
     Float_t getVtx3DSig() { return Vtx3DSig; }
 
    private:
+    TLorentzVector p4;
     Bool_t PFLooseId;
     Int_t LepTrackPID, PartonID, HadFlvr, ID, PUFullID, NCH, NNP;
     ULong64_t jetFiredTrgs;
@@ -65,7 +71,5 @@ class AK8 : public PObject {
         PUID, JECUnc, FiredTrgs, CHF, NHF, CEF, NEF, MUF, VtxPt, VtxMass, VtxNtrks, Vtx3DVal, Vtx3DSig, PrunedMass,
         SoftDropMass;
 };
-
-AK8::AK8(Float_t pt, Float_t eta, Float_t phi, Float_t energy) : PObject(pt, eta, phi, energy, comp0::energy) {}
 
 #endif  // INTERFACE_AK8_H_

@@ -114,7 +114,7 @@ void Boosted_Factory::Run_Factory() {
         if (boostedTauPt->at(i) < 30 || fabs(boostedTauEta->at(i)) > 2.3) {
             continue;
         }
-        auto boosted = Boosted(boostedTauPt->at(i), boostedTauEta->at(i), boostedTauPhi->at(i));
+        auto boosted = Boosted(boostedTauPt->at(i), boostedTauEta->at(i), boostedTauPhi->at(i), boostedTauMass->at(i));
         boosted.pass_vloose_iso = pass_vloose_iso->at(i);
         boosted.pass_loose_iso = pass_loose_iso->at(i);
         boosted.pass_medium_iso = pass_medium_iso->at(i);
