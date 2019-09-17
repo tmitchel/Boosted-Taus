@@ -10,5 +10,6 @@
     "OS_anti_fail": [30, 50, 140],
     "SS_anti_fail": [30, 50, 140],
     "OS_anti_control": [30, 50, 140],
-    "SS_anti_control": [30, 50, 140]
+    "SS_anti_control": [30, 50, 140],
+    "cutflow": [10, 0.5, 10.5]
 }
