@@ -86,87 +86,125 @@ int main(int argc, char** argv) {
         electron_factory.Run_Factory();
         event.Run_Factory();
 
-        if (!event.getLepTrigger(21)) {  // Mu50 trigger
+        /////////////////////////
+        // Begin pre-selection //
+        /////////////////////////
+        if (event.getLepTrigger(21)) {  // Mu50 trigger
+            hists->Fill("cutflow", 1., evtwt);
+        } else {
             continue;
         }
 
-        // general selection
-        if (!pass_electron_veto(electron_factory.getElectrons())) {
-            continue;  // found electrons in the event
+        if (pass_electron_veto(electron_factory.getElectrons())) {  // found electrons in the event
+            hists->Fill("cutflow", 2., evtwt);
+        } else {
+            continue;
         }
 
-        if (jet_factory.getNBTags() > 0) {  // TODO(tmitchel): implement
-            continue;                       // b-jet veto
+        if (jet_factory.getNBTags() > 0) {  // b-jet veto
+            hists->Fill("cutflow", 3., evtwt);
+        } else {
+            continue;
         }
 
         auto muons = muon_factory.getMuons();
         auto taus = boost_factory.getTaus();
 
+        //////////////////////////////
+        // Begin Zmumu CR selection //
+        //////////////////////////////
+
         // get necessary objects
         auto nloose = find_loose_muons(muons);
-        auto good_muon = get_signal_muon(muons);
-        auto anti_muon = get_antiid_muon(muons);
-        auto good_tau = get_signal_tau(taus);
+        if (nloose <= 2) {
+            hists->Fill("cutflow", 4., evtwt);
+        } else {
+            continue;
+        }
+
+        // get passing/failing pairs
         auto good_muon_pair = get_control_muons(muons);
         auto anti_muon_pair = get_antiid_control_muons(muons);
 
-        // construct signal region
-        if (nloose < 2 && good_muon.getPt() > 0 && good_tau.getPt() > 0 && good_muon.getP4().DeltaR(good_tau.getP4()) > 0.1 &&
-            good_muon.getP4().DeltaR(good_tau.getP4()) < 0.8) {
-            if (good_tau.getIso(medium)) {
-                // tau pass region
-                if (good_muon.getCharge() * good_tau.getCharge() < 0) {
-                    hists->Fill("OS_pass", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
-                } else {
-                    hists->Fill("SS_pass", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
-                }
-            } else if (good_tau.getIso(vloose)) {
-                // tau fail region
-                if (good_muon.getCharge() * good_tau.getCharge() < 0) {
-                    hists->Fill("OS_fail", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
-                } else {
-                    hists->Fill("SS_fail", (good_muon.getP4() + good_tau.getP4()).M(), evtwt);
-                }
-            }
-        }  // close signal region
-
-        // construct control region
-        if (nloose < 3 && good_muon_pair.size() == 2) {
+        // passing region
+        if (good_muon_pair.size() == 2) {
             if (good_muon_pair.at(0).getCharge() * good_muon_pair.at(1).getCharge() < 0) {
                 hists->Fill("OS_control", (good_muon_pair.at(0).getP4() + good_muon_pair.at(1).getP4()).M(), evtwt);
             } else {
                 hists->Fill("SS_control", (good_muon_pair.at(0).getP4() + good_muon_pair.at(1).getP4()).M(), evtwt);
             }
-        }  // close control region
-
-        // construct anti-id signal region
-        if (nloose < 2 && anti_muon.getPt() > 0 && good_tau.getPt() > 0 && anti_muon.getP4().DeltaR(good_tau.getP4()) > 0.1 &&
-            anti_muon.getP4().DeltaR(good_tau.getP4()) < 0.8) {
-            if (good_tau.getIso(medium)) {
-                // tau pass region
-                if (anti_muon.getCharge() * good_tau.getCharge() < 0) {
-                    hists->Fill("OS_anti_pass", (anti_muon.getP4() + good_tau.getP4()).M(), evtwt);
-                } else {
-                    hists->Fill("SS_anti_pass", (anti_muon.getP4() + good_tau.getP4()).M(), evtwt);
-                }
-            } else if (good_tau.getIso(vloose)) {
-                // tau fail region
-                if (anti_muon.getCharge() * good_tau.getCharge() < 0) {
-                    hists->Fill("OS_anti_fail", (anti_muon.getP4() + good_tau.getP4()).M(), evtwt);
-                } else {
-                    hists->Fill("SS_anti_fail", (anti_muon.getP4() + good_tau.getP4()).M(), evtwt);
-                }
-            }
-        }  // close anti-id signal region
-
-        // construct anti-id control region
-        if (nloose < 3 && anti_muon_pair.size() == 2) {
+        } else if (anti_muon_pair.size() == 2) {
             if (anti_muon_pair.at(0).getCharge() * anti_muon_pair.at(1).getCharge() < 0) {
                 hists->Fill("OS_anti_control", (anti_muon_pair.at(0).getP4() + anti_muon_pair.at(1).getP4()).M(), evtwt);
             } else {
                 hists->Fill("SS_anti_control", (anti_muon_pair.at(0).getP4() + anti_muon_pair.at(1).getP4()).M(), evtwt);
             }
-        }  // close anti-id control region
+        }
+
+        ///////////////////////////////////
+        // Begin signal region selection //
+        ///////////////////////////////////
+
+        if (nloose <= 1) {
+            hists->Fill("cutflow", 5., evtwt);
+        } else {
+            continue;
+        }
+
+        auto good_muon = get_signal_muon(muons);
+        auto anti_muon = get_antiid_muon(muons);
+        auto good_tau = get_signal_tau(taus);
+
+        // check if we find a good tau
+        if (good_tau.getPt() > 0) {
+            hists->Fill("cutflow", 6., evtwt);
+        } else {
+            continue;
+        }
+
+        // check if we found a good passing or failing muon
+        if (good_muon.getPt() > 0 || anti_muon.getPt() > 0) {
+            hists->Fill("cutflow", 7., evtwt);
+        } else {
+            continue;
+        }
+
+        // get the 4-vectors
+        auto mu_vector(good_muon.getP4()), anti_vector(anti_muon.getP4()), tau_vector(good_tau.getP4());
+
+        // construct pass-id signal region
+        if (mu_vector.DeltaR(tau_vector) > 0.1 && mu_vector.DeltaR(tau_vector) < 0.8) {
+            if (good_tau.getIso(medium)) {  // tau pass region
+                if (good_muon.getCharge() * good_tau.getCharge() < 0) {
+                    hists->Fill("OS_pass", (mu_vector + tau_vector).M(), evtwt);
+                } else {
+                    hists->Fill("SS_pass", (mu_vector + tau_vector).M(), evtwt);
+                }
+            } else if (good_tau.getIso(vloose)) {
+                if (good_muon.getCharge() * good_tau.getCharge() < 0) {  // tau fail region
+                    hists->Fill("OS_fail", (mu_vector + tau_vector).M(), evtwt);
+                } else {
+                    hists->Fill("SS_fail", (mu_vector + tau_vector).M(), evtwt);
+                }
+            }
+        }
+
+        // construct anti-id signal region
+        if (anti_vector.DeltaR(tau_vector) > 0.1 && anti_vector.DeltaR(tau_vector) < 0.8) {
+            if (good_tau.getIso(medium)) {  // tau pass region
+                if (anti_muon.getCharge() * good_tau.getCharge() < 0) {
+                    hists->Fill("OS_anti_pass", (anti_vector + tau_vector).M(), evtwt);
+                } else {
+                    hists->Fill("SS_anti_pass", (anti_vector + tau_vector).M(), evtwt);
+                }
+            } else if (good_tau.getIso(vloose)) {
+                if (anti_muon.getCharge() * good_tau.getCharge() < 0) {  // tau fail region
+                    hists->Fill("OS_anti_fail", (anti_vector + tau_vector).M(), evtwt);
+                } else {
+                    hists->Fill("SS_anti_fail", (anti_vector + tau_vector).M(), evtwt);
+                }
+            }
+        }
     }      // end event loop
     fin->Close();
     hists->Write();
