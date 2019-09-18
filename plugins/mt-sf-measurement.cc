@@ -173,9 +173,12 @@ int main(int argc, char** argv) {
         auto mu_vector(good_muon.getP4()), anti_vector(anti_muon.getP4()), tau_vector(good_tau.getP4());
 
         // construct pass-id signal region
-        if (mu_vector.DeltaR(tau_vector) > 0.1 && mu_vector.DeltaR(tau_vector) < 0.8) {
+        if (mu_vector.DeltaR(tau_vector) > 0.01 && mu_vector.DeltaR(tau_vector) < 0.8) {
+            hists->Fill("cutflow", 8., evtwt);
             if (good_tau.getIso(medium)) {  // tau pass region
+                hists->Fill("cutflow", 9., evtwt);
                 if (good_muon.getCharge() * good_tau.getCharge() < 0) {
+                    hists->Fill("cutflow", 10., evtwt);
                     hists->Fill("OS_pass", (mu_vector + tau_vector).M(), evtwt);
                 } else {
                     hists->Fill("SS_pass", (mu_vector + tau_vector).M(), evtwt);
@@ -190,7 +193,7 @@ int main(int argc, char** argv) {
         }
 
         // construct anti-id signal region
-        if (anti_vector.DeltaR(tau_vector) > 0.1 && anti_vector.DeltaR(tau_vector) < 0.8) {
+        if (anti_vector.DeltaR(tau_vector) > 0.01 && anti_vector.DeltaR(tau_vector) < 0.8) {
             if (good_tau.getIso(medium)) {  // tau pass region
                 if (anti_muon.getCharge() * good_tau.getCharge() < 0) {
                     hists->Fill("OS_anti_pass", (anti_vector + tau_vector).M(), evtwt);
