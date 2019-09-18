@@ -250,7 +250,8 @@ Muon get_antiid_muon(std::shared_ptr<VMuon> all_muons) {
 
 Boosted get_signal_tau(std::shared_ptr<VBoosted> all_taus) {
     for (unsigned i = 0; i < all_taus->size(); i++) {
-        if (all_taus->at(i).getPt() > 30 && fabs(all_taus->at(i).getEta()) < 2.3) {
+        if (all_taus->at(i).getPt() > 30 && fabs(all_taus->at(i).getEta()) < 2.3
+            && all_taus->at(i).getMuRejection(tight) && all_taus->at(i).getEleRejection(vloose)) {
             return all_taus->at(i);
         }
     }
