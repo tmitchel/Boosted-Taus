@@ -4,18 +4,22 @@
 #define INTERFACE_TAU_H_
 
 #include <stdexcept>
-#include "./object.h"
 #include "./util.h"
 #include "TLorentzVector.h"
 
-class Tau : public PObject {
+class Tau {
     friend class Tau_Factory;
 
    public:
-    Tau() : PObject() {}
-    Tau(Float_t, Float_t, Float_t, Float_t);
+    Tau(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _m) { this->p4.SetPtEtaPhiM(_pt, _eta, _phi, _m); }
+    Tau() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
 
     // getters
+    TLorentzVector getP4() { return p4; }
+    Float_t getPt() { return p4.Pt(); }
+    Float_t getEta() { return p4.Eta(); }
+    Float_t getPhi() { return p4.Phi(); }
+    Float_t getMass() { return p4.M(); }
     Bool_t getIso(working_point);
     Bool_t getDiscByDM(bool);
     Bool_t getEleRejection(working_point);
@@ -48,6 +52,7 @@ class Tau : public PObject {
     Float_t getDXY() { return dxy; }
 
    private:
+    TLorentzVector p4;
     Bool_t pass_vloose_iso, pass_loose_iso, pass_medium_iso, pass_tight_iso, pass_vtight_iso;
 
     Bool_t pfTausDiscriminationByDecayModeFinding, pfTausDiscriminationByDecayModeFindingNewDMs,
@@ -63,8 +68,6 @@ class Tau : public PObject {
         LeadChargedHadronPhi, LeadChargedHadronPt, ChargedIsoPtSum, NeutralIsoPtSum, PuCorrPtSum, footprintCorrection,
         photonPtSumOutsideSignalCone, dz, dxy, Energy;
 };
-
-Tau::Tau(Float_t pt, Float_t eta, Float_t phi, Float_t mass = 1.77682) : PObject(pt, eta, phi, mass, comp0::mass) {}
 
 Bool_t Tau::getIso(working_point wp) {
     if (wp == 0) {

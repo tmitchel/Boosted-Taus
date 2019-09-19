@@ -4,17 +4,21 @@
 #define INTERFACE_ELECTRON_H_
 
 #include <vector>
-#include "./object.h"
 #include "TLorentzVector.h"
 
-class Electron : public PObject {
+class Electron {
     friend class Electron_Factory;
 
    public:
-    Electron() : PObject() {}
-    Electron(Float_t, Float_t, Float_t, Float_t);
+    Electron(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _en) { this->p4.SetPtEtaPhiE(_pt, _eta, _phi, _en); }
+    Electron() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
 
     // getters
+    TLorentzVector getP4() { return p4; }
+    Float_t getPt() { return p4.Pt(); }
+    Float_t getEta() { return p4.Eta(); }
+    Float_t getPhi() { return p4.Phi(); }
+    Float_t getMass() { return p4.M(); }
     Float_t getSCEn() { return SCEn; }
     Float_t getEcalEn() { return EcalEn; }
     Float_t getESEnP1() { return ESEnP1; }
@@ -104,8 +108,5 @@ class Electron : public PObject {
     std::vector<Float_t> GSFPt, GSFEta, GSFPhi, GSFCharge, GSFVtxProb, GSFlxyPV, GSFlxyBS, BCEn, BCEta, BCPhi, BCS25,
         BCS15, BCSieie, BCSieip, BCSipip;
 };
-
-Electron::Electron(Float_t pt, Float_t eta, Float_t phi, Float_t energy)
-    : PObject(pt, eta, phi, energy, comp0::energy) {}
 
 #endif  // INTERFACE_ELECTRON_H_

@@ -59,10 +59,6 @@ AK8_Factory::AK8_Factory(TTree *tree, bool is_data_)
     tree->SetBranchAddress("AK8JetPhi", &jetPhi);
     tree->SetBranchAddress("AK8JetRawPt", &jetRawPt);
     tree->SetBranchAddress("AK8JetRawEn", &jetRawEn);
-    if (!is_data) {
-        tree->SetBranchAddress("AK8JetPartonID", &jetPartonID);
-        tree->SetBranchAddress("AK8JetHadFlvr", &jetHadFlvr);
-    }
     tree->SetBranchAddress("AK8JetPFLooseId", &jetPFLooseId);
     tree->SetBranchAddress("AK8JetJECUnc", &jetJECUnc);
     tree->SetBranchAddress("AK8JetCHF", &jetCHF);
@@ -74,22 +70,21 @@ AK8_Factory::AK8_Factory(TTree *tree, bool is_data_)
     tree->SetBranchAddress("AK8JetMUF", &jetMUF);
     tree->SetBranchAddress("AK8JetPrunedMass", &AK8JetPrunedMass);
     tree->SetBranchAddress("AK8JetSoftDropMass", &AK8JetSoftDropMass);
+    if (!is_data) {
+        tree->SetBranchAddress("AK8JetPartonID", &jetPartonID);
+        tree->SetBranchAddress("AK8JetHadFlvr", &jetHadFlvr);
+    }
 }
 
 void AK8_Factory::Run_Factory() {
     jets.clear();
     for (auto i = 0; i < nJet; i++) {
-        if (jetPt->at(i) < 30 || fabs(jetEta->at(i)) > 3) {
+        if (jetPt->at(i) < 30 || fabs(jetEta->at(i)) > 3) {  // baseline cuts
             continue;
         }
         auto jet = AK8(jetPt->at(i), jetEta->at(i), jetPhi->at(i), jetEn->at(i));
         jet.RawPt = jetRawPt->at(i);
         jet.RawEn = jetRawEn->at(i);
-
-        if (!is_data) {
-            jet.PartonID = jetPartonID->at(i);
-            jet.HadFlvr = jetHadFlvr->at(i);
-        }
         jet.PFLooseId = jetPFLooseId->at(i);
         jet.JECUnc = jetJECUnc->at(i);
         jet.CHF = jetCHF->at(i);
@@ -101,6 +96,10 @@ void AK8_Factory::Run_Factory() {
         jet.MUF = jetMUF->at(i);
         jet.PrunedMass = AK8JetPrunedMass->at(i);
         jet.SoftDropMass = AK8JetSoftDropMass->at(i);
+        if (!is_data) {
+            jet.PartonID = jetPartonID->at(i);
+            jet.HadFlvr = jetHadFlvr->at(i);
+        }
         jets.push_back(jet);
     }
 

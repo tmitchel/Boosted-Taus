@@ -85,7 +85,7 @@ Muon_Factory::Muon_Factory(TTree *tree)
 void Muon_Factory::Run_Factory() {
     muons.clear();
     for (auto i = 0; i < nMu; i++) {
-        if (muPt->at(i) < 30 || fabs(muEta->at(i)) > 2.3) {
+        if (muPt->at(i) < 30 || fabs(muEta->at(i)) > 2.4) {
             continue;
         }
         auto muon = Muon(muPt->at(i), muEta->at(i), muPhi->at(i), muEn->at(i));
