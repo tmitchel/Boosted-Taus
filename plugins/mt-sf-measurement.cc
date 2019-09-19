@@ -36,14 +36,14 @@ int main(int argc, char** argv) {
     auto output_name = parser->Option("-o");
     auto tree_name = parser->Option("-t", "ggNtuplizer/EventTree");
     auto histograms = parser->Option("-j", "test.json");
-    auto logname = parser->Option("-l");
 
     std::string sample_name = input_name.substr(input_name.rfind("/") + 1, std::string::npos);
     sample_name = sample_name.substr(0, sample_name.rfind(".root"));
 
     // create the log file
     std::ofstream logfile;
-    logfile.open(logname, std::ios::out | std::ios::trunc);
+    std::string logname = output_name.substr(0, sample_name.rfind(".root")) + ".log";
+    logfile.open(logname , std::ios::out | std::ios::trunc);
     logfile << "Processing file: " << input_name << std::endl;
     logfile << "Using options:" << std::endl;
     logfile << "\t is_data:     " << is_data << std::endl;
