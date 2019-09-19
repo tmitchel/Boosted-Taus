@@ -64,6 +64,7 @@ Electron_Factory::Electron_Factory(TTree *tree)
       eleFiredDoubleTrgs(nullptr),
       eleFiredL1Trgs(nullptr),
       eleIDbit(nullptr) {
+  tree->SetBranchAddress("eleCharge", &eleCharge);
   tree->SetBranchAddress("nEle", &nEle);
   tree->SetBranchAddress("eleSCEn", &eleSCEn);
   tree->SetBranchAddress("eleEcalEn", &eleEcalEn);
@@ -103,6 +104,7 @@ void Electron_Factory::Run_Factory() {
       continue;
     }
     auto electron = Electron(elePt->at(i), eleEta->at(i), elePhi->at(i), eleEn->at(i));
+    electron.Charge = eleCharge->at(i);
     electron.SCEn = eleSCEn->at(i);
     electron.EcalEn = eleEcalEn->at(i);
     electron.ESEnP1 = eleESEnP1->at(i);
