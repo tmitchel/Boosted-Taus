@@ -268,7 +268,7 @@ vector<Muon> get_control_muons(std::shared_ptr<VMuon> all_muons) {
             for (auto mu2 : *all_muons) {  // looser muon
                 if (mu2.getPt() > 10 && fabs(mu2.getEta()) < 2.4 && mu2.getID(medium) && mu2.getIsoTrk() < 0.15 &&
                     (mu.getP4() + mu2.getP4()).M() > 60 && (mu.getP4() + mu2.getP4()).M() < 120
-                    && mu.getP4().DeltaR(mu2.getP4() > 0.05 && mu.getP4().DeltaR(mu2.getP4() < 1.5)) {
+                    && mu.getP4().DeltaR(mu2.getP4()) > 0.05 && mu.getP4().DeltaR(mu2.getP4()) < 1.5) {
                     good_pair = {mu, mu2};
                 }
             }
@@ -284,7 +284,7 @@ vector<Muon> get_antiid_control_muons(std::shared_ptr<VMuon> all_muons) {
             for (auto mu2 : *all_muons) {  // looser muon
                 if (mu2.getPt() > 10 && fabs(mu2.getEta()) < 2.4 && !(mu2.getID(medium) && mu2.getIsoTrk() < 0.15) &&
                     (mu.getP4() + mu2.getP4()).M() > 60 && (mu.getP4() + mu2.getP4()).M() < 120
-                    && mu.getP4().DeltaR(mu2.getP4() > 0.05 && mu.getP4().DeltaR(mu2.getP4() < 1.5)) {
+                    && mu.getP4().DeltaR(mu2.getP4()) > 0.05 && mu.getP4().DeltaR(mu2.getP4()) < 1.5) {
                     good_pair = {mu, mu2};
                 }
             }
