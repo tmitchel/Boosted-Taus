@@ -226,7 +226,7 @@ bool pass_muon_veto(std::shared_ptr<VMuon> all_muons) {
 int find_loose_electron(std::shared_ptr<VElectron> all_electrons) {
     int loose_ele(0);
     for (auto& ele : *all_electrons) {
-        if (ele.getPt() > 10 && fabs(ele.getEta()) < 2.4 && ele.getIDMVANoIso()) {
+        if (ele.getPt() > 10 && fabs(ele.getEta()) < 2.4 && ele.getID(medium)) {
             loose_ele++;
         }
     }
@@ -235,7 +235,7 @@ int find_loose_electron(std::shared_ptr<VElectron> all_electrons) {
 
 Electron get_signal_electron(std::shared_ptr<VElectron> all_electrons) {
     for (auto ele : *all_electrons) {
-        if (ele.getPt() > 55 && fabs(ele.getEta()) < 2.4 && ele.getIDMVANoIso()) {
+        if (ele.getPt() > 55 && fabs(ele.getEta()) < 2.4 && ele.getID(medium)) {
             return ele;
         }
     }
@@ -244,7 +244,7 @@ Electron get_signal_electron(std::shared_ptr<VElectron> all_electrons) {
 
 Electron get_antiid_electron(std::shared_ptr<VElectron> all_electrons) {
     for (auto ele : *all_electrons) {
-        if (ele.getPt() > 55 && fabs(ele.getEta()) < 2.4 && !ele.getIDMVANoIso()) {
+        if (ele.getPt() > 55 && fabs(ele.getEta()) < 2.4 && !ele.getID(medium)) {
             return ele;
         }
     }
@@ -264,9 +264,9 @@ Boosted get_signal_tau(std::shared_ptr<VBoosted> all_taus) {
 vector<Electron> get_control_electrons(std::shared_ptr<VElectron> all_electrons) {
     vector<Electron> good_pair;
     for (auto ele : *all_electrons) {  // tighter electron
-        if (ele.getPt() > 55 && fabs(ele.getEta()) < 2.4 && ele.getIDMVANoIso()) {
+        if (ele.getPt() > 55 && fabs(ele.getEta()) < 2.4 && ele.getID(medium)) {
             for (auto ele2 : *all_electrons) {  // looser electron
-                if (ele2.getPt() > 10 && fabs(ele2.getEta()) < 2.4 && ele2.getIDMVANoIso() &&
+                if (ele2.getPt() > 10 && fabs(ele2.getEta()) < 2.4 && ele2.getID(medium) &&
                     (ele.getP4() + ele2.getP4()).M() > 60 && (ele.getP4() + ele2.getP4()).M() < 120
                     && ele.getP4().DeltaR(ele2.getP4()) > 0.05 && ele.getP4().DeltaR(ele2.getP4()) < 1.5) {
                     good_pair = {ele, ele2};
@@ -280,9 +280,9 @@ vector<Electron> get_control_electrons(std::shared_ptr<VElectron> all_electrons)
 vector<Electron> get_antiid_control_electrons(std::shared_ptr<VElectron> all_electrons) {
     vector<Electron> good_pair;
     for (auto ele : *all_electrons) {  // tighter muon
-        if (ele.getPt() > 55 && fabs(ele.getEta()) < 2.4 && ele.getIDMVANoIso()) {
+        if (ele.getPt() > 55 && fabs(ele.getEta()) < 2.4 && ele.getID(medium)) {
             for (auto ele2 : *all_electrons) {  // looser muon
-                if (ele2.getPt() > 10 && fabs(ele2.getEta()) < 2.4 && !ele2.getIDMVANoIso() &&
+                if (ele2.getPt() > 10 && fabs(ele2.getEta()) < 2.4 && !ele2.getID(medium) &&
                     (ele.getP4() + ele2.getP4()).M() > 60 && (ele.getP4() + ele2.getP4()).M() < 120
                     && ele.getP4().DeltaR(ele2.getP4()) > 0.05 && ele.getP4().DeltaR(ele2.getP4()) < 1.5) {
                     good_pair = {ele, ele2};

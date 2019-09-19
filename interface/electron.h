@@ -39,12 +39,12 @@ class Electron {
     Float_t getPFPUIso() { return PFPUIso; }
     Float_t getPFClusEcalIso() { return PFClusEcalIso; }
     Float_t getPFClusHcalIso() { return PFClusHcalIso; }
-    Float_t getIDMVAIso() { return IDMVAIso; }
-    Float_t getIDMVANoIso() { return IDMVANoIso; }
+    Bool_t getIDMVAIso() { return IDMVAIso; }
+    Bool_t getIDMVANoIso() { return IDMVANoIso; }
     ULong64_t getFiredSingleTrgs() { return FiredSingleTrgs; }
     ULong64_t getFiredDoubleTrgs() { return FiredDoubleTrgs; }
     ULong64_t getFiredL1Trgs() { return FiredL1Trgs; }
-    Short_t getIDbit() { return IDbit; }
+    Bool_t getID(int key) { return (IDbit >> key & 1) == 1; }
 
    private:
     TLorentzVector p4;
@@ -55,5 +55,9 @@ class Electron {
         SCRawEn, ESEffSigmaRR, PFChIso, PFPhoIso, PFNeuIso, PFPUIso, PFClusEcalIso,
         PFClusHcalIso, IDMVAIso, IDMVANoIso;
 };
+
+Bool_t getIDMVAIso() {
+
+}
 
 #endif  // INTERFACE_ELECTRON_H_
