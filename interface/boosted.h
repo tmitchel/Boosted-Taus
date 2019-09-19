@@ -21,6 +21,7 @@ class Boosted {
     Float_t getPhi() { return p4.Phi(); }
     Float_t getMass() { return p4.M(); }
     Bool_t getIso(working_point);
+    Float_t getRawIso() { return raw_iso; }
     Bool_t getDiscByDM(bool);
     Bool_t getEleRejection(working_point);
     Bool_t getMuRejection(working_point);
@@ -64,7 +65,7 @@ class Boosted {
     Int_t DecayMode, NumSignalPFChargedHadrCands, NumSignalPFNeutrHadrCands, NumSignalPFGammaCands, NumSignalPFCands,
         NumIsolationPFChargedHadrCands, NumIsolationPFNeutrHadrCands, NumIsolationPFGammaCands, NumIsolationPFCands;
 
-    Float_t CombinedIsolationDeltaBetaCorrRaw3Hits, Charge, Vz, Dxy, Mass, ZImpact, LeadChargedHadronEta,
+    Float_t raw_iso, CombinedIsolationDeltaBetaCorrRaw3Hits, Charge, Vz, Dxy, Mass, ZImpact, LeadChargedHadronEta,
         LeadChargedHadronPhi, LeadChargedHadronPt, ChargedIsoPtSum, NeutralIsoPtSum, PuCorrPtSum, footprintCorrection,
         photonPtSumOutsideSignalCone, dz, dxy, Energy;
 };

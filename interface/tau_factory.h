@@ -159,6 +159,7 @@ void Tau_Factory::Run_Factory() {
       tau.pass_medium_iso = pass_medium_iso->at(i);
       tau.pass_tight_iso = pass_tight_iso->at(i);
       tau.pass_vtight_iso = pass_vtight_iso->at(i);
+      tau.raw_iso = iso->at(i);
       tau.pfTausDiscriminationByDecayModeFinding = taupfTausDiscriminationByDecayModeFinding->at(i);
       tau.pfTausDiscriminationByDecayModeFindingNewDMs = taupfTausDiscriminationByDecayModeFindingNewDMs->at(i);
       tau.ByMVA6VLooseElectronRejection = tauByMVA6VLooseElectronRejection->at(i);
