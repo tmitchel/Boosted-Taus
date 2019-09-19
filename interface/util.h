@@ -29,7 +29,7 @@ std::map<std::string, double> cross_sections = {
   {"DYJetsToLL_M-50_HT-800to1200", 0.625},
   {"DYJetsToLL_M-50_HT-1200to2500", 0.151},
   {"DYJetsToLL_M-50_HT-2500toInf", 0.003647},
-  {"DYJetsToLL_M-50_v1", 0.},  // don't use inclusive yet
+  {"DYJetsToLL_M-50_Inc", 0.},  // don't use inclusive yet
 
   {"WJetsToLNu_HT-100To200", 1343.},
   {"WJetsToLNu_HT-200To400", 359.6},
@@ -65,6 +65,10 @@ std::map<std::string, double> cross_sections = {
   {"ZZTo2L2Nu_13TeV_powheg", 0.564},  // need to find this xs
   {"ZZTo2L2Q_13TeV_amcatnloFXFX_madspin", 3.22},
   {"ZZTo4L_13TeV_powheg", 1.212},
+
+  {"WW", 75.88},
+  {"WZ", 27.57},
+  {"ZZ", 12.14},
 
   {"JetHT_Run2017B-31Mar2018", 1.},
   {"JetHT_Run2017C-31Mar2018", 1.},
