@@ -17,11 +17,6 @@
 - N(electron) == 0
     - electron pT > 10
     - abs(electron eta) < 2.4
-- tau passes VLoose MVA Isolation
-- tau passes VLoose MVA anti-electron
-- tau passes Tight MVA anti-muon
-- muon pT > 55
-- muon PFIso / pT < 0.25 (using medium isolation instead for now)
 - N(jets) > 1
     - jet pT > 200
     - abs(jet eta) < 2.4
@@ -29,7 +24,11 @@
 - N(b-jets) == 0
 
 ##### Signal Region
-- tau passes Medium MVA Isolation
+- muon pT > 55
+- muon PFIso / pT < 0.25 (using medium isolation instead for now)
+- tau passes VLoose MVA Isolation
+- tau passes VLoose MVA anti-electron
+- tau passes Tight MVA anti-muon
 
 ##### Zmumu Control Region
 - N(muon) == 2
