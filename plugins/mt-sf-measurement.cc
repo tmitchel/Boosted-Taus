@@ -216,7 +216,7 @@ int main(int argc, char** argv) {
 
 bool pass_electron_veto(std::shared_ptr<VElectron> all_electrons) {
     for (auto el : *all_electrons) {
-        if (el.getPt() > 10 && fabs(el.getEta()) < 2.1) {
+        if (el.getPt() > 10 && fabs(el.getEta()) < 2.5) {
             return false;  // veto any electrons in the event
         }
     }
