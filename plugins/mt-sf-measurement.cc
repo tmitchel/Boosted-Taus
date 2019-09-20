@@ -169,11 +169,13 @@ int main(int argc, char** argv) {
             continue;
         }
 
+        bool good_match(false), anti_match(false);
         Muon good_muon, anti_muon;
         Boosted good_tau, anti_tau;
         for (auto& tau : good_taus) {
             for (auto& mu : good_muons) {
                 if (mu.getP4().DeltaR(tau.getP4()) > 0.4 && mu.getP4().DeltaR(tau.getP4()) < 0.8) {
+                    good_match = true;
                     good_muon = mu;
                     good_tau = tau;
                     break;
@@ -181,11 +183,18 @@ int main(int argc, char** argv) {
             }
             for (auto& mu : anti_muons) {
                 if (mu.getP4().DeltaR(tau.getP4()) > 0.4 && mu.getP4().DeltaR(tau.getP4()) < 0.8) {
+                    anti_match = true;
                     anti_muon = mu;
                     anti_tau = tau;
                     break;
                 }
             }
+        }
+
+        if (good_match || anti_match) {
+            hists->Fill("cutflow", 8., evtwt);
+        } else {
+            continue;
         }
 
         // get the 4-vectors
@@ -194,12 +203,11 @@ int main(int argc, char** argv) {
         // std::cout << mu_vector.DeltaR(tau_vector) << " " << anti_vector.DeltaR(tau_vector) << std::endl;
 
         // construct pass-id signal region
-        if (mu_vector.DeltaR(tau_vector) > 0.4 && mu_vector.DeltaR(tau_vector) < 0.8) {
-            hists->Fill("cutflow", 8., evtwt);
+        if (good_match) {
+            hists->Fill("cutflow", 9., evtwt);
             if (good_tau.getIso(medium)) {  // tau pass region
-                hists->Fill("cutflow", 9., evtwt);
+                hists->Fill("cutflow", 10., evtwt);
                 if (good_muon.getCharge() * good_tau.getCharge() < 0) {
-                    hists->Fill("cutflow", 10., evtwt);
                     hists->Fill("OS_pass", (mu_vector + tau_vector).M(), evtwt);
                 } else {
                     hists->Fill("SS_pass", (mu_vector + tau_vector).M(), evtwt);
@@ -214,10 +222,10 @@ int main(int argc, char** argv) {
         }
 
         // construct anti-id signal region
-        if (anti_vector.DeltaR(atau_vector) > 0.4 && anti_vector.DeltaR(atau_vector) < 0.8) {
-            hists->Fill("cutflow", 8., evtwt);
+        if (anti_match) {
+            hists->Fill("cutflow", 9., evtwt);
             if (good_tau.getIso(medium)) {  // tau pass region
-                hists->Fill("cutflow", 9., evtwt);
+                hists->Fill("cutflow", 10., evtwt);
                 if (anti_muon.getCharge() * good_tau.getCharge() < 0) {
                     hists->Fill("OS_anti_pass", (anti_vector + atau_vector).M(), evtwt);
                 } else {
