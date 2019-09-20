@@ -151,9 +151,9 @@ int main(int argc, char** argv) {
             continue;
         }
 
-        auto good_muons = get_signal_muon(muons);
-        auto anti_muons = get_antiid_muon(muons);
-        auto good_taus = get_signal_tau(taus);
+        auto good_muons = get_signal_muons(muons);
+        auto anti_muons = get_antiid_muons(muons);
+        auto good_taus = get_signal_taus(taus);
 
         // check if we find a good tau
         if (good_taus.size() > 0) {
@@ -256,17 +256,17 @@ int find_loose_muons(std::shared_ptr<VMuon> all_muons) {
     return loose_muons;
 }
 
-VMuon get_signal_muon(std::shared_ptr<VMuon> all_muons) {
+VMuon get_signal_muons(std::shared_ptr<VMuon> all_muons) {
     VMuon good_muons;
     for (auto mu : *all_muons) {
         if (mu.getPt() > 30 && fabs(mu.getEta()) < 2.4 && mu.getID(medium)) {
-            return mu;
+          good_muons.push_back(mu);
         }
     }
     return good_muons;
 }
 
-VMuon get_antiid_muon(std::shared_ptr<VMuon> all_muons) {
+VMuon get_antiid_muons(std::shared_ptr<VMuon> all_muons) {
     VMuon good_muons;
     for (auto mu : *all_muons) {
         if (mu.getPt() > 30 && fabs(mu.getEta()) < 2.4 && !mu.getID(medium)) {
@@ -276,7 +276,7 @@ VMuon get_antiid_muon(std::shared_ptr<VMuon> all_muons) {
     return good_muons;
 }
 
-VBoosted get_signal_tau(std::shared_ptr<VBoosted> all_taus) {
+VBoosted get_signal_taus(std::shared_ptr<VBoosted> all_taus) {
     VBoosted good_taus;
     for (unsigned i = 0; i < all_taus->size(); i++) {
         if (all_taus->at(i).getPt() > 30 && fabs(all_taus->at(i).getEta()) < 2.3
