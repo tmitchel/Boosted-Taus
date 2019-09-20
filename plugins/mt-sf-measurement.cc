@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
         /////////////////////////
         // Begin pre-selection //
         /////////////////////////
-        if (event.getLepTrigger(19)) {  // HLT_IsoMu24_v
+        if (event.getLepTrigger(19) || event.getLepTrigger(20)) {  // HLT_IsoMu24_v
             hists->Fill("cutflow", 1., evtwt);
         } else {
             continue;
@@ -200,7 +200,6 @@ int main(int argc, char** argv) {
         // get the 4-vectors
         auto mu_vector(good_muon.getP4()), anti_vector(anti_muon.getP4());
         auto tau_vector(good_tau.getP4()), atau_vector(anti_tau.getP4());
-        // std::cout << mu_vector.DeltaR(tau_vector) << " " << anti_vector.DeltaR(tau_vector) << std::endl;
 
         // construct pass-id signal region
         if (good_match) {
