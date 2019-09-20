@@ -171,6 +171,7 @@ int main(int argc, char** argv) {
 
         // get the 4-vectors
         auto mu_vector(good_muon.getP4()), anti_vector(anti_muon.getP4()), tau_vector(good_tau.getP4());
+        std::cout << mu_vector.DeltaR(tau_vector) << " " << anti_vector.DeltaR(tau_vector) << std::endl;
 
         // construct pass-id signal region
         if (mu_vector.DeltaR(tau_vector) > 0.4 && mu_vector.DeltaR(tau_vector) < 0.8) {
@@ -194,7 +195,9 @@ int main(int argc, char** argv) {
 
         // construct anti-id signal region
         if (anti_vector.DeltaR(tau_vector) > 0.4 && anti_vector.DeltaR(tau_vector) < 0.8) {
+            hists->Fill("cutflow", 8., evtwt);
             if (good_tau.getIso(medium)) {  // tau pass region
+                hists->Fill("cutflow", 9., evtwt);
                 if (anti_muon.getCharge() * good_tau.getCharge() < 0) {
                     hists->Fill("OS_anti_pass", (anti_vector + tau_vector).M(), evtwt);
                 } else {
