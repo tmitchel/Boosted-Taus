@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
         /////////////////////////
         // Begin pre-selection //
         /////////////////////////
-        if (event.getLepTrigger(21)) {  // Mu50 trigger
+        if (event.getLepTrigger(19)) {  // HLT_IsoMu24_v
             hists->Fill("cutflow", 1., evtwt);
         } else {
             continue;
@@ -244,7 +244,7 @@ Muon get_signal_muon(std::shared_ptr<VMuon> all_muons) {
 
 Muon get_antiid_muon(std::shared_ptr<VMuon> all_muons) {
     for (auto mu : *all_muons) {
-        if (mu.getPt() > 55 && fabs(mu.getEta()) < 2.4 && !mu.getID(medium)) {
+        if (mu.getPt() > 30 && fabs(mu.getEta()) < 2.4 && !mu.getID(medium)) {
             return mu;
         }
     }
