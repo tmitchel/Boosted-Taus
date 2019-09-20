@@ -171,7 +171,6 @@ int main(int argc, char** argv) {
 
         // get the 4-vectors
         auto mu_vector(good_muon.getP4()), anti_vector(anti_muon.getP4()), tau_vector(good_tau.getP4());
-        std::cout << mu_vector.DeltaR(tau_vector) << " " << anti_vector.DeltaR(tau_vector) << std::endl;
 
         // construct pass-id signal region
         if (mu_vector.DeltaR(tau_vector) > 0.4 && mu_vector.DeltaR(tau_vector) < 0.8) {
@@ -238,7 +237,7 @@ int find_loose_muons(std::shared_ptr<VMuon> all_muons) {
 
 Muon get_signal_muon(std::shared_ptr<VMuon> all_muons) {
     for (auto mu : *all_muons) {
-        if (mu.getPt() > 55 && fabs(mu.getEta()) < 2.4 && mu.getID(medium)) {
+        if (mu.getPt() > 30 && fabs(mu.getEta()) < 2.4 && mu.getID(medium)) {
             return mu;
         }
     }
@@ -267,7 +266,7 @@ Boosted get_signal_tau(std::shared_ptr<VBoosted> all_taus) {
 vector<Muon> get_control_muons(std::shared_ptr<VMuon> all_muons) {
     vector<Muon> good_pair;
     for (auto mu : *all_muons) {  // tighter muon
-        if (mu.getPt() > 55 && fabs(mu.getEta()) < 2.4 && mu.getID(medium) && mu.getIsoTrk() < 0.15) {
+        if (mu.getPt() > 30 && fabs(mu.getEta()) < 2.4 && mu.getID(medium) && mu.getIsoTrk() < 0.15) {
             for (auto mu2 : *all_muons) {  // looser muon
                 if (mu2.getPt() > 10 && fabs(mu2.getEta()) < 2.4 && mu2.getID(medium) && mu2.getIsoTrk() < 0.15 &&
                     (mu.getP4() + mu2.getP4()).M() > 60 && (mu.getP4() + mu2.getP4()).M() < 120
@@ -283,7 +282,7 @@ vector<Muon> get_control_muons(std::shared_ptr<VMuon> all_muons) {
 vector<Muon> get_antiid_control_muons(std::shared_ptr<VMuon> all_muons) {
     vector<Muon> good_pair;
     for (auto mu : *all_muons) {  // tighter muon
-        if (mu.getPt() > 55 && fabs(mu.getEta()) < 2.4 && mu.getID(medium) && mu.getIsoTrk() < 0.15) {
+        if (mu.getPt() > 30 && fabs(mu.getEta()) < 2.4 && mu.getID(medium) && mu.getIsoTrk() < 0.15) {
             for (auto mu2 : *all_muons) {  // looser muon
                 if (mu2.getPt() > 10 && fabs(mu2.getEta()) < 2.4 && !(mu2.getID(medium) && mu2.getIsoTrk() < 0.15) &&
                     (mu.getP4() + mu2.getP4()).M() > 60 && (mu.getP4() + mu2.getP4()).M() < 120
