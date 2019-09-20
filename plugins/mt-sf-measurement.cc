@@ -259,8 +259,8 @@ int find_loose_muons(std::shared_ptr<VMuon> all_muons) {
 VMuon get_signal_muon(std::shared_ptr<VMuon> all_muons) {
     VMuon good_muons;
     for (auto mu : *all_muons) {
-        if (mu.getPt() > 55 && fabs(mu.getEta()) < 2.4 && mu.getID(medium)) {
-            good_muons.push_back(mu);
+        if (mu.getPt() > 30 && fabs(mu.getEta()) < 2.4 && mu.getID(medium)) {
+            return mu;
         }
     }
     return good_muons;
@@ -290,7 +290,7 @@ VBoosted get_signal_tau(std::shared_ptr<VBoosted> all_taus) {
 VMuon get_control_muons(std::shared_ptr<VMuon> all_muons) {
     VMuon good_pair;
     for (auto mu : *all_muons) {  // tighter muon
-        if (mu.getPt() > 55 && fabs(mu.getEta()) < 2.4 && mu.getID(medium) && mu.getIsoTrk() < 0.15) {
+        if (mu.getPt() > 30 && fabs(mu.getEta()) < 2.4 && mu.getID(medium) && mu.getIsoTrk() < 0.15) {
             for (auto mu2 : *all_muons) {  // looser muon
                 if (mu2.getPt() > 10 && fabs(mu2.getEta()) < 2.4 && mu2.getID(medium) && mu2.getIsoTrk() < 0.15 &&
                     (mu.getP4() + mu2.getP4()).M() > 60 && (mu.getP4() + mu2.getP4()).M() < 120
@@ -306,7 +306,7 @@ VMuon get_control_muons(std::shared_ptr<VMuon> all_muons) {
 VMuon get_antiid_control_muons(std::shared_ptr<VMuon> all_muons) {
     VMuon good_pair;
     for (auto mu : *all_muons) {  // tighter muon
-        if (mu.getPt() > 55 && fabs(mu.getEta()) < 2.4 && mu.getID(medium) && mu.getIsoTrk() < 0.15) {
+        if (mu.getPt() > 30 && fabs(mu.getEta()) < 2.4 && mu.getID(medium) && mu.getIsoTrk() < 0.15) {
             for (auto mu2 : *all_muons) {  // looser muon
                 if (mu2.getPt() > 10 && fabs(mu2.getEta()) < 2.4 && !(mu2.getID(medium) && mu2.getIsoTrk() < 0.15) &&
                     (mu.getP4() + mu2.getP4()).M() > 60 && (mu.getP4() + mu2.getP4()).M() < 120
