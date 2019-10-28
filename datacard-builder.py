@@ -92,17 +92,22 @@ def build_qcd(osss_histos):
     antiiso_osss_ratio = os_antiid_antiiso.Integral() / ss_antiid_antiiso.Integral()
     control_osss_ratio = os_antiid_ctr.Integral() / ss_antiid_ctr.Integral()
 
+    print 'OS/SS ratio scale factors'
+    print '\tNominal: {}'.format(nom_osss_ratio)
+    print '\tFail: {}'.format(antiiso_osss_ratio)
+    print '\tControl: {}'.format(control_osss_ratio)
+
     nom_norm = ss_id_iso.Clone()
     antiiso_norm = ss_id_antiiso.Clone()
     control_norm = ss_id_ctr.Clone()
 
     nom_norm.Scale(nom_osss_ratio)
     antiiso_norm.Scale(antiiso_osss_ratio)
-    control_norm.Scale(control_osss_rati()
+    control_norm.Scale(control_osss_ratio)
 
     nom_qcd = ss_id_antiiso.Clone()
     antiiso_qcd = ss_id_iso.Clone()
-    control_qcd = ss_id_ctr.Clone9)
+    control_qcd = ss_id_ctr.Clone()
 
     nom_qcd.Scale(nom_norm.Integral() / nom_qcd.Integral())
     antiiso_qcd.Scale(antiiso_norm.Integral() / antiiso_qcd.Integral())
@@ -126,7 +131,7 @@ def main(args):
     filelist = [ifile for ifile in glob('{}/*.root'.format(args.input_dir))]
     fout = ROOT.TFile('out.root', 'RECREATE')
     histos, osss_histos = get_histos(fout, filelist, '')
-    histos['QCD'], osss_histos['os_id_antiiso']['QCD'], osss_histos['os_id_control']['QCD'] = build_qcd(osss_histos)
+    histos['QCD'], osss_histos['os_id_antiiso']['QCD'], osss_histos['os_id_ctr']['QCD'] = build_qcd(osss_histos)
 
     # pass region
     fout.mkdir('pass')
@@ -151,10 +156,10 @@ def main(args):
     # Zmumu control region
     fout.mkdir('control')
     fout.cd('control')
-    antiiso_data = osss_histos['os_id_control'].pop('Data')
+    antiiso_data = osss_histos['os_id_ctr'].pop('Data')
     antiiso_data.SetName('data_obs')
     antiiso_data.Write()
-    for name, histo in osss_histos['os_id_control'].iteritems():
+    for name, histo in osss_histos['os_id_ctr'].iteritems():
         histo.SetName(name)
         histo.Write()
 

@@ -64,6 +64,7 @@ Electron_Factory::Electron_Factory(TTree *tree)
       eleFiredDoubleTrgs(nullptr),
       eleFiredL1Trgs(nullptr),
       eleIDbit(nullptr) {
+  tree->SetBranchAddress("eleCharge", &eleCharge);
   tree->SetBranchAddress("nEle", &nEle);
   tree->SetBranchAddress("eleSCEn", &eleSCEn);
   tree->SetBranchAddress("eleEcalEn", &eleEcalEn);
@@ -99,10 +100,11 @@ Electron_Factory::Electron_Factory(TTree *tree)
 void Electron_Factory::Run_Factory() {
   electrons.clear();
   for (auto i = 0; i < nEle; i++) {
-    if (elePt->at(i) < 10 || fabs(eleEta->at(i)) > 2.1) {
+    if (elePt->at(i) < 10 || fabs(eleEta->at(i)) > 2.4) {
       continue;
     }
     auto electron = Electron(elePt->at(i), eleEta->at(i), elePhi->at(i), eleEn->at(i));
+    electron.Charge = eleCharge->at(i);
     electron.SCEn = eleSCEn->at(i);
     electron.EcalEn = eleEcalEn->at(i);
     electron.ESEnP1 = eleESEnP1->at(i);
