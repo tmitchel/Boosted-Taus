@@ -6,9 +6,10 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
-#include "./muon.h"
 #include "TTree.h"
+#include "./util.h"
 
+class Muon;
 typedef std::vector<Muon> VMuon;
 
 class Muon_Factory {
@@ -24,10 +25,8 @@ class Muon_Factory {
    private:
     Int_t nMu, nGoodMu;
     VMuon muons;
-    std::vector<Float_t> *muPt, *muEta, *muPhi, *muEn;
-    std::vector<ULong64_t> *muFiredTrgs, *muFiredL1Trgs;
-    std::vector<Int_t> *muCharge, *muType, *muIDbit, *muMuonHits, *muStations, *muMatches, *muTrkQuality;
-    std::vector<Float_t> *muD0, *muDz, *muSIP, *muChi2NDF, *muInnerD0, *muInnerDz, *muIsoTrk, *muPFChIso, *muPFPhoIso, *muPFNeuIso, *muPFPUIso;
+    std::vector<Float_t> *muPt, *muEta, *muPhi, *muEn, *muD0, *muDz;
+    std::vector<Int_t> *muCharge, *muType, *muIDbit, *muMuonHits, *muTrkQuality;
 };
 
 Muon_Factory::Muon_Factory(TTree *tree)
@@ -35,80 +34,41 @@ Muon_Factory::Muon_Factory(TTree *tree)
       muEta(nullptr),
       muPhi(nullptr),
       muEn(nullptr),
-      muFiredTrgs(nullptr),
-      muFiredL1Trgs(nullptr),
       muCharge(nullptr),
       muType(nullptr),
       muIDbit(nullptr),
       muMuonHits(nullptr),
-      muStations(nullptr),
-      muMatches(nullptr),
       muTrkQuality(nullptr),
       muD0(nullptr),
-      muDz(nullptr),
-      muSIP(nullptr),
-      muChi2NDF(nullptr),
-      muInnerD0(nullptr),
-      muInnerDz(nullptr),
-      muIsoTrk(nullptr),
-      muPFChIso(nullptr),
-      muPFPhoIso(nullptr),
-      muPFNeuIso(nullptr),
-      muPFPUIso(nullptr) {
+      muDz(nullptr) {
     tree->SetBranchAddress("nMu", &nMu);
     tree->SetBranchAddress("muPt", &muPt);
     tree->SetBranchAddress("muEta", &muEta);
     tree->SetBranchAddress("muPhi", &muPhi);
     tree->SetBranchAddress("muEn", &muEn);
-    tree->SetBranchAddress("muFiredTrgs", &muFiredTrgs);
-    tree->SetBranchAddress("muFiredL1Trgs", &muFiredL1Trgs);
     tree->SetBranchAddress("muCharge", &muCharge);
     tree->SetBranchAddress("muType", &muType);
     tree->SetBranchAddress("muIDbit", &muIDbit);
     tree->SetBranchAddress("muMuonHits", &muMuonHits);
-    tree->SetBranchAddress("muStations", &muStations);
-    tree->SetBranchAddress("muMatches", &muMatches);
     tree->SetBranchAddress("muTrkQuality", &muTrkQuality);
     tree->SetBranchAddress("muD0", &muD0);
     tree->SetBranchAddress("muDz", &muDz);
-    tree->SetBranchAddress("muSIP", &muSIP);
-    tree->SetBranchAddress("muChi2NDF", &muChi2NDF);
-    tree->SetBranchAddress("muInnerD0", &muInnerD0);
-    tree->SetBranchAddress("muInnerDz", &muInnerDz);
-    tree->SetBranchAddress("muIsoTrk", &muIsoTrk);
-    tree->SetBranchAddress("muPFChIso", &muPFChIso);
-    tree->SetBranchAddress("muPFPhoIso", &muPFPhoIso);
-    tree->SetBranchAddress("muPFNeuIso", &muPFNeuIso);
-    tree->SetBranchAddress("muPFPUIso", &muPFPUIso);
 }
 
 void Muon_Factory::Run_Factory() {
     muons.clear();
     for (auto i = 0; i < nMu; i++) {
-        if (muPt->at(i) < 30 || fabs(muEta->at(i)) > 2.4) {
+        if (muPt->at(i) < 10 || fabs(muEta->at(i)) > 2.4) {
             continue;
         }
         auto muon = Muon(muPt->at(i), muEta->at(i), muPhi->at(i), muEn->at(i));
-        muon.FiredTrgs = muFiredTrgs->at(i);
-        muon.FiredL1Trgs = muFiredL1Trgs->at(i);
         muon.Charge = muCharge->at(i);
         muon.Type = muType->at(i);
         muon.IDbit = muIDbit->at(i);
         muon.MuonHits = muMuonHits->at(i);
-        muon.Stations = muStations->at(i);
-        muon.Matches = muMatches->at(i);
         muon.TrkQuality = muTrkQuality->at(i);
         muon.D0 = muD0->at(i);
         muon.Dz = muDz->at(i);
-        muon.SIP = muSIP->at(i);
-        muon.Chi2NDF = muChi2NDF->at(i);
-        muon.InnerD0 = muInnerD0->at(i);
-        muon.InnerDz = muInnerDz->at(i);
-        muon.IsoTrk = muIsoTrk->at(i);
-        muon.PFChIso = muPFChIso->at(i);
-        muon.PFPhoIso = muPFPhoIso->at(i);
-        muon.PFNeuIso = muPFNeuIso->at(i);
-        muon.PFPUIso = muPFPUIso->at(i);
         muons.push_back(muon);
     }
 
@@ -116,5 +76,31 @@ void Muon_Factory::Run_Factory() {
     std::sort(muons.begin(), muons.end(), [](Muon &p1, Muon &p2) -> bool { return p1.getPt() > p2.getPt(); });
     nGoodMu = muons.size();
 }
+
+class Muon {
+  friend class Muon_Factory;
+
+ public:
+    Muon(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _en) { this->p4.SetPtEtaPhiE(_pt, _eta, _phi, _en); }
+    Muon() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
+  // getters
+  TLorentzVector getP4() { return p4; }
+  Float_t getPt() { return p4.Pt(); }
+  Float_t getEta() { return p4.Eta(); }
+  Float_t getPhi() { return p4.Phi(); }
+  Float_t getMass() { return p4.M(); }
+  Bool_t getID(working_point key) { return (IDbit >> key & 1) == 1; }
+  Float_t getCharge() { return Charge; }
+  Float_t getType() { return Type; }
+  Float_t getMuonHits() { return MuonHits; }
+  Float_t getTrkQuality() { return TrkQuality; }
+  Float_t getD0() { return D0; }
+  Float_t getDz() { return Dz; }
+
+ private:
+  TLorentzVector p4;
+  Int_t Charge, Type, IDbit, MuonHits, TrkQuality;
+  Float_t D0, Dz;
+};
 
 #endif  // INTERFACE_MUON_FACTORY_H_
