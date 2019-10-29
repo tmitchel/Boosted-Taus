@@ -14,10 +14,10 @@ mt-sf-measurement: plugins/mt-sf-measurement.cc
 et-sf-measurement: plugins/et-sf-measurement.cc
 	g++ $(OPT) plugins/et-sf-measurement.cc $(ROOT) $(CFLAGS) -o bin/et-sf-measurement
 
-mt-sf-measurement: plugins/mt-sf-measurement.cc
+test-mt-sf-measurement: plugins/mt-sf-measurement.cc
 	g++ plugins/mt-sf-measurement.cc $(ROOT) $(CFLAGS) -o test
 
-et-sf-measurement: plugins/et-sf-measurement.cc
+test-et-sf-measurement: plugins/et-sf-measurement.cc
 	g++ plugins/et-sf-measurement.cc $(ROOT) $(CFLAGS) -o test
 
 clean:
