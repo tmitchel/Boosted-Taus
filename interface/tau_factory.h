@@ -14,6 +14,43 @@
 class Tau;
 typedef std::vector<Tau> VTau;
 
+class Tau {
+    friend class Tau_Factory;
+
+   public:
+    Tau(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _m) { this->p4.SetPtEtaPhiM(_pt, _eta, _phi, _m); }
+    Tau() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
+
+    // getters
+    TLorentzVector getP4() { return p4; }
+    Float_t getPt() { return p4.Pt(); }
+    Float_t getEta() { return p4.Eta(); }
+    Float_t getPhi() { return p4.Phi(); }
+    Float_t getMass() { return p4.M(); }
+    Bool_t getIso(working_point);
+    Bool_t getDiscByDM(bool);
+    Bool_t getEleRejection(working_point);
+    Bool_t getMuRejection(working_point);
+    Bool_t getCombinedIsolationDeltaBetaCorr3Hits(working_point);
+    Int_t getDecayMode() { return DecayMode; }
+    Float_t getCharge() { return Charge; }
+    Float_t getDxy() { return Dxy; }
+    Float_t getDZ() { return dz; }
+    Float_t getDXY() { return dxy; }
+
+   private:
+    TLorentzVector p4;
+    Bool_t pass_vloose_iso, pass_loose_iso, pass_medium_iso, pass_tight_iso, pass_vtight_iso;
+
+    Bool_t pfTausDiscriminationByDecayModeFinding, pfTausDiscriminationByDecayModeFindingNewDMs, ByMVA6VLooseElectronRejection,
+        ByMVA6LooseElectronRejection, ByMVA6MediumElectronRejection, ByMVA6TightElectronRejection, ByMVA6VTightElectronRejection,
+        ByLooseMuonRejection3, ByTightMuonRejection3;
+
+    Int_t DecayMode;
+
+    Float_t Charge, Dxy, Mass, dz, dxy;
+};
+
 class Tau_Factory {
    public:
     explicit Tau_Factory(TTree *, std::string);
@@ -133,42 +170,7 @@ void Tau_Factory::Run_Factory() {
     nGoodTau = taus.size();
 }
 
-class Tau {
-    friend class Tau_Factory;
 
-   public:
-    Tau(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _m) { this->p4.SetPtEtaPhiM(_pt, _eta, _phi, _m); }
-    Tau() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
-
-    // getters
-    TLorentzVector getP4() { return p4; }
-    Float_t getPt() { return p4.Pt(); }
-    Float_t getEta() { return p4.Eta(); }
-    Float_t getPhi() { return p4.Phi(); }
-    Float_t getMass() { return p4.M(); }
-    Bool_t getIso(working_point);
-    Bool_t getDiscByDM(bool);
-    Bool_t getEleRejection(working_point);
-    Bool_t getMuRejection(working_point);
-    Bool_t getCombinedIsolationDeltaBetaCorr3Hits(working_point);
-    Int_t getDecayMode() { return DecayMode; }
-    Float_t getCharge() { return Charge; }
-    Float_t getDxy() { return Dxy; }
-    Float_t getDZ() { return dz; }
-    Float_t getDXY() { return dxy; }
-
-   private:
-    TLorentzVector p4;
-    Bool_t pass_vloose_iso, pass_loose_iso, pass_medium_iso, pass_tight_iso, pass_vtight_iso;
-
-    Bool_t pfTausDiscriminationByDecayModeFinding, pfTausDiscriminationByDecayModeFindingNewDMs, ByMVA6VLooseElectronRejection,
-        ByMVA6LooseElectronRejection, ByMVA6MediumElectronRejection, ByMVA6TightElectronRejection, ByMVA6VTightElectronRejection,
-        ByLooseMuonRejection3, ByTightMuonRejection3;
-
-    Int_t DecayMode;
-
-    Float_t Charge, Dxy, Mass, dz, dxy;
-};
 
 Bool_t Tau::getIso(working_point wp) {
     if (wp == vloose) {

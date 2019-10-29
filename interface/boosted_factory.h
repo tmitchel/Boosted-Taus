@@ -8,10 +8,47 @@
 #include <string>
 #include <vector>
 #include "./util.h"
+#include "TLorentzVector.h"
 #include "TTree.h"
 
 class Boosted;
 typedef std::vector<Boosted> VBoosted;
+
+class Boosted {
+    friend class Boosted_Factory;
+
+   public:
+    Boosted(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _m) { this->p4.SetPtEtaPhiM(_pt, _eta, _phi, _m); }
+    Boosted() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
+
+    // getters
+    TLorentzVector getP4() { return p4; }
+    Float_t getPt() { return p4.Pt(); }
+    Float_t getEta() { return p4.Eta(); }
+    Float_t getPhi() { return p4.Phi(); }
+    Float_t getMass() { return p4.M(); }
+    Float_t getIsoRaw() { return Iso; }
+    Bool_t getIso(working_point);
+    Bool_t getDiscByDM(bool);
+    Bool_t getEleRejection(working_point);
+    Bool_t getMuRejection(working_point);
+    Int_t getDecayMode() { return DecayMode; }
+    Float_t getCharge() { return Charge; }
+    Float_t getDZ() { return dz; }
+    Float_t getDXY() { return dxy; }
+
+   private:
+    TLorentzVector p4;
+    Bool_t pass_vloose_iso, pass_loose_iso, pass_medium_iso, pass_tight_iso, pass_vtight_iso;
+
+    Bool_t pfTausDiscriminationByDecayModeFinding, pfTausDiscriminationByDecayModeFindingNewDMs, ByMVA6VLooseElectronRejection,
+        ByMVA6LooseElectronRejection, ByMVA6MediumElectronRejection, ByMVA6TightElectronRejection, ByMVA6VTightElectronRejection,
+        ByLooseMuonRejection3, ByTightMuonRejection3;
+
+    Int_t DecayMode;
+
+    Float_t Charge, Mass, dz, dxy, Energy, Iso;
+};
 
 class Boosted_Factory {
    public:
@@ -124,41 +161,7 @@ void Boosted_Factory::Run_Factory() {
     nGoodTaus = boosteds.size();
 }
 
-class Boosted {
-    friend class Boosted_Factory;
 
-   public:
-    Boosted(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _m) { this->p4.SetPtEtaPhiM(_pt, _eta, _phi, _m); }
-    Boosted() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
-
-    // getters
-    TLorentzVector getP4() { return p4; }
-    Float_t getPt() { return p4.Pt(); }
-    Float_t getEta() { return p4.Eta(); }
-    Float_t getPhi() { return p4.Phi(); }
-    Float_t getMass() { return p4.M(); }
-    Float_t getIsoRaw() { return Iso; }
-    Bool_t getIso(working_point);
-    Bool_t getDiscByDM(bool);
-    Bool_t getEleRejection(working_point);
-    Bool_t getMuRejection(working_point);
-    Int_t getDecayMode() { return DecayMode; }
-    Float_t getCharge() { return Charge; }
-    Float_t getDZ() { return dz; }
-    Float_t getDXY() { return dxy; }
-
-   private:
-    TLorentzVector p4;
-    Bool_t pass_vloose_iso, pass_loose_iso, pass_medium_iso, pass_tight_iso, pass_vtight_iso;
-
-    Bool_t pfTausDiscriminationByDecayModeFinding, pfTausDiscriminationByDecayModeFindingNewDMs, ByMVA6VLooseElectronRejection,
-        ByMVA6LooseElectronRejection, ByMVA6MediumElectronRejection, ByMVA6TightElectronRejection, ByMVA6VTightElectronRejection,
-        ByLooseMuonRejection3, ByTightMuonRejection3;
-
-    Int_t DecayMode;
-
-    Float_t Charge, Mass, dz, dxy, Energy, Iso;
-};
 
 Bool_t Boosted::getIso(working_point wp) {
     if (wp == vloose) {

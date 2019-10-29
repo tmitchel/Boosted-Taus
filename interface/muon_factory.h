@@ -8,9 +8,36 @@
 #include <vector>
 #include "TTree.h"
 #include "./util.h"
+#include "TLorentzVector.h"
 
 class Muon;
 typedef std::vector<Muon> VMuon;
+
+class Muon {
+  friend class Muon_Factory;
+
+ public:
+    Muon(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _en) { this->p4.SetPtEtaPhiE(_pt, _eta, _phi, _en); }
+    Muon() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
+  // getters
+  TLorentzVector getP4() { return p4; }
+  Float_t getPt() { return p4.Pt(); }
+  Float_t getEta() { return p4.Eta(); }
+  Float_t getPhi() { return p4.Phi(); }
+  Float_t getMass() { return p4.M(); }
+  Bool_t getID(working_point key) { return (IDbit >> key & 1) == 1; }
+  Float_t getCharge() { return Charge; }
+  Float_t getType() { return Type; }
+  Float_t getMuonHits() { return MuonHits; }
+  Float_t getTrkQuality() { return TrkQuality; }
+  Float_t getD0() { return D0; }
+  Float_t getDz() { return Dz; }
+
+ private:
+  TLorentzVector p4;
+  Int_t Charge, Type, IDbit, MuonHits, TrkQuality;
+  Float_t D0, Dz;
+};
 
 class Muon_Factory {
    public:
@@ -77,30 +104,6 @@ void Muon_Factory::Run_Factory() {
     nGoodMu = muons.size();
 }
 
-class Muon {
-  friend class Muon_Factory;
 
- public:
-    Muon(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _en) { this->p4.SetPtEtaPhiE(_pt, _eta, _phi, _en); }
-    Muon() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
-  // getters
-  TLorentzVector getP4() { return p4; }
-  Float_t getPt() { return p4.Pt(); }
-  Float_t getEta() { return p4.Eta(); }
-  Float_t getPhi() { return p4.Phi(); }
-  Float_t getMass() { return p4.M(); }
-  Bool_t getID(working_point key) { return (IDbit >> key & 1) == 1; }
-  Float_t getCharge() { return Charge; }
-  Float_t getType() { return Type; }
-  Float_t getMuonHits() { return MuonHits; }
-  Float_t getTrkQuality() { return TrkQuality; }
-  Float_t getD0() { return D0; }
-  Float_t getDz() { return Dz; }
-
- private:
-  TLorentzVector p4;
-  Int_t Charge, Type, IDbit, MuonHits, TrkQuality;
-  Float_t D0, Dz;
-};
 
 #endif  // INTERFACE_MUON_FACTORY_H_

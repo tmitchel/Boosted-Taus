@@ -12,6 +12,33 @@
 class AK8;
 typedef std::vector<AK8> VAK8;
 
+class AK8 {
+    friend class AK8_Factory;
+
+   public:
+    AK8(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _en) { this->p4.SetPtEtaPhiE(_pt, _eta, _phi, _en); }
+    AK8() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
+
+    // getters
+    TLorentzVector getP4() { return p4; }
+    Float_t getPt() { return p4.Pt(); }
+    Float_t getEta() { return p4.Eta(); }
+    Float_t getPhi() { return p4.Phi(); }
+    Float_t getMass() { return p4.M(); }
+    Bool_t getJetPFLooseId() { return jetPFLooseId; }
+    Int_t getPartonID() { return jetPartonID; }
+    Int_t getHadFlvr() { return jetHadFlvr; }
+    Float_t getPrunedMass() { return AK8JetPrunedMass; }
+    Float_t getSoftDropMass() { return AK8JetSoftDropMass; }
+
+   private:
+    TLorentzVector p4;
+    Bool_t jetPFLooseId;
+    Int_t jetPartonID, jetHadFlvr;
+    ULong64_t jetFiredTrgs;
+    Float_t AK8JetPrunedMass, AK8JetSoftDropMass;
+};
+
 class AK8_Factory {
    public:
     AK8_Factory(TTree *, bool);
@@ -77,32 +104,5 @@ void AK8_Factory::Run_Factory() {
     std::sort(jets.begin(), jets.end(), [](AK8 &p1, AK8 &p2) -> bool { return p1.getPt() > p2.getPt(); });
     nGoodJet = jets.size();
 }
-
-class AK8 {
-    friend class AK8_Factory;
-
-   public:
-    AK8(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _en) { this->p4.SetPtEtaPhiE(_pt, _eta, _phi, _en); }
-    AK8() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
-
-    // getters
-    TLorentzVector getP4() { return p4; }
-    Float_t getPt() { return p4.Pt(); }
-    Float_t getEta() { return p4.Eta(); }
-    Float_t getPhi() { return p4.Phi(); }
-    Float_t getMass() { return p4.M(); }
-    Bool_t getJetPFLooseId() { return jetPFLooseId; }
-    Int_t getPartonID() { return jetPartonID; }
-    Int_t getHadFlvr() { return jetHadFlvr; }
-    Float_t getPrunedMass() { return AK8JetPrunedMass; }
-    Float_t getSoftDropMass() { return AK8JetSoftDropMass; }
-
-   private:
-    TLorentzVector p4;
-    Bool_t jetPFLooseId;
-    Int_t jetPartonID, jetHadFlvr;
-    ULong64_t jetFiredTrgs;
-    Float_t AK8JetPrunedMass, AK8JetSoftDropMass;
-};
 
 #endif  // INTERFACE_AK8_FACTORY_H_

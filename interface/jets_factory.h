@@ -7,9 +7,40 @@
 #include <memory>
 #include <vector>
 #include "TTree.h"
+#include "TLorentzVector.h"
 
 class Jets;
 typedef std::vector<Jets> VJets;
+
+class Jets {
+    friend class Jets_Factory;
+
+   public:
+    Jets(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _en) { this->p4.SetPtEtaPhiE(_pt, _eta, _phi, _en); }
+    Jets() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
+
+    // getters
+    TLorentzVector getP4() { return p4; }
+    Float_t getPt() { return p4.Pt(); }
+    Float_t getEta() { return p4.Eta(); }
+    Float_t getPhi() { return p4.Phi(); }
+    Float_t getMass() { return p4.M(); }
+    Bool_t getJetPFLooseId() { return PFLooseId; }
+    Int_t getPartonID() { return PartonID; }
+    Int_t getHadFlvr() { return HadFlvr; }
+    Int_t getID() { return ID; }
+    Float_t getCSV2BJetTags() { return CSV2BJetTags; }
+    Float_t getDeepCSVTags_b() { return DeepCSVTags_b; }
+    Float_t getDeepCSVTags_bb() { return DeepCSVTags_bb; }
+    Float_t getDeepCSVTags_c() { return DeepCSVTags_c; }
+    Float_t getDeepCSVTags_udsg() { return DeepCSVTags_udsg; }
+
+   private:
+    TLorentzVector p4;
+    Bool_t PFLooseId;
+    Int_t PartonID, HadFlvr, ID;
+    Float_t CSV2BJetTags, DeepCSVTags_b, DeepCSVTags_bb, DeepCSVTags_c, DeepCSVTags_udsg;
+};
 
 class Jets_Factory {
    public:
@@ -98,35 +129,5 @@ void Jets_Factory::Run_Factory() {
     nGoodJet = jets.size();
     nBTag = btags.size();
 }
-
-class Jets {
-    friend class Jets_Factory;
-
-   public:
-    Jets(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _en) { this->p4.SetPtEtaPhiE(_pt, _eta, _phi, _en); }
-    Jets() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
-
-    // getters
-    TLorentzVector getP4() { return p4; }
-    Float_t getPt() { return p4.Pt(); }
-    Float_t getEta() { return p4.Eta(); }
-    Float_t getPhi() { return p4.Phi(); }
-    Float_t getMass() { return p4.M(); }
-    Bool_t getJetPFLooseId() { return PFLooseId; }
-    Int_t getPartonID() { return PartonID; }
-    Int_t getHadFlvr() { return HadFlvr; }
-    Int_t getID() { return ID; }
-    Float_t getCSV2BJetTags() { return CSV2BJetTags; }
-    Float_t getDeepCSVTags_b() { return DeepCSVTags_b; }
-    Float_t getDeepCSVTags_bb() { return DeepCSVTags_bb; }
-    Float_t getDeepCSVTags_c() { return DeepCSVTags_c; }
-    Float_t getDeepCSVTags_udsg() { return DeepCSVTags_udsg; }
-
-   private:
-    TLorentzVector p4;
-    Bool_t PFLooseId;
-    Int_t PartonID, HadFlvr, ID;
-    Float_t CSV2BJetTags, DeepCSVTags_b, DeepCSVTags_bb, DeepCSVTags_c, DeepCSVTags_udsg;
-};
 
 #endif  // INTERFACE_JETS_FACTORY_H_

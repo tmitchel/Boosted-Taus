@@ -7,10 +7,40 @@
 #include <memory>
 #include <vector>
 #include "TTree.h"
+#include "TLorentzVector.h"
 #include "./util.h"
 
 class Electron;
 typedef std::vector<Electron> VElectron;
+
+class Electron {
+    friend class Electron_Factory;
+
+   public:
+    Electron(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _en) { this->p4.SetPtEtaPhiE(_pt, _eta, _phi, _en); }
+    Electron() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
+
+    // getters
+    TLorentzVector getP4() { return p4; }
+    Int_t getCharge() { return Charge; }
+    Int_t getConvVeto() { return ConvVeto; }
+    Int_t getMissHits() { return MissHits; }
+    Float_t getPt() { return p4.Pt(); }
+    Float_t getEta() { return p4.Eta(); }
+    Float_t getPhi() { return p4.Phi(); }
+    Float_t getMass() { return p4.M(); }
+    Float_t getD0() { return D0; }
+    Float_t getDz() { return Dz; }
+    Bool_t getIDMVAIso() { return IDMVAIso; }
+    Bool_t getIDMVANoIso() { return IDMVANoIso; }
+    Bool_t getID(working_point key) { return (IDbit >> key & 1) == 1; }
+
+   private:
+    TLorentzVector p4;
+    Short_t IDbit;
+    Int_t Charge, ConvVeto, MissHits;
+    Float_t D0, Dz, IDMVAIso, IDMVANoIso;
+};
 
 class Electron_Factory {
    public:
@@ -81,33 +111,6 @@ void Electron_Factory::Run_Factory() {
     nGoodEle = electrons.size();
 }
 
-class Electron {
-    friend class Electron_Factory;
 
-   public:
-    Electron(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _en) { this->p4.SetPtEtaPhiE(_pt, _eta, _phi, _en); }
-    Electron() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
-
-    // getters
-    TLorentzVector getP4() { return p4; }
-    Int_t getCharge() { return Charge; }
-    Int_t getConvVeto() { return ConvVeto; }
-    Int_t getMissHits() { return MissHits; }
-    Float_t getPt() { return p4.Pt(); }
-    Float_t getEta() { return p4.Eta(); }
-    Float_t getPhi() { return p4.Phi(); }
-    Float_t getMass() { return p4.M(); }
-    Float_t getD0() { return D0; }
-    Float_t getDz() { return Dz; }
-    Bool_t getIDMVAIso() { return IDMVAIso; }
-    Bool_t getIDMVANoIso() { return IDMVANoIso; }
-    Bool_t getID(working_point key) { return (IDbit >> key & 1) == 1; }
-
-   private:
-    TLorentzVector p4;
-    Short_t IDbit;
-    Int_t Charge, ConvVeto, MissHits;
-    Float_t D0, Dz, IDMVAIso, IDMVANoIso;
-};
 
 #endif  // INTERFACE_ELECTRON_FACTORY_H_

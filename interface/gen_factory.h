@@ -7,9 +7,43 @@
 #include <memory>
 #include <vector>
 #include "TTree.h"
+#include "TLorentzVector.h"
 
 class Gen;
 typedef std::vector<Gen> VGen;
+
+class Gen {
+    friend class Gen_Factory;
+
+   public:
+    Gen(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _mass) { this->p4.SetPtEtaPhiM(_pt, _eta, _phi, _mass); }
+    Gen() { this->p4.SetPtEtaPhiM(0, 0, 0, 0); }
+
+    // getters
+    Int_t getPID() const { return PID; }
+    Int_t getMomPID() const { return MomPID; }
+    Int_t getGMomPID() const { return GMomPID; }
+    Int_t getStatus() const { return Status; }
+    Int_t getParentage() const { return Parentage; }
+    TLorentzVector getP4() { return p4; }
+    Float_t getPt() { return p4.Pt(); }
+    Float_t getEta() { return p4.Eta(); }
+    Float_t getPhi() { return p4.Phi(); }
+    Float_t getMass() { return p4.M(); }
+    TLorentzVector getMomP4() { return MomP4; }
+    Float_t getMomPt() const { return MomP4.Pt(); }
+    Float_t getMomEta() const { return MomP4.Eta(); }
+    Float_t getMomPhi() const { return MomP4.Phi(); }
+    Float_t getMomMass() const { return MomP4.M(); }
+
+    // setters
+    void setMomP4(float _pt, float _eta, float _phi, float _mass) { MomP4.SetPtEtaPhiM(_pt, _eta, _phi, _mass); }
+    void setP4WithEnergy(float _pt, float _eta, float _phi, float _energy) { p4.SetPtEtaPhiE(_pt, _eta, _phi, _energy); }
+
+   private:
+    TLorentzVector p4, MomP4;
+    Int_t PID, GMomPID, MomPID, Parentage, Status;
+};
 
 class Gen_Factory {
    public:
@@ -119,38 +153,5 @@ void Gen_Factory::Run_Factory() {
     nGoodGen = gen_particles.size();
     MET_p4.SetPtEtaPhiM(genMET, 0, genMETPhi, 0);
 }
-
-class Gen {
-    friend class Gen_Factory;
-
-   public:
-    Gen(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _mass) { this->p4.SetPtEtaPhiM(_pt, _eta, _phi, _mass); }
-    Gen() { this->p4.SetPtEtaPhiM(0, 0, 0, 0); }
-
-    // getters
-    Int_t getPID() const { return PID; }
-    Int_t getMomPID() const { return MomPID; }
-    Int_t getGMomPID() const { return GMomPID; }
-    Int_t getStatus() const { return Status; }
-    Int_t getParentage() const { return Parentage; }
-    TLorentzVector getP4() { return p4; }
-    Float_t getPt() { return p4.Pt(); }
-    Float_t getEta() { return p4.Eta(); }
-    Float_t getPhi() { return p4.Phi(); }
-    Float_t getMass() { return p4.M(); }
-    TLorentzVector getMomP4() { return MomP4; }
-    Float_t getMomPt() const { return MomP4.Pt(); }
-    Float_t getMomEta() const { return MomP4.Eta(); }
-    Float_t getMomPhi() const { return MomP4.Phi(); }
-    Float_t getMomMass() const { return MomP4.M(); }
-
-    // setters
-    void setMomP4(float _pt, float _eta, float _phi, float _mass) { MomP4.SetPtEtaPhiM(_pt, _eta, _phi, _mass); }
-    void setP4WithEnergy(float _pt, float _eta, float _phi, float _energy) { p4.SetPtEtaPhiE(_pt, _eta, _phi, _energy); }
-
-   private:
-    TLorentzVector p4, MomP4;
-    Int_t PID, GMomPID, MomPID, Parentage, Status;
-};
 
 #endif  // INTERFACE_GEN_FACTORY_H_
