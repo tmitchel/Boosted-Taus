@@ -140,7 +140,6 @@ void Boosted_Factory::Run_Factory() {
         boosted.pass_medium_iso = pass_medium_iso->at(i);
         boosted.pass_tight_iso = pass_tight_iso->at(i);
         boosted.pass_vtight_iso = pass_vtight_iso->at(i);
-        boosted.raw_iso = iso->at(i);
         boosted.pfTausDiscriminationByDecayModeFinding = boostedTaupfTausDiscriminationByDecayModeFinding->at(i);
         boosted.pfTausDiscriminationByDecayModeFindingNewDMs = boostedTaupfTausDiscriminationByDecayModeFindingNewDMs->at(i);
         boosted.ByMVA6VLooseElectronRejection = boostedTauByMVA6VLooseElectronRejection->at(i);
