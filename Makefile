@@ -2,6 +2,10 @@ OPT=-O3
 ROOT=`root-config --cflags --glibs`  -lRooFit -lRooFitCore
 CFLAGS=-I${CMSSW_BASE}/src
 
+.PHONY: mt-sf-measurement et-sf-measurement all
+
+all: mt-sf-measurement et-sf-measurement
+
 mt-sf-measurement: plugins/mt-sf-measurement.cc
 	g++ $(OPT) plugins/mt-sf-measurement.cc $(ROOT) $(CFLAGS) -o bin/mt-sf-measurement
 
