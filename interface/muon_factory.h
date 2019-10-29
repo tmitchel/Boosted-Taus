@@ -112,10 +112,10 @@ void Muon_Factory::Run_Factory() {
         muon.muIsoTrk = muIsoTrk->at(i);
         muon.D0 = muD0->at(i);
         muon.Dz = muDz->at(i);
-        muPFChIso = muPFChIso->at(i);
-        muPFNeuIso = muPFNeuIso->at(i);
-        muPFPhoIso = muPFPhoIso->at(i);
-        muPFPUIso = muPFPUIso->at(i);
+        muon.muPFChIso = muPFChIso->at(i);
+        muon.muPFNeuIso = muPFNeuIso->at(i);
+        muon.muPFPhoIso = muPFPhoIso->at(i);
+        muon.muPFPUIso = muPFPUIso->at(i);
         muons.push_back(muon);
     }
 
