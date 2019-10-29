@@ -6,10 +6,38 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
-#include "./ak8.h"
+#include "TLorentzVector.h"
 #include "TTree.h"
 
+class AK8;
 typedef std::vector<AK8> VAK8;
+
+class AK8 {
+    friend class AK8_Factory;
+
+   public:
+    AK8(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _en) { this->p4.SetPtEtaPhiE(_pt, _eta, _phi, _en); }
+    AK8() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
+
+    // getters
+    TLorentzVector getP4() { return p4; }
+    Float_t getPt() { return p4.Pt(); }
+    Float_t getEta() { return p4.Eta(); }
+    Float_t getPhi() { return p4.Phi(); }
+    Float_t getMass() { return p4.M(); }
+    Bool_t getJetPFLooseId() { return jetPFLooseId; }
+    Int_t getPartonID() { return jetPartonID; }
+    Int_t getHadFlvr() { return jetHadFlvr; }
+    Float_t getPrunedMass() { return AK8JetPrunedMass; }
+    Float_t getSoftDropMass() { return AK8JetSoftDropMass; }
+
+   private:
+    TLorentzVector p4;
+    Bool_t jetPFLooseId;
+    Int_t jetPartonID, jetHadFlvr;
+    ULong64_t jetFiredTrgs;
+    Float_t AK8JetPrunedMass, AK8JetSoftDropMass;
+};
 
 class AK8_Factory {
    public:
@@ -26,9 +54,8 @@ class AK8_Factory {
     Int_t nJet, nGoodJet;
     VAK8 jets;
     std::vector<Bool_t> *jetPFLooseId;
-    std::vector<Int_t> *jetPartonID, *jetHadFlvr, *jetNCH, *jetNNP;
-    std::vector<Float_t> *jetPt, *jetEta, *jetPhi, *jetEn, *jetRawPt, *jetRawEn, *jetP4Smear, *jetP4SmearUp,
-        *jetP4SmearDo, *jetJECUnc, *jetCHF, *jetNHF, *jetCEF, *jetNEF, *jetMUF, *AK8JetPrunedMass, *AK8JetSoftDropMass;
+    std::vector<Int_t> *jetPartonID, *jetHadFlvr;
+    std::vector<Float_t> *jetPt, *jetEta, *jetPhi, *jetEn, *AK8JetPrunedMass, *AK8JetSoftDropMass;
 };
 
 AK8_Factory::AK8_Factory(TTree *tree, bool is_data_)
@@ -37,19 +64,9 @@ AK8_Factory::AK8_Factory(TTree *tree, bool is_data_)
       jetEta(nullptr),
       jetPhi(nullptr),
       jetEn(nullptr),
-      jetRawPt(nullptr),
-      jetRawEn(nullptr),
       jetPartonID(nullptr),
       jetHadFlvr(nullptr),
       jetPFLooseId(nullptr),
-      jetJECUnc(nullptr),
-      jetCHF(nullptr),
-      jetNHF(nullptr),
-      jetCEF(nullptr),
-      jetNEF(nullptr),
-      jetNCH(nullptr),
-      jetNNP(nullptr),
-      jetMUF(nullptr),
       AK8JetPrunedMass(nullptr),
       AK8JetSoftDropMass(nullptr) {
     tree->SetBranchAddress("nAK8Jet", &nJet);
@@ -57,17 +74,7 @@ AK8_Factory::AK8_Factory(TTree *tree, bool is_data_)
     tree->SetBranchAddress("AK8JetEn", &jetEn);
     tree->SetBranchAddress("AK8JetEta", &jetEta);
     tree->SetBranchAddress("AK8JetPhi", &jetPhi);
-    tree->SetBranchAddress("AK8JetRawPt", &jetRawPt);
-    tree->SetBranchAddress("AK8JetRawEn", &jetRawEn);
     tree->SetBranchAddress("AK8JetPFLooseId", &jetPFLooseId);
-    tree->SetBranchAddress("AK8JetJECUnc", &jetJECUnc);
-    tree->SetBranchAddress("AK8JetCHF", &jetCHF);
-    tree->SetBranchAddress("AK8JetNHF", &jetNHF);
-    tree->SetBranchAddress("AK8JetCEF", &jetCEF);
-    tree->SetBranchAddress("AK8JetNEF", &jetNEF);
-    tree->SetBranchAddress("AK8JetNCH", &jetNCH);
-    tree->SetBranchAddress("AK8JetNNP", &jetNNP);
-    tree->SetBranchAddress("AK8JetMUF", &jetMUF);
     tree->SetBranchAddress("AK8JetPrunedMass", &AK8JetPrunedMass);
     tree->SetBranchAddress("AK8JetSoftDropMass", &AK8JetSoftDropMass);
     if (!is_data) {
@@ -83,22 +90,12 @@ void AK8_Factory::Run_Factory() {
             continue;
         }
         auto jet = AK8(jetPt->at(i), jetEta->at(i), jetPhi->at(i), jetEn->at(i));
-        jet.RawPt = jetRawPt->at(i);
-        jet.RawEn = jetRawEn->at(i);
-        jet.PFLooseId = jetPFLooseId->at(i);
-        jet.JECUnc = jetJECUnc->at(i);
-        jet.CHF = jetCHF->at(i);
-        jet.NHF = jetNHF->at(i);
-        jet.CEF = jetCEF->at(i);
-        jet.NEF = jetNEF->at(i);
-        jet.NCH = jetNCH->at(i);
-        jet.NNP = jetNNP->at(i);
-        jet.MUF = jetMUF->at(i);
-        jet.PrunedMass = AK8JetPrunedMass->at(i);
-        jet.SoftDropMass = AK8JetSoftDropMass->at(i);
+        jet.jetPFLooseId = jetPFLooseId->at(i);
+        jet.AK8JetPrunedMass = AK8JetPrunedMass->at(i);
+        jet.AK8JetSoftDropMass = AK8JetSoftDropMass->at(i);
         if (!is_data) {
-            jet.PartonID = jetPartonID->at(i);
-            jet.HadFlvr = jetHadFlvr->at(i);
+            jet.jetPartonID = jetPartonID->at(i);
+            jet.jetHadFlvr = jetHadFlvr->at(i);
         }
         jets.push_back(jet);
     }
