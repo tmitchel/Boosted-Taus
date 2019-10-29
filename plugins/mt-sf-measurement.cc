@@ -26,7 +26,7 @@ bool pass_electron_veto(std::shared_ptr<VElectron>);
 VJets analysis_jets(std::shared_ptr<VJets>);
 VMuon analysis_muons(std::shared_ptr<VMuon>);
 VBoosted analysis_taus(std::shared_ptr<VBoosted>);
-Double_t calculate_muon_iso(Muon);
+bool calculate_muon_iso(Muon);
 
 int main(int argc, char** argv) {
     auto parser = std::unique_ptr<CLParser>(new CLParser(argc, argv));
@@ -166,7 +166,7 @@ int main(int argc, char** argv) {
             continue;
         }
 
-        auto pass_muon_isolation = calculate_muon_iso(good_muon) < 0.2;
+        auto pass_muon_isolation = calculate_muon_iso(good_muon);
         auto mu_vector(good_muon.getP4());
         auto tau_vector(good_tau.getP4());
 
@@ -261,8 +261,8 @@ VBoosted analysis_taus(std::shared_ptr<VBoosted> all_taus) {
     return good_taus;
 }
 
-Double_t calculate_muon_iso(Muon mu) {
+bool calculate_muon_iso(Muon mu) {
     auto iso = mu.getPFChIso() / mu.getPt();
     iso += std::max(0., mu.getPFNeuIso() + mu.getPFPhoIso() - 0.5 * mu.getPFPUIso()) / mu.getPt();
-    return iso;
+    return iso < 0.2;
 }
