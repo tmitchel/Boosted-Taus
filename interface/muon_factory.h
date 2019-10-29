@@ -30,13 +30,14 @@ class Muon {
   Float_t getType() { return Type; }
   Float_t getMuonHits() { return MuonHits; }
   Float_t getTrkQuality() { return TrkQuality; }
+  Float_t getIsoTrk() { return muIsoTrk; }
   Float_t getD0() { return D0; }
   Float_t getDz() { return Dz; }
 
  private:
   TLorentzVector p4;
   Int_t Charge, Type, IDbit, MuonHits, TrkQuality;
-  Float_t D0, Dz;
+  Float_t D0, Dz, muIsoTrk;
 };
 
 class Muon_Factory {
@@ -52,7 +53,7 @@ class Muon_Factory {
    private:
     Int_t nMu, nGoodMu;
     VMuon muons;
-    std::vector<Float_t> *muPt, *muEta, *muPhi, *muEn, *muD0, *muDz;
+    std::vector<Float_t> *muPt, *muEta, *muPhi, *muEn, *muD0, *muDz, *muIsoTrk;
     std::vector<Int_t> *muCharge, *muType, *muIDbit, *muMuonHits, *muTrkQuality;
 };
 
@@ -67,7 +68,8 @@ Muon_Factory::Muon_Factory(TTree *tree)
       muMuonHits(nullptr),
       muTrkQuality(nullptr),
       muD0(nullptr),
-      muDz(nullptr) {
+      muDz(nullptr),
+      muIsoTrk(nullptr) {
     tree->SetBranchAddress("nMu", &nMu);
     tree->SetBranchAddress("muPt", &muPt);
     tree->SetBranchAddress("muEta", &muEta);
@@ -80,6 +82,7 @@ Muon_Factory::Muon_Factory(TTree *tree)
     tree->SetBranchAddress("muTrkQuality", &muTrkQuality);
     tree->SetBranchAddress("muD0", &muD0);
     tree->SetBranchAddress("muDz", &muDz);
+    tree->SetBranchAddress("muIsoTrk", &muIsoTrk);
 }
 
 void Muon_Factory::Run_Factory() {
@@ -94,6 +97,7 @@ void Muon_Factory::Run_Factory() {
         muon.IDbit = muIDbit->at(i);
         muon.MuonHits = muMuonHits->at(i);
         muon.TrkQuality = muTrkQuality->at(i);
+        muon.muIsoTrk = muIsoTrk->at(i);
         muon.D0 = muD0->at(i);
         muon.Dz = muDz->at(i);
         muons.push_back(muon);
