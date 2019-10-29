@@ -11,7 +11,7 @@ sudo chmod 777 /home/travis/build/tmitchel/Boosted-Taus/
 
 cd /home/travis/build/tmitchel/Boosted-Taus/
 
-make all
+make test
 
 # for i in plugins/*; do
 #     if [ -f $i ] ; then
