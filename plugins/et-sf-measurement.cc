@@ -1,7 +1,9 @@
 // Copyright [2019] Tyler Mitchell
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 
 #include "TTree.h"
 
@@ -20,13 +22,11 @@
 using std::string;
 using std::vector;
 
-int find_loose_electron(std::shared_ptr<VElectron>);
-Electron get_signal_electron(std::shared_ptr<VElectron>);
-Electron get_antiid_electron(std::shared_ptr<VElectron>);
-Boosted get_signal_tau(std::shared_ptr<VBoosted>);
-vector<Electron> get_control_electrons(std::shared_ptr<VElectron>);
-vector<Electron> get_antiid_control_electrons(std::shared_ptr<VElectron>);
 bool pass_muon_veto(std::shared_ptr<VMuon>);
+VJets analysis_jets(std::shared_ptr<VJets>);
+VElectron analysis_electrons(std::shared_ptr<VElectron>);
+VBoosted analysis_taus(std::shared_ptr<VBoosted>);
+bool calculate_electron_iso(Electron);
 
 int main(int argc, char** argv) {
     auto parser = std::unique_ptr<CLParser>(new CLParser(argc, argv));
@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
     auto cross_section = cross_sections[sample_name];
     Double_t init_weight(cross_section * lumi["2017"] / nevt_hist->GetBinContent(2));
     if (is_data) {
-      init_weight = 1.;
+        init_weight = 1.;
     }
 
     auto nevts = tree->GetEntries();
@@ -89,96 +89,93 @@ int main(int argc, char** argv) {
         /////////////////////////
         // Begin pre-selection //
         /////////////////////////
-        if (event.getLepTrigger(38)) {  // HLT_Ele115_CaloIdVT_GsfTrkIdT_v
+        if (event.getLepTrigger(3) || event.getLepTrigger(4)) {  // HLT_Ele35_WPTight_Gsf_v || HLT_Ele27_WPTight_Gsf_v
             hists->Fill("cutflow", 1., evtwt);
         } else {
             continue;
         }
 
-        if (pass_muon_veto(muon_factory.getMuons())) {  // found electrons in the event
+        if (jet_factory.getNBTags() > 0) {  // b-jet veto
             hists->Fill("cutflow", 2., evtwt);
         } else {
             continue;
         }
 
-        if (jet_factory.getNBTags() > 0) {  // b-jet veto
+        // calculate get good jets and HT
+        auto jets = analysis_jets(jet_factory.getJets());
+        auto HT = jet_factory.HT(jets);
+        if (HT > 200) {
             hists->Fill("cutflow", 3., evtwt);
         } else {
             continue;
         }
 
-        auto electrons = electron_factory.getElectrons();
-        auto taus = boost_factory.getTaus();
-
-        //////////////////////////////
-        // Begin Zmumu CR selection //
-        //////////////////////////////
-
-        // get necessary objects
-        auto nloose = find_loose_electron(electrons);
-        if (nloose <= 2) {
+        if (pass_muon_veto(muon_factory.getMuons())) {  // no muons in the event
             hists->Fill("cutflow", 4., evtwt);
         } else {
             continue;
         }
 
-        // get passing/failing pairs
-        auto good_ele_pair = get_control_electrons(electrons);
-        auto anti_ele_pair = get_antiid_control_electrons(electrons);
-
-        // passing region
-        if (good_ele_pair.size() == 2) {
-            if (good_ele_pair.at(0).getCharge() * good_ele_pair.at(1).getCharge() < 0) {
-                hists->Fill("OS_control", (good_ele_pair.at(0).getP4() + good_ele_pair.at(1).getP4()).M(), evtwt);
-            } else {
-                hists->Fill("SS_control", (good_ele_pair.at(0).getP4() + good_ele_pair.at(1).getP4()).M(), evtwt);
-            }
-        } else if (anti_ele_pair.size() == 2) {
-            if (anti_ele_pair.at(0).getCharge() * anti_ele_pair.at(1).getCharge() < 0) {
-                hists->Fill("OS_anti_control", (anti_ele_pair.at(0).getP4() + anti_ele_pair.at(1).getP4()).M(), evtwt);
-            } else {
-                hists->Fill("SS_anti_control", (anti_ele_pair.at(0).getP4() + anti_ele_pair.at(1).getP4()).M(), evtwt);
-            }
-        }
+        // get leptons
+        auto electrons = analysis_electrons(electron_factory.getElectrons());
+        auto taus = analysis_taus(boost_factory.getTaus());
 
         ///////////////////////////////////
         // Begin signal region selection //
         ///////////////////////////////////
 
-        if (nloose <= 1) {
+        // veto on too many electrons
+        if (electrons.size() < 2) {
             hists->Fill("cutflow", 5., evtwt);
         } else {
             continue;
         }
 
-        auto good_electron = get_signal_electron(electrons);
-        auto anti_electron = get_antiid_electron(electrons);
-        auto good_tau = get_signal_tau(taus);
-
         // check if we find a good tau
-        if (good_tau.getPt() > 0) {
-            hists->Fill("cutflow", 6., evtwt);
-        } else {
-            continue;
-        }
-
-        // check if we found a good passing or failing electron
-        if (good_electron.getPt() > 0 || anti_electron.getPt() > 0) {
+        if (taus.size() > 0) {
             hists->Fill("cutflow", 7., evtwt);
         } else {
             continue;
         }
 
-        // get the 4-vectors
-        auto el_vector(good_electron.getP4()), anti_vector(anti_electron.getP4()), tau_vector(good_tau.getP4());
-
-        // construct pass-id signal region
-        if (el_vector.DeltaR(tau_vector) > 0.4 && el_vector.DeltaR(tau_vector) < 0.8) {
+        // check if we found a good passing or failing electrons
+        if (electrons.size() > 0) {
             hists->Fill("cutflow", 8., evtwt);
+        } else {
+            continue;
+        }
+
+        bool good_match(false);
+        Electron good_electron;
+        Boosted good_tau;
+        for (auto& tau : taus) {
+            for (auto& el : electrons) {
+                if (el.getP4().DeltaR(tau.getP4()) > 0.4 && el.getP4().DeltaR(tau.getP4()) < 0.8) {
+                    good_match = true;
+                    good_electron = el;
+                    good_tau = tau;
+                    break;
+                }
+            }
+        }
+
+        // found a matched mu/tau pair
+        if (good_match) {
+            hists->Fill("cutflow", 9., evtwt);
+        } else {
+            continue;
+        }
+
+        auto pass_electron_isolation = calculate_electron_iso(good_electron);
+        auto el_vector(good_electron.getP4());
+        auto tau_vector(good_tau.getP4());
+
+        // construct pass-iso signal region
+        if (pass_electron_isolation) {
+            hists->Fill("cutflow", 10., evtwt);
             if (good_tau.getIso(medium)) {  // tau pass region
-                hists->Fill("cutflow", 9., evtwt);
+                hists->Fill("cutflow", 11., evtwt);
                 if (good_electron.getCharge() * good_tau.getCharge() < 0) {
-                    hists->Fill("cutflow", 10., evtwt);
                     hists->Fill("OS_pass", (el_vector + tau_vector).M(), evtwt);
                 } else {
                     hists->Fill("SS_pass", (el_vector + tau_vector).M(), evtwt);
@@ -192,23 +189,25 @@ int main(int argc, char** argv) {
             }
         }
 
-        // construct anti-id signal region
-        if (anti_vector.DeltaR(tau_vector) > 0.4 && anti_vector.DeltaR(tau_vector) < 0.8) {
+        // construct anti-iso signal region
+        if (!pass_electron_isolation) {
+            hists->Fill("cutflow", 10., evtwt);
             if (good_tau.getIso(medium)) {  // tau pass region
-                if (anti_electron.getCharge() * good_tau.getCharge() < 0) {
-                    hists->Fill("OS_anti_pass", (anti_vector + tau_vector).M(), evtwt);
+                hists->Fill("cutflow", 11., evtwt);
+                if (good_electron.getCharge() * good_tau.getCharge() < 0) {
+                    hists->Fill("OS_anti_pass", (el_vector + tau_vector).M(), evtwt);
                 } else {
-                    hists->Fill("SS_anti_pass", (anti_vector + tau_vector).M(), evtwt);
+                    hists->Fill("SS_anti_pass", (el_vector + tau_vector).M(), evtwt);
                 }
             } else if (good_tau.getIso(vloose)) {
-                if (anti_electron.getCharge() * good_tau.getCharge() < 0) {  // tau fail region
-                    hists->Fill("OS_anti_fail", (anti_vector + tau_vector).M(), evtwt);
+                if (good_electron.getCharge() * good_tau.getCharge() < 0) {  // tau fail region
+                    hists->Fill("OS_anti_fail", (el_vector + tau_vector).M(), evtwt);
                 } else {
-                    hists->Fill("SS_anti_fail", (anti_vector + tau_vector).M(), evtwt);
+                    hists->Fill("SS_anti_fail", (el_vector + tau_vector).M(), evtwt);
                 }
             }
         }
-    }      // end event loop
+    }  // end event loop
     fin->Close();
     hists->Write();
     logfile.close();
@@ -223,72 +222,51 @@ bool pass_muon_veto(std::shared_ptr<VMuon> all_muons) {
     return true;
 }
 
-int find_loose_electron(std::shared_ptr<VElectron> all_electrons) {
-    int loose_ele(0);
-    for (auto& ele : *all_electrons) {
-        if (ele.getPt() > 10 && fabs(ele.getEta()) < 2.4 && ele.getID(medium)) {
-            loose_ele++;
+VJets analysis_jets(std::shared_ptr<VJets> jets) {
+    VJets good_jets;
+    for (auto& jet : *jets) {
+        // jets are sorted by pT so once we find one with pT < 30
+        // there's no point in looping through the rest
+        if (jet.getPt() < 30) {
+            break;
+        }
+
+        // apply eta selection
+        if (fabs(jet.getEta()) < 2.4) {
+            good_jets.push_back(jet);
         }
     }
-    return loose_ele;
+    return good_jets;
 }
 
-Electron get_signal_electron(std::shared_ptr<VElectron> all_electrons) {
-    for (auto ele : *all_electrons) {
-        if (ele.getPt() > 55 && fabs(ele.getEta()) < 2.4 && ele.getID(medium)) {
-            return ele;
+VElectron analysis_electrons(std::shared_ptr<VElectron> all_electrons) {
+    VElectron good_electrons;
+    for (auto& el : *all_electrons) {
+        if (el.getPt() > 40 && fabs(el.getEta()) < 2.5) {
+            good_electrons.push_back(el);
         }
     }
-    return Electron(0, 0, 0, 0);
+    return good_electrons;
 }
 
-Electron get_antiid_electron(std::shared_ptr<VElectron> all_electrons) {
-    for (auto ele : *all_electrons) {
-        if (ele.getPt() > 55 && fabs(ele.getEta()) < 2.4 && !ele.getID(medium)) {
-            return ele;
-        }
-    }
-    return Electron(0, 0, 0, 0);
-}
-
-Boosted get_signal_tau(std::shared_ptr<VBoosted> all_taus) {
+VBoosted analysis_taus(std::shared_ptr<VBoosted> all_taus) {
+    VBoosted good_taus;
     for (unsigned i = 0; i < all_taus->size(); i++) {
-        if (all_taus->at(i).getPt() > 30 && fabs(all_taus->at(i).getEta()) < 2.3
-            && all_taus->at(i).getMuRejection(loose) && all_taus->at(i).getEleRejection(tight)) {
-            return all_taus->at(i);
+        if (all_taus->at(i).getPt() > 20 && fabs(all_taus->at(i).getEta()) < 2.3 && all_taus->at(i).getMuRejection(loose) &&
+            all_taus->at(i).getEleRejection(tight) && all_taus->at(i).getDiscByDM(false) > 0.5) {
+            good_taus.push_back(all_taus->at(i));
         }
     }
-    return Boosted(0, 0, 0, 0);
+    return good_taus;
 }
 
-vector<Electron> get_control_electrons(std::shared_ptr<VElectron> all_electrons) {
-    vector<Electron> good_pair;
-    for (auto ele : *all_electrons) {  // tighter electron
-        if (ele.getPt() > 55 && fabs(ele.getEta()) < 2.4 && ele.getID(medium)) {
-            for (auto ele2 : *all_electrons) {  // looser electron
-                if (ele2.getPt() > 10 && fabs(ele2.getEta()) < 2.4 && ele2.getID(medium) &&
-                    (ele.getP4() + ele2.getP4()).M() > 60 && (ele.getP4() + ele2.getP4()).M() < 120
-                    && ele.getP4().DeltaR(ele2.getP4()) > 0.05 && ele.getP4().DeltaR(ele2.getP4()) < 1.5) {
-                    good_pair = {ele, ele2};
-                }
-            }
-        }
+bool calculate_electron_iso(Electron el) {
+    if (fabs(el.getSCEta()) < 0.8 && el.getIDMVAIso() > 0.941) {
+        return true;
+    } else if (fabs(el.getSCEta()) > 0.8 && fabs(el.getSCEta()) < 1.5 && el.getIDMVAIso() > 0.899) {
+        return true;
+    } else if (fabs(el.getSCEta()) > 1.5 && el.getIDMVAIso() > 0.758) {
+        return true;
     }
-    return good_pair;
-}
-
-vector<Electron> get_antiid_control_electrons(std::shared_ptr<VElectron> all_electrons) {
-    vector<Electron> good_pair;
-    for (auto ele : *all_electrons) {  // tighter muon
-        if (ele.getPt() > 55 && fabs(ele.getEta()) < 2.4 && ele.getID(medium)) {
-            for (auto ele2 : *all_electrons) {  // looser muon
-                if (ele2.getPt() > 10 && fabs(ele2.getEta()) < 2.4 && !ele2.getID(medium) &&
-                    (ele.getP4() + ele2.getP4()).M() > 60 && (ele.getP4() + ele2.getP4()).M() < 120
-                    && ele.getP4().DeltaR(ele2.getP4()) > 0.05 && ele.getP4().DeltaR(ele2.getP4()) < 1.5) {
-                    good_pair = {ele, ele2};
-                }
-            }
-        }
-    }
-    return good_pair;
+    return false;
 }
