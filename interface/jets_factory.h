@@ -21,19 +21,19 @@ class Jets {
 
     // getters
     TLorentzVector getP4() { return p4; }
-    Float_t getPt() { return p4.Pt(); }
-    Float_t getEta() { return p4.Eta(); }
-    Float_t getPhi() { return p4.Phi(); }
-    Float_t getMass() { return p4.M(); }
-    Bool_t getJetPFLooseId() { return PFLooseId; }
-    Int_t getPartonID() { return PartonID; }
-    Int_t getHadFlvr() { return HadFlvr; }
-    Int_t getID() { return ID; }
-    Float_t getCSV2BJetTags() { return CSV2BJetTags; }
-    Float_t getDeepCSVTags_b() { return DeepCSVTags_b; }
-    Float_t getDeepCSVTags_bb() { return DeepCSVTags_bb; }
-    Float_t getDeepCSVTags_c() { return DeepCSVTags_c; }
-    Float_t getDeepCSVTags_udsg() { return DeepCSVTags_udsg; }
+    Float_t getPt() const { return p4.Pt(); }
+    Float_t getEta() const { return p4.Eta(); }
+    Float_t getPhi() const { return p4.Phi(); }
+    Float_t getMass() const { return p4.M(); }
+    Bool_t getJetPFLooseId() const { return PFLooseId; }
+    Int_t getPartonID() const { return PartonID; }
+    Int_t getHadFlvr() const { return HadFlvr; }
+    Int_t getID() const { return ID; }
+    Float_t getCSV2BJetTags() const { return CSV2BJetTags; }
+    Float_t getDeepCSVTags_b() const { return DeepCSVTags_b; }
+    Float_t getDeepCSVTags_bb() const { return DeepCSVTags_bb; }
+    Float_t getDeepCSVTags_c() const { return DeepCSVTags_c; }
+    Float_t getDeepCSVTags_udsg() const { return DeepCSVTags_udsg; }
 
    private:
     TLorentzVector p4;
@@ -52,6 +52,7 @@ class Jets_Factory {
     Int_t getNGoodJets() { return nGoodJet; }
     Int_t getNBTags() { return nBTag; }
     std::shared_ptr<VJets> getJets() { return std::make_shared<VJets>(jets); }
+    Double_t HT(const VJets&);
 
    private:
     Bool_t is_data;
@@ -101,7 +102,7 @@ void Jets_Factory::Run_Factory() {
     btags.clear();
     Jets jet;
     for (auto i = 0; i < nJet; i++) {
-        if (jetPt->at(i) < 30 || fabs(jetEta->at(i)) > 3) {
+        if (jetPt->at(i) < 20 || fabs(jetEta->at(i)) > 3 || jetPFLooseId->at(i) < 0.5) {
             continue;
         }
         jet = Jets(jetPt->at(i), jetEta->at(i), jetPhi->at(i), jetEn->at(i));
@@ -118,7 +119,7 @@ void Jets_Factory::Run_Factory() {
         }
         jets.push_back(jet);
 
-        if (jetCSV2BJetTags->at(i) > 0.4941) {
+        if (jetCSV2BJetTags->at(i) > 0.8838 && fabs(jetEta->at(i)) < 2.4) {  // medium b-jets
             btags.push_back(jet);
         }
     }
@@ -128,6 +129,14 @@ void Jets_Factory::Run_Factory() {
     std::sort(btags.begin(), btags.end(), [](Jets &p1, Jets &p2) -> bool { return p1.getPt() > p2.getPt(); });
     nGoodJet = jets.size();
     nBTag = btags.size();
+}
+
+Double_t Jets_Factory::HT(const VJets& jets) {
+    double ht(0.);
+    for (auto& jet : jets) {
+        ht += jet.getPt();
+    }
+    return ht;
 }
 
 #endif  // INTERFACE_JETS_FACTORY_H_

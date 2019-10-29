@@ -33,11 +33,15 @@ class Muon {
   Float_t getIsoTrk() { return muIsoTrk; }
   Float_t getD0() { return D0; }
   Float_t getDz() { return Dz; }
+  Float_t getPFChIso() { return muPFChIso; }
+  Float_t getPFNeuIso() { return muPFNeuIso; }
+  Float_t getPFPhoIso() { return muPFPhoIso; }
+  Float_t getPFPUIso() { return muPFPUIso; }
 
  private:
   TLorentzVector p4;
   Int_t Charge, Type, IDbit, MuonHits, TrkQuality;
-  Float_t D0, Dz, muIsoTrk;
+  Float_t D0, Dz, muIsoTrk, muPFChIso, muPFNeuIso, muPFPhoIso, muPFPUIso;
 };
 
 class Muon_Factory {
@@ -53,7 +57,7 @@ class Muon_Factory {
    private:
     Int_t nMu, nGoodMu;
     VMuon muons;
-    std::vector<Float_t> *muPt, *muEta, *muPhi, *muEn, *muD0, *muDz, *muIsoTrk;
+    std::vector<Float_t> *muPt, *muEta, *muPhi, *muEn, *muD0, *muDz, *muIsoTrk, *muPFChIso, *muPFNeuIso, *muPFPhoIso, *muPFPUIso;
     std::vector<Int_t> *muCharge, *muType, *muIDbit, *muMuonHits, *muTrkQuality;
 };
 
@@ -69,7 +73,11 @@ Muon_Factory::Muon_Factory(TTree *tree)
       muTrkQuality(nullptr),
       muD0(nullptr),
       muDz(nullptr),
-      muIsoTrk(nullptr) {
+      muIsoTrk(nullptr),
+      muPFChIso(nullptr),
+      muPFNeuIso(nullptr),
+      muPFPhoIso(nullptr),
+      muPFPUIso(nullptr) {
     tree->SetBranchAddress("nMu", &nMu);
     tree->SetBranchAddress("muPt", &muPt);
     tree->SetBranchAddress("muEta", &muEta);
@@ -83,6 +91,10 @@ Muon_Factory::Muon_Factory(TTree *tree)
     tree->SetBranchAddress("muD0", &muD0);
     tree->SetBranchAddress("muDz", &muDz);
     tree->SetBranchAddress("muIsoTrk", &muIsoTrk);
+    tree->SetBranchAddress("muPFChIso", &muPFChIso);
+    tree->SetBranchAddress("muPFNeuIso", &muPFNeuIso);
+    tree->SetBranchAddress("muPFPhoIso", &muPFPhoIso);
+    tree->SetBranchAddress("muPFPUIso", &muPFPUIso);
 }
 
 void Muon_Factory::Run_Factory() {
@@ -100,6 +112,10 @@ void Muon_Factory::Run_Factory() {
         muon.muIsoTrk = muIsoTrk->at(i);
         muon.D0 = muD0->at(i);
         muon.Dz = muDz->at(i);
+        muPFChIso = muPFChIso->at(i);
+        muPFNeuIso = muPFNeuIso->at(i);
+        muPFPhoIso = muPFPhoIso->at(i);
+        muPFPUIso = muPFPUIso->at(i);
         muons.push_back(muon);
     }
 
