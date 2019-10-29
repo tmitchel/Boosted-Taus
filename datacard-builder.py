@@ -92,6 +92,11 @@ def build_qcd(osss_histos):
     antiiso_osss_ratio = os_antiid_antiiso.Integral() / ss_antiid_antiiso.Integral()
     control_osss_ratio = os_antiid_ctr.Integral() / ss_antiid_ctr.Integral()
 
+    print 'OS/SS ratio scale factors'
+    print '\tNominal: {}'.format(nom_osss_ratio)
+    print '\tFail: {}'.format(antiiso_osss_ratio)
+    print '\tControl: {}'.format(control_osss_ratio)
+
     nom_norm = ss_id_iso.Clone()
     antiiso_norm = ss_id_antiiso.Clone()
     control_norm = ss_id_ctr.Clone()

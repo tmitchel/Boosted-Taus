@@ -6,15 +6,14 @@ import multiprocessing
 def format_command(args, ifile):
     if not os.path.exists(args.output_dir):
       os.mkdir(args.output_dir)
-    logname = ifile.replace('.root', '')
     output_name = ifile.replace('.root', '_output.root').split('/')[-1]
     print output_name
     if args.local:
       args.ext = ''
-    callstring = './{0} -i {1}{2} -o {3}/{4} -j {5} -t {6} -l {3}/{7}'.format(args.exe, args.ext, ifile, args.output_dir, output_name, args.json, args.treename, logname)
+    callstring = './{0} -i {1}{2} -o {3}/{4} -j {5} -t {6}'.format(args.exe, args.ext, ifile, args.output_dir, output_name, args.json, args.treename)
     if args.verbose:
       callstring += ' -v'
-    if 'JetHT_Run' in ifile or 'muon' in ifile or 'data.root' in ifile.lower():
+    if 'JetHT_Run' in ifile or 'muon' in ifile.lower() or 'electron' in ifile.lower() or 'data_output' in ifile.lower():
       callstring += ' --data'
     return callstring
 

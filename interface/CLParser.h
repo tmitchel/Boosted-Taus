@@ -22,6 +22,7 @@ class CLParser {
 };
 
 CLParser::CLParser(int &argc, char** argv) {
+    // read tokens from argv
     for (int i = 0; i < argc; i++) {
         tokens.push_back(std::string(argv[i]));
     }
