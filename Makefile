@@ -6,7 +6,7 @@ CFLAGS=-I${CMSSW_BASE}/src
 
 all: mt-sf-measurement et-sf-measurement
 
-test: test-mt-sf-measurement test-et-sf-measurement
+test: test-mt-sf-measurement test-et-sf-measurement test-mm-sf-measurement
 
 mt-sf-measurement: plugins/mt-sf-measurement.cc
 	g++ $(OPT) plugins/mt-sf-measurement.cc $(ROOT) $(CFLAGS) -o bin/mt-sf-measurement
