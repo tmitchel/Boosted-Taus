@@ -4,7 +4,7 @@ CFLAGS=-I${CMSSW_BASE}/src
 
 .PHONY: mt-sf-measurement et-sf-measurement all test
 
-all: mt-sf-measurement et-sf-measurement
+all: mt-sf-measurement et-sf-measurement mm-sf-measurement
 
 test: test-mt-sf-measurement test-et-sf-measurement test-mm-sf-measurement
 
