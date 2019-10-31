@@ -9,7 +9,7 @@ files = [
     'DYJetsToLL_M-50_HT-800to1200',
     'DYJetsToLL_M-50_HT-1200to2500',
     'DYJetsToLL_M-50_HT-2500toInf',
-    'DYJetsToLL_Inc',
+    'DYJetsToLL_M-50_v',
     'ST_t-channel_antitop',
     'ST_t-channel_top',
     'ST_tW_antitop',
@@ -38,12 +38,12 @@ files = [
 
 def main(args):
     search = {
-        key: ['xrdfs', 'root://cmseos.fnal.gov/', 'ls', '{}/{}'.format(args.input, key)]
+        key: ['xrdfs', 'root://cmseos.fnal.gov/', 'ls', args.input]
         for key in files
     }
     file_dict = {
-        ifile: [ifile for ifile in check_output(search).split('\n') if '.root' in ifile]
-        for ifile, term in search
+        sfile: [ifile for ifile in check_output(search).split('\n') if '.root' in ifile and ifile in sfile]
+        for sfile, term in search.iteritems()
     }
     pprint.pprint(file_dict)
 
