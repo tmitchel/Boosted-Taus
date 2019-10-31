@@ -12,7 +12,6 @@
 #include "../interface/histManager.h"
 
 // Objects
-#include "../interface/boosted_factory.h"
 #include "../interface/electron_factory.h"
 #include "../interface/event_factory.h"
 #include "../interface/jets_factory.h"
@@ -57,7 +56,6 @@ int main(int argc, char** argv) {
     auto tree = reinterpret_cast<TTree*>(fin->Get(tree_name.c_str()));
 
     // construct our object factories
-    auto boost_factory = Boosted_Factory(tree);
     auto jet_factory = Jets_Factory(tree, is_data);
     auto muon_factory = Muon_Factory(tree);
     auto electron_factory = Electron_Factory(tree);
@@ -79,7 +77,6 @@ int main(int argc, char** argv) {
         }
 
         auto evtwt = init_weight;
-        boost_factory.Run_Factory();
         jet_factory.Run_Factory();
         muon_factory.Run_Factory();
         electron_factory.Run_Factory();
