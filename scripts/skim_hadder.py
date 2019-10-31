@@ -35,14 +35,25 @@ files = [
     'ZZ',
 ]
 
+def name_filter(search, name):
+    if not '.root' in name:
+        return False
+    if search not in name.split('/')[-1]:
+        return False
+
+    return True
+
 
 def main(args):
-    search = ['xrdfs', 'root://cmseos.fnal.gov/', 'ls', args.input]
+    search = ['xrdfs', 'root://cmseos.fnal.gov/', 'ls', '-u', args.input]
     file_dict = {
-        sfile: [ifile for ifile in check_output(search).split('\n') if '.root' in ifile and ifile in sfile]
+        sfile: [ifile for ifile in check_output(search).split('\n') if name_filter(sfile, ifile)]
         for sfile in files
     }
-    pprint.pprint(file_dict)
+    pprint(file_dict)
+
+    # for fname, ifiles in file_dict.iteritems():
+    #     call('hadd {}.root ')
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
