@@ -50,7 +50,7 @@ def main(args):
         sfile: [ifile for ifile in check_output(search).split('\n') if name_filter(sfile, ifile)]
         for sfile in files
     }
-    pprint(file_dict)
+    pprint.pprint(file_dict)
 
     # for fname, ifiles in file_dict.iteritems():
     #     call('hadd {}.root ')
