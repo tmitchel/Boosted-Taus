@@ -37,13 +37,10 @@ files = [
 
 
 def main(args):
-    search = {
-        key: ['xrdfs', 'root://cmseos.fnal.gov/', 'ls', args.input]
-        for key in files
-    }
+    search = ['xrdfs', 'root://cmseos.fnal.gov/', 'ls', args.input]
     file_dict = {
         sfile: [ifile for ifile in check_output(search).split('\n') if '.root' in ifile and ifile in sfile]
-        for sfile, term in search.iteritems()
+        for sfile in files
     }
     pprint.pprint(file_dict)
 
