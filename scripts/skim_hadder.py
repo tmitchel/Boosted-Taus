@@ -50,10 +50,14 @@ def main(args):
         sfile: [ifile for ifile in check_output(search).split('\n') if name_filter(sfile, ifile)]
         for sfile in files
     }
-    pprint.pprint(file_dict)
+    # pprint.pprint(file_dict)
 
-    # for fname, ifiles in file_dict.iteritems():
-    #     call('hadd {}.root ')
+    sep = ' '
+    for fname, ifiles in file_dict.iteritems():
+        new_name = '{}.root'.format(fname)
+        call('hadd {} {}'.format(new_name, sep.join(ifiles)), shell=True)
+        call('xrdcp {} root://cmsxrootd.fnal.gov/{}'.format(new_name, args.output), shell=True)
+        call('rm {}'.format(new_name), shell=True)
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
