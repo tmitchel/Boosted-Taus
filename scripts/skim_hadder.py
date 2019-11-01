@@ -19,6 +19,11 @@ files = [
     'SingleMuon_Run2017D-31Mar2018',
     'SingleMuon_Run2017E-31Mar2018',
     'SingleMuon_Run2017F-31Mar2018',
+    'SingleElectron_Run2017B-31Mar2018',
+    'SingleElectron_Run2017C-31Mar2018',
+    'SingleElectron_Run2017D-31Mar2018',
+    'SingleElectron_Run2017E-31Mar2018',
+    'SingleElectron_Run2017F-31Mar2018',
     'TTTo2L2Nu',
     'TTToHadronic',
     'TTToSemiLeptonic',
@@ -50,13 +55,23 @@ def main(args):
         sfile: [ifile for ifile in check_output(search).split('\n') if name_filter(sfile, ifile)]
         for sfile in files
     }
-    # pprint.pprint(file_dict)
+
+    out_search = ['xrdfs', 'root://cmseos.fnal.gov/', 'ls', '-u', args.output]
+    existing = [ifile.split('/')[-1].replace('.root', '') for ifile in check_output(out_search).split('\n')]
 
     sep = ' '
     for fname, ifiles in file_dict.iteritems():
+        if fname in existing:
+            print '\033[93m[WARNING] File {} already exists. Skipping...\033[0m'.format(fname)
+            continue
+
+        if len(ifile) == 0:
+            print '\033[91m[ERROR] No files were found matching name {}. Skipping...\033[0m'.format(fname)
+            continue
+
         new_name = '{}.root'.format(fname)
         call('hadd {} {}'.format(new_name, sep.join(ifiles)), shell=True)
-        call('xrdcp {} root://cmsxrootd.fnal.gov/{}'.format(new_name, args.output), shell=True)
+        call('xrdcp {} root://cmseos.fnal.gov/{}'.format(new_name, args.output), shell=True)
         call('rm {}'.format(new_name), shell=True)
 
 if __name__ == "__main__":
