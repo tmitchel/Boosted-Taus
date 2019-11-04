@@ -11,11 +11,15 @@
 #include "TLorentzVector.h"
 #include "TTree.h"
 
-class Tau;
+class Tau;  // Tau combines all tau information
 typedef std::vector<Tau> VTau;
 
+// Tau combines all tau related information along with
+// creating the tau 4-vector. Helper functions are provided
+// to access properties of the taus. These properties cannot
+// be updated.
 class Tau {
-    friend class Tau_Factory;
+    friend class Tau_Factory;  // Tau_Factory constructs individual Taus
 
    public:
     Tau(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _m) { this->p4.SetPtEtaPhiM(_pt, _eta, _phi, _m); }
@@ -39,6 +43,7 @@ class Tau {
     Float_t getDXY() { return dxy; }
 
    private:
+    // these should never be modified once read from the TTree
     TLorentzVector p4;
     Bool_t pass_vloose_iso, pass_loose_iso, pass_medium_iso, pass_tight_iso, pass_vtight_iso;
 
@@ -51,14 +56,18 @@ class Tau {
     Float_t Charge, Dxy, Mass, dz, dxy;
 };
 
+// Tau_Factory reads from the TTree and constructs
+// individual Tau objects. The Tau_Factory holds the
+// list of taus, but can provided a shared_ptr to the
+// list.
 class Tau_Factory {
    public:
     explicit Tau_Factory(TTree *, std::string);
     void Run_Factory();
 
     // getters
-    Int_t getNTotalTau() { return nTau; }
-    Int_t getNGoodTau() { return nGoodTau; }
+    Int_t getNTotalTau() { return nTau; }     // nTaus directly from TTree
+    Int_t getNGoodTau() { return nGoodTau; }  // nTaus passing preselection
     std::shared_ptr<VTau> getTaus() { return std::make_shared<VTau>(taus); }
 
    private:
@@ -67,6 +76,7 @@ class Tau_Factory {
 
     std::vector<Bool_t> *taupfTausDiscriminationByDecayModeFinding, *taupfTausDiscriminationByDecayModeFindingNewDMs,
         *tauByMVA6VLooseElectronRejection, *tauByMVA6LooseElectronRejection, *tauByMVA6MediumElectronRejection, *tauByMVA6TightElectronRejection,
+        *tauByMVA6VTightElectronRejection, *tauByLooseMuonRejection3, *tauByTightMuonRejection3;
 
     std::vector<Bool_t> *pass_vloose_iso, *pass_loose_iso, *pass_medium_iso, *pass_tight_iso, *pass_vtight_iso;
 
@@ -75,6 +85,9 @@ class Tau_Factory {
     std::vector<Float_t> *tauEta, *tauPhi, *tauPt, *tauCharge, *tauP, *tauPx, *tauPy, *tauPz, *tauMass, *tauDxy, *taudz, *taudxy, *iso;
 };
 
+// Set all branch addresses when constructing a Tau_Factory.
+// The type of tau isolation can be chosen and defaults to
+// MVArun2v1DBOldDMwLT.
 Tau_Factory::Tau_Factory(TTree *tree, std::string isoType = "IsolationMVArun2v1DBoldDMwLT")
     : tauPt(nullptr),
       tauEta(nullptr),
@@ -135,33 +148,37 @@ Tau_Factory::Tau_Factory(TTree *tree, std::string isoType = "IsolationMVArun2v1D
     tree->SetBranchAddress("taudxy", &taudxy);
 }
 
+// Called once per event to construct the Taus. A basic
+// preselection is applied to all taus. All Taus passing
+// preselection are sorted by pT and stored.
 void Tau_Factory::Run_Factory() {
     taus.clear();
     for (auto i = 0; i < nTau; i++) {
         // baseline/default selection
-        if (tauPt->at(i) > 20 && tauEta->at(i) < 2.3 && pass_vloose_iso->at(i)) {
-            auto tau = Tau(tauPt->at(i), tauEta->at(i), tauPhi->at(i), tauMass->at(i));  // build the tau
-            tau.pass_vloose_iso = pass_vloose_iso->at(i);
-            tau.pass_loose_iso = pass_loose_iso->at(i);
-            tau.pass_medium_iso = pass_medium_iso->at(i);
-            tau.pass_tight_iso = pass_tight_iso->at(i);
-            tau.pass_vtight_iso = pass_vtight_iso->at(i);
-            tau.pfTausDiscriminationByDecayModeFinding = taupfTausDiscriminationByDecayModeFinding->at(i);
-            tau.pfTausDiscriminationByDecayModeFindingNewDMs = taupfTausDiscriminationByDecayModeFindingNewDMs->at(i);
-            tau.ByMVA6VLooseElectronRejection = tauByMVA6VLooseElectronRejection->at(i);
-            tau.ByMVA6LooseElectronRejection = tauByMVA6LooseElectronRejection->at(i);
-            tau.ByMVA6MediumElectronRejection = tauByMVA6MediumElectronRejection->at(i);
-            tau.ByMVA6TightElectronRejection = tauByMVA6TightElectronRejection->at(i);
-            tau.ByMVA6VTightElectronRejection = tauByMVA6VTightElectronRejection->at(i);
-            tau.ByLooseMuonRejection3 = tauByLooseMuonRejection3->at(i);
-            tau.ByTightMuonRejection3 = tauByTightMuonRejection3->at(i);
-            tau.DecayMode = tauDecayMode->at(i);
-            tau.Charge = tauCharge->at(i);
-            tau.Dxy = tauDxy->at(i);
-            tau.dz = taudz->at(i);
-            tau.dxy = taudxy->at(i);
-            taus.push_back(tau);
+        if (tauPt->at(i) < 20 || tauEta->at(i) > 2.3 || !pass_vloose_iso->at(i)) {
+            continue;
         }
+        auto tau = Tau(tauPt->at(i), tauEta->at(i), tauPhi->at(i), tauMass->at(i));  // build the tau
+        tau.pass_vloose_iso = pass_vloose_iso->at(i);
+        tau.pass_loose_iso = pass_loose_iso->at(i);
+        tau.pass_medium_iso = pass_medium_iso->at(i);
+        tau.pass_tight_iso = pass_tight_iso->at(i);
+        tau.pass_vtight_iso = pass_vtight_iso->at(i);
+        tau.pfTausDiscriminationByDecayModeFinding = taupfTausDiscriminationByDecayModeFinding->at(i);
+        tau.pfTausDiscriminationByDecayModeFindingNewDMs = taupfTausDiscriminationByDecayModeFindingNewDMs->at(i);
+        tau.ByMVA6VLooseElectronRejection = tauByMVA6VLooseElectronRejection->at(i);
+        tau.ByMVA6LooseElectronRejection = tauByMVA6LooseElectronRejection->at(i);
+        tau.ByMVA6MediumElectronRejection = tauByMVA6MediumElectronRejection->at(i);
+        tau.ByMVA6TightElectronRejection = tauByMVA6TightElectronRejection->at(i);
+        tau.ByMVA6VTightElectronRejection = tauByMVA6VTightElectronRejection->at(i);
+        tau.ByLooseMuonRejection3 = tauByLooseMuonRejection3->at(i);
+        tau.ByTightMuonRejection3 = tauByTightMuonRejection3->at(i);
+        tau.DecayMode = tauDecayMode->at(i);
+        tau.Charge = tauCharge->at(i);
+        tau.Dxy = tauDxy->at(i);
+        tau.dz = taudz->at(i);
+        tau.dxy = taudxy->at(i);
+        taus.push_back(tau);
     }
 
     // sort by pT
@@ -169,6 +186,9 @@ void Tau_Factory::Run_Factory() {
     nGoodTau = taus.size();
 }
 
+// Check whether the tau passes isolation at
+// the provided working point. The type of isolation
+// is chosen in the Tau_Factory constructor.
 Bool_t Tau::getIso(working_point wp) {
     if (wp == vloose) {
         return pass_vloose_iso;
@@ -184,6 +204,9 @@ Bool_t Tau::getIso(working_point wp) {
     throw std::invalid_argument("Must use one of the provided tau isolation WPs");
 }
 
+// Check whether the Tau passes decay mode finding.
+// New and old DMs are available with old being the
+// default option.
 Bool_t Tau::getDiscByDM(bool newDM = false) {
     if (newDM) {
         return pfTausDiscriminationByDecayModeFindingNewDMs;
@@ -191,6 +214,8 @@ Bool_t Tau::getDiscByDM(bool newDM = false) {
     return pfTausDiscriminationByDecayModeFinding;
 }
 
+// Check whether the Tau passes electron rejection
+// at the requested working point.
 Bool_t Tau::getEleRejection(working_point wp) {
     if (wp == vloose) {
         return ByMVA6VLooseElectronRejection;
@@ -206,6 +231,8 @@ Bool_t Tau::getEleRejection(working_point wp) {
     throw std::invalid_argument("Must use one of the provided electron rejection WPs");
 }
 
+// Check whether the Tau passes muon rejection
+// at the requested working point.
 Bool_t Tau::getMuRejection(working_point wp) {
     if (wp == loose) {
         return ByLooseMuonRejection3;

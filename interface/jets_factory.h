@@ -6,14 +6,18 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
-#include "TTree.h"
 #include "TLorentzVector.h"
+#include "TTree.h"
 
-class Jets;
+class Jets;  // Jets combines all tau information
 typedef std::vector<Jets> VJets;
 
+// Jets combines all jet related information along with
+// creating the jet 4-vector. Helper functions are provided
+// to access properties of the jets. These properties cannot
+// be updated.
 class Jets {
-    friend class Jets_Factory;
+    friend class Jets_Factory;  // Jet_Factory constructs individual Jets
 
    public:
     Jets(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _en) { this->p4.SetPtEtaPhiE(_pt, _eta, _phi, _en); }
@@ -36,23 +40,28 @@ class Jets {
     Float_t getDeepCSVTags_udsg() const { return DeepCSVTags_udsg; }
 
    private:
+    // these should never be modified once read from the TTree
     TLorentzVector p4;
     Bool_t PFLooseId;
     Int_t PartonID, HadFlvr, ID;
     Float_t CSV2BJetTags, DeepCSVTags_b, DeepCSVTags_bb, DeepCSVTags_c, DeepCSVTags_udsg;
 };
 
+// Jets_Factory reads from the TTree and constructs
+// individual Jets objects. The Jets_Factory holds the
+// list of jets, but can provided a shared_ptr to the
+// list.
 class Jets_Factory {
    public:
     Jets_Factory(TTree *, bool);
     void Run_Factory();
 
     // getters
-    Int_t getNTotalJets() { return nJet; }
-    Int_t getNGoodJets() { return nGoodJet; }
-    Int_t getNBTags() { return nBTag; }
+    Int_t getNTotalJets() { return nJet; }     // nJets directly from TTree
+    Int_t getNGoodJets() { return nGoodJet; }  // nJets passing preselection
+    Int_t getNBTags() { return nBTag; }        // nBtags passing preselection
     std::shared_ptr<VJets> getJets() { return std::make_shared<VJets>(jets); }
-    Double_t HT(const VJets&);
+    Double_t HT(const VJets &);
 
    private:
     Bool_t is_data;
@@ -64,6 +73,7 @@ class Jets_Factory {
         *jetDeepCSVTags_udsg;
 };
 
+// Set all branch addresses when constructing a Jets_Factory.
 Jets_Factory::Jets_Factory(TTree *tree, bool is_data_)
     : is_data(is_data_),
       jetPt(nullptr),
@@ -91,17 +101,21 @@ Jets_Factory::Jets_Factory(TTree *tree, bool is_data_)
     tree->SetBranchAddress("jetDeepCSVTags_udsg", &jetDeepCSVTags_udsg);
     tree->SetBranchAddress("jetPFLooseId", &jetPFLooseId);
     tree->SetBranchAddress("jetID", &jetID);
-    if (!is_data) {
+    if (!is_data) {  // not available in data
         tree->SetBranchAddress("jetPartonID", &jetPartonID);
         tree->SetBranchAddress("jetHadFlvr", &jetHadFlvr);
     }
 }
 
+// Called once per event to construct the Jets. A basic
+// preselection is applied to all jets. All Jets passing
+// preselection are sorted by pT and stored.
 void Jets_Factory::Run_Factory() {
     jets.clear();
     btags.clear();
     Jets jet;
     for (auto i = 0; i < nJet; i++) {
+        // baseline/default selection
         if (jetPt->at(i) < 20 || fabs(jetEta->at(i)) > 3 || jetPFLooseId->at(i) < 0.5) {
             continue;
         }
@@ -119,7 +133,8 @@ void Jets_Factory::Run_Factory() {
         }
         jets.push_back(jet);
 
-        if (jetCSV2BJetTags->at(i) > 0.8838 && fabs(jetEta->at(i)) < 2.4) {  // medium b-jets
+        // medium b-jets
+        if (jetCSV2BJetTags->at(i) > 0.8838 && fabs(jetEta->at(i)) < 2.4) {
             btags.push_back(jet);
         }
     }
@@ -131,9 +146,11 @@ void Jets_Factory::Run_Factory() {
     nBTag = btags.size();
 }
 
-Double_t Jets_Factory::HT(const VJets& jets) {
+// HT calculates the scalar sum of all hadronic
+// activity in the event.
+Double_t Jets_Factory::HT(const VJets &jets) {
     double ht(0.);
-    for (auto& jet : jets) {
+    for (auto &jet : jets) {
         ht += jet.getPt();
     }
     return ht;

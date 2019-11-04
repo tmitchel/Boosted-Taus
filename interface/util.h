@@ -6,7 +6,9 @@
 #include <cmath>
 #include <map>
 #include <string>
+#include <vector>
 
+// enum for things like ID working points
 enum working_point {
     vloose,
     loose,
@@ -15,12 +17,14 @@ enum working_point {
     vtight
 };
 
+// luminosity for each year
 std::map<std::string, double> lumi = {
   {"2016", 35900},
   {"2017", 41500},
   {"2018", 63670}
 };
 
+// cross sections for all processes
 std::map<std::string, double> cross_sections = {
   {"DYJetsToLL_M-50_HT-100to200", 148.},
   {"DYJetsToLL_M-50_HT-200to400", 40.94},
@@ -76,9 +80,9 @@ std::map<std::string, double> cross_sections = {
   {"JetHT_Run2017E-31Mar2018", 1.},
   {"JetHT_Run2017F-31Mar2018", 1.},
   {"Data", 1.}
-
 };
 
+// calculate the tranverse mass
 double transverse_mass(std::vector<double> p1, std::vector<double> p2) {
   return sqrt(pow(p1.at(0) + p2.at(0), 2) - pow(p1.at(1) + p2.at(1), 2) - pow(p1.at(2) + p2.at(2), 2));
 }

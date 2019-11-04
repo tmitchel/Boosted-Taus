@@ -7,6 +7,9 @@
 #include "TLorentzVector.h"
 #include "TTree.h"
 
+// EventFactory combines all event level information
+// and provides methods to access it. The EventFactory
+// handles all the bit-shifts required to apply triggers.
 class Event_Factory {
  public:
   explicit Event_Factory(TTree*);
@@ -31,6 +34,7 @@ class Event_Factory {
   TLorentzVector MET;
 };
 
+// SetBranchAddresses when constructing an Event_Factory.
 Event_Factory::Event_Factory(TTree* tree) {
   tree->SetBranchAddress("HLTEleMuX", &HLTEleMuX);
   tree->SetBranchAddress("HLTPho", &HLTPho);

@@ -6,14 +6,18 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
-#include "TTree.h"
 #include "TLorentzVector.h"
+#include "TTree.h"
 
-class Gen;
+class Gen;  // Gen combines all generator-level information
 typedef std::vector<Gen> VGen;
 
+// Gen combines all generator-level information along with
+// creating the gen 4-vector. Helper functions are provided
+// to access properties of the gens. These properties cannot
+// be updated.
 class Gen {
-    friend class Gen_Factory;
+    friend class Gen_Factory;  // Gen_Factory constructs individual Gens
 
    public:
     Gen(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _mass) { this->p4.SetPtEtaPhiM(_pt, _eta, _phi, _mass); }
@@ -41,18 +45,23 @@ class Gen {
     void setP4WithEnergy(float _pt, float _eta, float _phi, float _energy) { p4.SetPtEtaPhiE(_pt, _eta, _phi, _energy); }
 
    private:
+    // these should never be modified once read from the TTree
     TLorentzVector p4, MomP4;
     Int_t PID, GMomPID, MomPID, Parentage, Status;
 };
 
+// Gen_Factory reads from the TTree and constructs
+// individual Gen objects. The Gen_Factory holds the
+// list of gens, but can provided a shared_ptr to the
+// list.
 class Gen_Factory {
    public:
     Gen_Factory(TTree *, bool);
     void Run_Factory();
 
     // getters
-    Int_t getNTotalGen() { return nMC; }
-    Int_t getNGoodGen() { return nGoodGen; }
+    Int_t getNTotalGen() { return nMC; }      // nMC directly from TTree
+    Int_t getNGoodGen() { return nGoodGen; }  // nMC passing preselection
     Float_t getMET() { return genMET; }
     Float_t getMetPhi() { return genMETPhi; }
     TLorentzVector getMETP4() { return MET_p4; }
@@ -70,6 +79,7 @@ class Gen_Factory {
     std::vector<Float_t> *jetGenJetPt, *jetGenJetEta, *jetGenJetPhi, *jetGenJetEn;
 };
 
+// Set all branch addresses when constructing a Gen_Factory.
 Gen_Factory::Gen_Factory(TTree *tree, bool is_data_)
     : is_data(is_data_),
       mcPID(nullptr),
@@ -117,8 +127,11 @@ Gen_Factory::Gen_Factory(TTree *tree, bool is_data_)
     }
 }
 
+// Called once per event to construct the Gens. A basic
+// preselection is applied to all gens. All Gens passing
+// preselection are sorted by pT and stored.
 void Gen_Factory::Run_Factory() {
-    if (is_data) {
+    if (is_data) {  // generator-information isn't avaiable in data
         return;
     }
     // get gen quarks (mc*)

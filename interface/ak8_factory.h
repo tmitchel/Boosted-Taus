@@ -9,11 +9,15 @@
 #include "TLorentzVector.h"
 #include "TTree.h"
 
-class AK8;
+class AK8;  // AK8 combines all tau information
 typedef std::vector<AK8> VAK8;
 
+// AK8 combines all tau related information along with
+// creating the ak8 jet 4-vector. Helper functions are provided
+// to access properties of the ak8 jets. These properties cannot
+// be updated.
 class AK8 {
-    friend class AK8_Factory;
+    friend class AK8_Factory;  // AK8_Factory constructs individual AK8s
 
    public:
     AK8(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _en) { this->p4.SetPtEtaPhiE(_pt, _eta, _phi, _en); }
@@ -32,6 +36,7 @@ class AK8 {
     Float_t getSoftDropMass() { return AK8JetSoftDropMass; }
 
    private:
+    // these should never be modified once read from the TTree
     TLorentzVector p4;
     Bool_t jetPFLooseId;
     Int_t jetPartonID, jetHadFlvr;
@@ -39,14 +44,18 @@ class AK8 {
     Float_t AK8JetPrunedMass, AK8JetSoftDropMass;
 };
 
+// AK8_Factory reads from the TTree and constructs
+// individual AK8 objects. The AK8_Factory holds the
+// list of ak8 jets, but can provided a shared_ptr to the
+// list.
 class AK8_Factory {
    public:
     AK8_Factory(TTree *, bool);
     void Run_Factory();
 
     // getters
-    Int_t getNTotalAK8() { return nJet; }
-    Int_t getNGoodAK8() { return nGoodJet; }
+    Int_t getNTotalAK8() { return nJet; }     // nJet directly from TTree
+    Int_t getNGoodAK8() { return nGoodJet; }  // nJet passing preselection
     std::shared_ptr<VAK8> getAK8() { return std::make_shared<VAK8>(jets); }
 
    private:
@@ -58,6 +67,7 @@ class AK8_Factory {
     std::vector<Float_t> *jetPt, *jetEta, *jetPhi, *jetEn, *AK8JetPrunedMass, *AK8JetSoftDropMass;
 };
 
+// Set all branch addresses when constructing a AK8_Factory.
 AK8_Factory::AK8_Factory(TTree *tree, bool is_data_)
     : is_data(is_data_),
       jetPt(nullptr),
@@ -77,12 +87,15 @@ AK8_Factory::AK8_Factory(TTree *tree, bool is_data_)
     tree->SetBranchAddress("AK8JetPFLooseId", &jetPFLooseId);
     tree->SetBranchAddress("AK8JetPrunedMass", &AK8JetPrunedMass);
     tree->SetBranchAddress("AK8JetSoftDropMass", &AK8JetSoftDropMass);
-    if (!is_data) {
+    if (!is_data) {  // not available in data
         tree->SetBranchAddress("AK8JetPartonID", &jetPartonID);
         tree->SetBranchAddress("AK8JetHadFlvr", &jetHadFlvr);
     }
 }
 
+// Called once per event to construct the AK8s. A basic
+// preselection is applied to all ak8 jets. All AK8s passing
+// preselection are sorted by pT and stored.
 void AK8_Factory::Run_Factory() {
     jets.clear();
     for (auto i = 0; i < nJet; i++) {
@@ -93,7 +106,7 @@ void AK8_Factory::Run_Factory() {
         jet.jetPFLooseId = jetPFLooseId->at(i);
         jet.AK8JetPrunedMass = AK8JetPrunedMass->at(i);
         jet.AK8JetSoftDropMass = AK8JetSoftDropMass->at(i);
-        if (!is_data) {
+        if (!is_data) {  // not available in data
             jet.jetPartonID = jetPartonID->at(i);
             jet.jetHadFlvr = jetHadFlvr->at(i);
         }

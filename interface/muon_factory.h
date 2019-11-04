@@ -6,52 +6,62 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
-#include "TTree.h"
 #include "./util.h"
 #include "TLorentzVector.h"
+#include "TTree.h"
 
-class Muon;
+class Muon;  // Tau combines all muon information
 typedef std::vector<Muon> VMuon;
 
+// Muon combines all muon related information along with
+// creating the muon 4-vector. Helper functions are provided
+// to access properties of the muons. These properties cannot
+// be updated.
 class Muon {
-  friend class Muon_Factory;
+    friend class Muon_Factory;  // Muon_Factory constructs individual Muons
 
- public:
+   public:
     Muon(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _en) { this->p4.SetPtEtaPhiE(_pt, _eta, _phi, _en); }
     Muon() { this->p4.SetPtEtaPhiE(0, 0, 0, 0); }
-  // getters
-  TLorentzVector getP4() { return p4; }
-  Float_t getPt() { return p4.Pt(); }
-  Float_t getEta() { return p4.Eta(); }
-  Float_t getPhi() { return p4.Phi(); }
-  Float_t getMass() { return p4.M(); }
-  Bool_t getID(working_point key) { return (IDbit >> key & 1) == 1; }
-  Float_t getCharge() { return Charge; }
-  Float_t getType() { return Type; }
-  Float_t getMuonHits() { return MuonHits; }
-  Float_t getTrkQuality() { return TrkQuality; }
-  Float_t getIsoTrk() { return muIsoTrk; }
-  Float_t getD0() { return D0; }
-  Float_t getDz() { return Dz; }
-  Float_t getPFChIso() { return muPFChIso; }
-  Float_t getPFNeuIso() { return muPFNeuIso; }
-  Float_t getPFPhoIso() { return muPFPhoIso; }
-  Float_t getPFPUIso() { return muPFPUIso; }
 
- private:
-  TLorentzVector p4;
-  Int_t Charge, Type, IDbit, MuonHits, TrkQuality;
-  Float_t D0, Dz, muIsoTrk, muPFChIso, muPFNeuIso, muPFPhoIso, muPFPUIso;
+    // getters
+    TLorentzVector getP4() { return p4; }
+    Float_t getPt() { return p4.Pt(); }
+    Float_t getEta() { return p4.Eta(); }
+    Float_t getPhi() { return p4.Phi(); }
+    Float_t getMass() { return p4.M(); }
+    Bool_t getID(working_point key) { return (IDbit >> key & 1) == 1; }
+    Float_t getCharge() { return Charge; }
+    Float_t getType() { return Type; }
+    Float_t getMuonHits() { return MuonHits; }
+    Float_t getTrkQuality() { return TrkQuality; }
+    Float_t getIsoTrk() { return muIsoTrk; }
+    Float_t getD0() { return D0; }
+    Float_t getDz() { return Dz; }
+    Float_t getPFChIso() { return muPFChIso; }
+    Float_t getPFNeuIso() { return muPFNeuIso; }
+    Float_t getPFPhoIso() { return muPFPhoIso; }
+    Float_t getPFPUIso() { return muPFPUIso; }
+
+   private:
+    // these should never be modified once read from the TTree
+    TLorentzVector p4;
+    Int_t Charge, Type, IDbit, MuonHits, TrkQuality;
+    Float_t D0, Dz, muIsoTrk, muPFChIso, muPFNeuIso, muPFPhoIso, muPFPUIso;
 };
 
+// Muon_Factory reads from the TTree and constructs
+// individual Muon objects. The Muon_Factory holds the
+// list of muons, but can provided a shared_ptr to the
+// list.
 class Muon_Factory {
    public:
     explicit Muon_Factory(TTree *);
     void Run_Factory();
 
     // getters
-    Int_t getNTotalMuon() { return nMu; }
-    Int_t getNGoodMuon() { return nGoodMu; }
+    Int_t getNTotalMuon() { return nMu; }     // nMuons directly from TTree
+    Int_t getNGoodMuon() { return nGoodMu; }  // nMuons passing preselection
     std::shared_ptr<VMuon> getMuons() { return std::make_shared<VMuon>(muons); }
 
    private:
@@ -61,6 +71,7 @@ class Muon_Factory {
     std::vector<Int_t> *muCharge, *muType, *muIDbit, *muMuonHits, *muTrkQuality;
 };
 
+// Set all branch addresses when constructing a Muon_Factory.
 Muon_Factory::Muon_Factory(TTree *tree)
     : muPt(nullptr),
       muEta(nullptr),
@@ -97,9 +108,13 @@ Muon_Factory::Muon_Factory(TTree *tree)
     tree->SetBranchAddress("muPFPUIso", &muPFPUIso);
 }
 
+// Called once per event to construct the Muons. A basic
+// preselection is applied to all muons. All Muons passing
+// preselection are sorted by pT and stored.
 void Muon_Factory::Run_Factory() {
     muons.clear();
     for (auto i = 0; i < nMu; i++) {
+        // baseline/default selection
         if (muPt->at(i) < 10 || fabs(muEta->at(i)) > 2.4) {
             continue;
         }
@@ -123,7 +138,5 @@ void Muon_Factory::Run_Factory() {
     std::sort(muons.begin(), muons.end(), [](Muon &p1, Muon &p2) -> bool { return p1.getPt() > p2.getPt(); });
     nGoodMu = muons.size();
 }
-
-
 
 #endif  // INTERFACE_MUON_FACTORY_H_

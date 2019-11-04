@@ -11,11 +11,15 @@
 #include "TLorentzVector.h"
 #include "TTree.h"
 
-class Boosted;
+class Boosted;  // Boosted combines all boosted tau information
 typedef std::vector<Boosted> VBoosted;
 
+// Boosted combines all boosted tau related information along with
+// creating the boosted tau 4-vector. Helper functions are provided
+// to access properties of the boosted taus. These properties cannot
+// be updated.
 class Boosted {
-    friend class Boosted_Factory;
+    friend class Boosted_Factory;  // Boosted_Factory constructs individual Boosteds
 
    public:
     Boosted(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _m) { this->p4.SetPtEtaPhiM(_pt, _eta, _phi, _m); }
@@ -38,6 +42,7 @@ class Boosted {
     Float_t getDXY() { return dxy; }
 
    private:
+    // these should never be modified once read from the TTree
     TLorentzVector p4;
     Bool_t pass_vloose_iso, pass_loose_iso, pass_medium_iso, pass_tight_iso, pass_vtight_iso;
 
@@ -50,14 +55,18 @@ class Boosted {
     Float_t Charge, Mass, dz, dxy, Energy, Iso;
 };
 
+// Boosted_Factory reads from the TTree and constructs
+// individual Boosted objects. The Boosted_Factory holds the
+// list of boosted taus, but can provided a shared_ptr to the
+// list.
 class Boosted_Factory {
    public:
     explicit Boosted_Factory(TTree *, std::string);
     void Run_Factory();
 
     // getters
-    Int_t getNTotalBoosted() { return nBoostedTau; }
-    Int_t getNGoodBoosted() { return nGoodTaus; }
+    Int_t getNTotalBoosted() { return nBoostedTau; }  // nBoostedTau directly from TTree
+    Int_t getNGoodBoosted() { return nGoodTaus; }     // nBoostedTau passing preselection
     std::shared_ptr<VBoosted> getTaus() { return std::make_shared<VBoosted>(boosteds); }
 
    private:
@@ -76,6 +85,9 @@ class Boosted_Factory {
     std::vector<Int_t> *boostedTauDecayMode;
 };
 
+// Set all branch addresses when constructing a Boosted_Factory.
+// The type of tau isolation can be chosen and defaults to
+// MVArun2v2DBOldDMwLT.
 Boosted_Factory::Boosted_Factory(TTree *tree, std::string isoType = "IsolationMVArun2v2DBoldDMwLT")
     : boostedTauPt(nullptr),
       boostedTauEta(nullptr),
@@ -127,9 +139,13 @@ Boosted_Factory::Boosted_Factory(TTree *tree, std::string isoType = "IsolationMV
     tree->SetBranchAddress("boostedTaudxy", &boostedTaudxy);
 }
 
+// Called once per event to construct the Boosteds. A basic
+// preselection is applied to all boosted taus. All Boosteds passing
+// preselection are sorted by pT and stored.
 void Boosted_Factory::Run_Factory() {
     boosteds.clear();
     for (auto i = 0; i < nBoostedTau; i++) {
+        // baseline/default selection
         if (boostedTauPt->at(i) < 20 || fabs(boostedTauEta->at(i)) > 2.3) {
             continue;
         }
@@ -161,8 +177,9 @@ void Boosted_Factory::Run_Factory() {
     nGoodTaus = boosteds.size();
 }
 
-
-
+// Check whether the tau passes isolation at
+// the provided working point. The type of isolation
+// is chosen in the Boosted_Factory constructor.
 Bool_t Boosted::getIso(working_point wp) {
     if (wp == vloose) {
         return pass_vloose_iso;
@@ -178,6 +195,9 @@ Bool_t Boosted::getIso(working_point wp) {
     throw std::invalid_argument("Must use one of the provided tau isolation WPs");
 }
 
+// Check whether the boosted tau passes decay mode finding.
+// New and old DMs are available with old being the
+// default option.
 Bool_t Boosted::getDiscByDM(bool newDM = false) {
     if (newDM) {
         return pfTausDiscriminationByDecayModeFindingNewDMs;
@@ -185,6 +205,8 @@ Bool_t Boosted::getDiscByDM(bool newDM = false) {
     return pfTausDiscriminationByDecayModeFinding;
 }
 
+// Check whether the boosted tau passes electron rejection
+// at the requested working point.
 Bool_t Boosted::getEleRejection(working_point wp) {
     if (wp == vloose) {
         return ByMVA6VLooseElectronRejection;
@@ -200,6 +222,8 @@ Bool_t Boosted::getEleRejection(working_point wp) {
     throw std::invalid_argument("Must use one of the provided electron rejection WPs");
 }
 
+// Check whether the boosted tau passes muon rejection
+// at the requested working point.
 Bool_t Boosted::getMuRejection(working_point wp) {
     if (wp == loose) {
         return ByLooseMuonRejection3;

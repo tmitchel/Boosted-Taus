@@ -8,6 +8,10 @@
 #include <string>
 #include <vector>
 
+// CLParser is used to provide simple command-line
+// option functionality. It allows a user to specify
+// flags and options to be used in analysis code without
+// being too bloated.
 class CLParser {
  private:
     std::vector<std::string> tokens;

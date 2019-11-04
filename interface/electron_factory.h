@@ -6,15 +6,19 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
-#include "TTree.h"
-#include "TLorentzVector.h"
 #include "./util.h"
+#include "TLorentzVector.h"
+#include "TTree.h"
 
-class Electron;
+class Electron;  // Electorn combines all electron information
 typedef std::vector<Electron> VElectron;
 
+// Electron combines all electron related information along with
+// creating the electron 4-vector. Helper functions are provided
+// to access properties of the electrons. These properties cannot
+// be updated.
 class Electron {
-    friend class Electron_Factory;
+    friend class Electron_Factory;  // Electron_Factory constructs individual Electrons
 
    public:
     Electron(Float_t _pt, Float_t _eta, Float_t _phi, Float_t _en) { this->p4.SetPtEtaPhiE(_pt, _eta, _phi, _en); }
@@ -37,20 +41,25 @@ class Electron {
     Bool_t getID(working_point key) { return (IDbit >> key & 1) == 1; }
 
    private:
+    // these should never be modified once read from the TTree
     TLorentzVector p4;
     Short_t IDbit;
     Int_t Charge, ConvVeto, MissHits;
     Float_t D0, Dz, IDMVAIso, IDMVANoIso, eleSCEta;
 };
 
+// Electron_Factory reads from the TTree and constructs
+// individual Electron objects. The Electron_Factory holds the
+// list of electrons, but can provided a shared_ptr to the
+// list.
 class Electron_Factory {
    public:
     explicit Electron_Factory(TTree *);
     void Run_Factory();
 
     // getters
-    Int_t getNTotalElectron() { return nEle; }
-    Int_t getNGoodElectron() { return nGoodEle; }
+    Int_t getNTotalElectron() { return nEle; }     // nEle directly from TTree
+    Int_t getNGoodElectron() { return nGoodEle; }  // nEle passing preselection
     std::shared_ptr<VElectron> getElectrons() { return std::make_shared<VElectron>(electrons); }
 
    private:
@@ -61,6 +70,7 @@ class Electron_Factory {
     std::vector<Float_t> *eleEn, *eleD0, *eleDz, *elePt, *eleEta, *elePhi, *eleIDMVAIso, *eleIDMVANoIso, *eleSCEta;
 };
 
+// Set all branch addresses when constructing a Electron_Factory.
 Electron_Factory::Electron_Factory(TTree *tree)
     : eleCharge(nullptr),
       eleEn(nullptr),
@@ -91,6 +101,9 @@ Electron_Factory::Electron_Factory(TTree *tree)
     tree->SetBranchAddress("eleSCEta", &eleSCEta);
 }
 
+// Called once per event to construct the Electrons. A basic
+// preselection is applied to all electrons. All Electrons passing
+// preselection are sorted by pT and stored.
 void Electron_Factory::Run_Factory() {
     electrons.clear();
     for (auto i = 0; i < nEle; i++) {
@@ -114,7 +127,5 @@ void Electron_Factory::Run_Factory() {
     std::sort(electrons.begin(), electrons.end(), [](Electron &p1, Electron &p2) -> bool { return p1.getPt() > p2.getPt(); });
     nGoodEle = electrons.size();
 }
-
-
 
 #endif  // INTERFACE_ELECTRON_FACTORY_H_
