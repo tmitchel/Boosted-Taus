@@ -91,7 +91,7 @@ int main(int argc, char** argv) {
             continue;
         }
 
-        if (jet_factory.getNBTags() > 0) {  // b-jet veto
+        if (jet_factory.getNBTags() == 0) {  // b-jet veto
             hists->Fill("cutflow", 2., evtwt);
         } else {
             continue;
