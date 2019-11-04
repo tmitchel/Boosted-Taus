@@ -8,7 +8,7 @@ files = {
     'SingleTop': ['ST_t*'],
     'ttbar': ['TTTo*'],
     'WJets': ['WJetsToLNu_*'],
-    'Diboson': ['WW', 'WZ', 'ZZ'],
+    'Diboson': ['WW*', 'WZ*', 'ZZ*'],
 }
 
 
@@ -34,6 +34,9 @@ def main(args):
         if matches == 0:
             print '\033[93m[WARNING] No files to hadd for {}. Skipping...\033[0m'.format(name)
             continue
+
+        if name == 'DataEl' or name == 'DataMu':
+            name = 'Data'
 
         # if there are files to hadd, do it
         call('hadd {}/{}.root {}'.format(args.input, name, ' '.join(pattern)), shell=True)
