@@ -31,6 +31,7 @@ class Electron {
     Float_t getMass() { return p4.M(); }
     Float_t getD0() { return D0; }
     Float_t getDz() { return Dz; }
+    Float_t getSCEta() { return eleSCEta; }
     Bool_t getIDMVAIso() { return IDMVAIso; }
     Bool_t getIDMVANoIso() { return IDMVANoIso; }
     Bool_t getID(working_point key) { return (IDbit >> key & 1) == 1; }
@@ -39,7 +40,7 @@ class Electron {
     TLorentzVector p4;
     Short_t IDbit;
     Int_t Charge, ConvVeto, MissHits;
-    Float_t D0, Dz, IDMVAIso, IDMVANoIso;
+    Float_t D0, Dz, IDMVAIso, IDMVANoIso, eleSCEta;
 };
 
 class Electron_Factory {
@@ -57,7 +58,7 @@ class Electron_Factory {
     VElectron electrons;
     std::vector<Short_t> *eleIDbit;
     std::vector<Int_t> *eleCharge, *eleConvVeto, *eleMissHits;
-    std::vector<Float_t> *eleEn, *eleD0, *eleDz, *elePt, *eleEta, *elePhi, *eleIDMVAIso, *eleIDMVANoIso;
+    std::vector<Float_t> *eleEn, *eleD0, *eleDz, *elePt, *eleEta, *elePhi, *eleIDMVAIso, *eleIDMVANoIso, *eleSCEta;
 };
 
 Electron_Factory::Electron_Factory(TTree *tree)
@@ -72,7 +73,8 @@ Electron_Factory::Electron_Factory(TTree *tree)
       eleMissHits(nullptr),
       eleIDMVAIso(nullptr),
       eleIDMVANoIso(nullptr),
-      eleIDbit(nullptr) {
+      eleIDbit(nullptr),
+      eleSCEta(nullptr) {
     tree->SetBranchAddress("nEle", &nEle);
     tree->SetBranchAddress("eleCharge", &eleCharge);
     tree->SetBranchAddress("eleD0", &eleD0);
@@ -86,12 +88,13 @@ Electron_Factory::Electron_Factory(TTree *tree)
     tree->SetBranchAddress("eleIDMVAIso", &eleIDMVAIso);
     tree->SetBranchAddress("eleIDMVANoIso", &eleIDMVANoIso);
     tree->SetBranchAddress("eleIDbit", &eleIDbit);
+    tree->SetBranchAddress("eleSCEta", &eleSCEta);
 }
 
 void Electron_Factory::Run_Factory() {
     electrons.clear();
     for (auto i = 0; i < nEle; i++) {
-        if (elePt->at(i) < 10 || fabs(eleEta->at(i)) > 2.4) {
+        if (elePt->at(i) < 10 || fabs(eleEta->at(i)) > 2.5) {
             continue;
         }
         auto electron = Electron(elePt->at(i), eleEta->at(i), elePhi->at(i), eleEn->at(i));
@@ -103,6 +106,7 @@ void Electron_Factory::Run_Factory() {
         electron.IDMVAIso = eleIDMVAIso->at(i);
         electron.IDMVANoIso = eleIDMVANoIso->at(i);
         electron.IDbit = eleIDbit->at(i);
+        electron.eleSCEta = eleSCEta->at(i);
         electrons.push_back(electron);
     }
 

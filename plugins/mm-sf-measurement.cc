@@ -12,7 +12,6 @@
 #include "../interface/histManager.h"
 
 // Objects
-#include "../interface/boosted_factory.h"
 #include "../interface/electron_factory.h"
 #include "../interface/event_factory.h"
 #include "../interface/jets_factory.h"
@@ -25,7 +24,6 @@ using std::vector;
 bool pass_electron_veto(std::shared_ptr<VElectron>);
 VJets analysis_jets(std::shared_ptr<VJets>);
 VMuon analysis_muons(std::shared_ptr<VMuon>);
-VBoosted analysis_taus(std::shared_ptr<VBoosted>);
 bool calculate_muon_iso(Muon);
 
 int main(int argc, char** argv) {
@@ -58,7 +56,6 @@ int main(int argc, char** argv) {
     auto tree = reinterpret_cast<TTree*>(fin->Get(tree_name.c_str()));
 
     // construct our object factories
-    auto boost_factory = Boosted_Factory(tree);
     auto jet_factory = Jets_Factory(tree, is_data);
     auto muon_factory = Muon_Factory(tree);
     auto electron_factory = Electron_Factory(tree);
@@ -80,7 +77,6 @@ int main(int argc, char** argv) {
         }
 
         auto evtwt = init_weight;
-        boost_factory.Run_Factory();
         jet_factory.Run_Factory();
         muon_factory.Run_Factory();
         electron_factory.Run_Factory();
@@ -118,94 +114,49 @@ int main(int argc, char** argv) {
 
         // get leptons
         auto muons = analysis_muons(muon_factory.getMuons());
-        auto taus = analysis_taus(boost_factory.getTaus());
 
-        ///////////////////////////////////
-        // Begin signal region selection //
-        ///////////////////////////////////
+        //////////////////////////////
+        // Begin Zmumu CR selection //
+        //////////////////////////////
 
-        // veto on too many muons
-        if (muons.size() < 2) {
+        // only dimuon events
+        if (muons.size() == 2) {
             hists->Fill("cutflow", 5., evtwt);
         } else {
             continue;
         }
 
-        // check if we find a good tau
-        if (taus.size() > 0) {
+        // lead muon needs to be harder
+        if (muons.at(0).getPt() > 30) {
+            hists->Fill("cutflow", 6., evtwt);
+        } else {
+            continue;
+        }
+
+        // get our dimuon pair
+        auto lead_muon = muons.at(0);
+        auto sub_muon = muons.at(1);
+
+        // make sure they are near each other (somewhat boosted)
+        if (lead_muon.getP4().DeltaR(sub_muon.getP4()) < 1.) {
             hists->Fill("cutflow", 7., evtwt);
         } else {
             continue;
         }
 
-        // check if we found a good passing or failing muon
-        if (muons.size() > 0) {
+        // reconstruct Z and make sure it has sufficient pT
+        auto recoZ = (lead_muon.getP4() + sub_muon.getP4());
+        if (recoZ.Pt() > 40) {
             hists->Fill("cutflow", 8., evtwt);
-        } else {
+        }  else {
             continue;
         }
 
-        bool good_match(false);
-        Muon good_muon;
-        Boosted good_tau;
-        for (auto& tau : taus) {
-            for (auto& mu : muons) {
-                if (mu.getP4().DeltaR(tau.getP4()) > 0.4 && mu.getP4().DeltaR(tau.getP4()) < 0.8) {
-                    good_match = true;
-                    good_muon = mu;
-                    good_tau = tau;
-                    break;
-                }
-            }
-        }
-
-        // found a matched mu/tau pair
-        if (good_match) {
-            hists->Fill("cutflow", 9., evtwt);
+        // fill control histograms
+        if (lead_muon.getCharge() * sub_muon.getCharge() < 0) {
+            hists->Fill("OS_pass", recoZ.M(), evtwt);
         } else {
-            continue;
-        }
-
-        auto pass_muon_isolation = calculate_muon_iso(good_muon);
-        auto mu_vector(good_muon.getP4());
-        auto tau_vector(good_tau.getP4());
-
-        // construct pass-iso signal region
-        if (pass_muon_isolation) {
-            hists->Fill("cutflow", 10., evtwt);
-            if (good_tau.getIso(medium)) {  // tau pass region
-                hists->Fill("cutflow", 11., evtwt);
-                if (good_muon.getCharge() * good_tau.getCharge() < 0) {
-                    hists->Fill("OS_pass", (mu_vector + tau_vector).M(), evtwt);
-                } else {
-                    hists->Fill("SS_pass", (mu_vector + tau_vector).M(), evtwt);
-                }
-            } else if (good_tau.getIso(vloose)) {
-                if (good_muon.getCharge() * good_tau.getCharge() < 0) {  // tau fail region
-                    hists->Fill("OS_fail", (mu_vector + tau_vector).M(), evtwt);
-                } else {
-                    hists->Fill("SS_fail", (mu_vector + tau_vector).M(), evtwt);
-                }
-            }
-        }
-
-        // construct anti-iso signal region
-        if (!pass_muon_isolation) {
-            hists->Fill("cutflow", 10., evtwt);
-            if (good_tau.getIso(medium)) {  // tau pass region
-                hists->Fill("cutflow", 11., evtwt);
-                if (good_muon.getCharge() * good_tau.getCharge() < 0) {
-                    hists->Fill("OS_anti_pass", (mu_vector + tau_vector).M(), evtwt);
-                } else {
-                    hists->Fill("SS_anti_pass", (mu_vector + tau_vector).M(), evtwt);
-                }
-            } else if (good_tau.getIso(vloose)) {
-                if (good_muon.getCharge() * good_tau.getCharge() < 0) {  // tau fail region
-                    hists->Fill("OS_anti_fail", (mu_vector + tau_vector).M(), evtwt);
-                } else {
-                    hists->Fill("SS_anti_fail", (mu_vector + tau_vector).M(), evtwt);
-                }
-            }
+            hists->Fill("SS_pass", recoZ.M(), evtwt);
         }
     }  // end event loop
     fin->Close();
@@ -239,26 +190,18 @@ VJets analysis_jets(std::shared_ptr<VJets> jets) {
     return good_jets;
 }
 
+
 VMuon analysis_muons(std::shared_ptr<VMuon> all_muons) {
     VMuon good_muons;
     for (auto& mu : *all_muons) {
-        if (mu.getPt() > 60 && fabs(mu.getEta()) < 2.4 && mu.getID(medium)
+        if (mu.getPt() > 10 && fabs(mu.getEta()) < 2.4 && mu.getID(medium)
             && fabs(mu.getD0()) < 0.045 && fabs(mu.getDz()) < 0.2) {
-            good_muons.push_back(mu);
+            if (calculate_muon_iso(mu) < 0.2) {
+                good_muons.push_back(mu);
+            }
         }
     }
     return good_muons;
-}
-
-VBoosted analysis_taus(std::shared_ptr<VBoosted> all_taus) {
-    VBoosted good_taus;
-    for (unsigned i = 0; i < all_taus->size(); i++) {
-        if (all_taus->at(i).getPt() > 20 && fabs(all_taus->at(i).getEta()) < 2.3 && all_taus->at(i).getMuRejection(tight) &&
-            all_taus->at(i).getEleRejection(vloose) && all_taus->at(i).getDiscByDM(false) > 0.5) {
-            good_taus.push_back(all_taus->at(i));
-        }
-    }
-    return good_taus;
 }
 
 bool calculate_muon_iso(Muon mu) {
