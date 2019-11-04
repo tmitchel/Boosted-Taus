@@ -213,6 +213,9 @@ int main(int argc, char** argv) {
     logfile.close();
 }
 
+// pass_electron_veto returns false if the event has any
+// loose electrons. This is used to veto extra electrons in the
+// event.
 bool pass_electron_veto(std::shared_ptr<VElectron> all_electrons) {
     for (auto el : *all_electrons) {
         if (el.getPt() > 10 && fabs(el.getEta()) < 2.4) {
@@ -222,6 +225,8 @@ bool pass_electron_veto(std::shared_ptr<VElectron> all_electrons) {
     return true;
 }
 
+// analysis_jets returns all jets passing selection for this
+// analysis.
 VJets analysis_jets(std::shared_ptr<VJets> jets) {
     VJets good_jets;
     for (auto& jet : *jets) {
@@ -239,6 +244,8 @@ VJets analysis_jets(std::shared_ptr<VJets> jets) {
     return good_jets;
 }
 
+// analysis_muons returns all muons passing the muon
+// selection.
 VMuon analysis_muons(std::shared_ptr<VMuon> all_muons) {
     VMuon good_muons;
     for (auto& mu : *all_muons) {
@@ -250,6 +257,8 @@ VMuon analysis_muons(std::shared_ptr<VMuon> all_muons) {
     return good_muons;
 }
 
+// analysis_taus returns all taus passing the tau
+// selection.
 VBoosted analysis_taus(std::shared_ptr<VBoosted> all_taus) {
     VBoosted good_taus;
     for (unsigned i = 0; i < all_taus->size(); i++) {
@@ -261,6 +270,8 @@ VBoosted analysis_taus(std::shared_ptr<VBoosted> all_taus) {
     return good_taus;
 }
 
+// calculate_muon_iso returns true if the muon
+// passes the isolation requirements and false otherwise.
 bool calculate_muon_iso(Muon mu) {
     auto iso = mu.getPFChIso() / mu.getPt();
     iso += std::max(0., mu.getPFNeuIso() + mu.getPFPhoIso() - 0.5 * mu.getPFPUIso()) / mu.getPt();
