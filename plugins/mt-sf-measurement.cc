@@ -176,15 +176,19 @@ int main(int argc, char** argv) {
             if (good_tau.getIso(medium)) {  // tau pass region
                 hists->Fill("cutflow", 11., evtwt);
                 if (good_muon.getCharge() * good_tau.getCharge() < 0) {
-                    hists->Fill("OS_pass", (mu_vector + tau_vector).M(), evtwt);
+                    hists->Fill("OS_pass/Z_mass", (mu_vector + tau_vector).M(), evtwt);
+                    hists->Fill("OS_pass/Z_pt", (mu_vector + tau_vector).Pt(), evtwt);
                 } else {
-                    hists->Fill("SS_pass", (mu_vector + tau_vector).M(), evtwt);
+                    hists->Fill("SS_pass/Z_mass", (mu_vector + tau_vector).M(), evtwt);
+                    hists->Fill("SS_pass/Z_pt", (mu_vector + tau_vector).Pt(), evtwt);
                 }
             } else if (good_tau.getIso(vloose)) {
                 if (good_muon.getCharge() * good_tau.getCharge() < 0) {  // tau fail region
-                    hists->Fill("OS_fail", (mu_vector + tau_vector).M(), evtwt);
+                    hists->Fill("OS_fail/Z_mass", (mu_vector + tau_vector).M(), evtwt);
+                    hists->Fill("OS_fail/Z_pt", (mu_vector + tau_vector).Pt(), evtwt);
                 } else {
-                    hists->Fill("SS_fail", (mu_vector + tau_vector).M(), evtwt);
+                    hists->Fill("SS_fail/Z_mass", (mu_vector + tau_vector).M(), evtwt);
+                    hists->Fill("SS_fail/Z_pt", (mu_vector + tau_vector).Pt(), evtwt);
                 }
             }
         }
@@ -195,15 +199,19 @@ int main(int argc, char** argv) {
             if (good_tau.getIso(medium)) {  // tau pass region
                 hists->Fill("cutflow", 11., evtwt);
                 if (good_muon.getCharge() * good_tau.getCharge() < 0) {
-                    hists->Fill("OS_anti_pass", (mu_vector + tau_vector).M(), evtwt);
+                    hists->Fill("OS_anti_pass/Z_mass", (mu_vector + tau_vector).M(), evtwt);
+                    hists->Fill("OS_anti_pass/Z_pt", (mu_vector + tau_vector).Pt(), evtwt);
                 } else {
-                    hists->Fill("SS_anti_pass", (mu_vector + tau_vector).M(), evtwt);
+                    hists->Fill("SS_anti_pass/Z_mass", (mu_vector + tau_vector).M(), evtwt);
+                    hists->Fill("SS_anti_pass/Z_pt", (mu_vector + tau_vector).Pt(), evtwt);
                 }
             } else if (good_tau.getIso(vloose)) {
                 if (good_muon.getCharge() * good_tau.getCharge() < 0) {  // tau fail region
-                    hists->Fill("OS_anti_fail", (mu_vector + tau_vector).M(), evtwt);
+                    hists->Fill("OS_anti_fail/Z_mass", (mu_vector + tau_vector).M(), evtwt);
+                    hists->Fill("OS_anti_fail/Z_pt", (mu_vector + tau_vector).Pt(), evtwt);
                 } else {
-                    hists->Fill("SS_anti_fail", (mu_vector + tau_vector).M(), evtwt);
+                    hists->Fill("SS_anti_fail/Z_mass", (mu_vector + tau_vector).M(), evtwt);
+                    hists->Fill("SS_anti_fail/Z_pt", (mu_vector + tau_vector).Pt(), evtwt);
                 }
             }
         }

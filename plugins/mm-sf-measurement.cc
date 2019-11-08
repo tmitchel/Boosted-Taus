@@ -154,9 +154,11 @@ int main(int argc, char** argv) {
 
         // fill control histograms
         if (lead_muon.getCharge() * sub_muon.getCharge() < 0) {
-            hists->Fill("OS_pass", recoZ.M(), evtwt);
+            hists->Fill("OS_pass/Z_mass", recoZ.M(), evtwt);
+            hists->Fill("OS_pass/Z_pt", recoZ.Pt(), evtwt);
         } else {
-            hists->Fill("SS_pass", recoZ.M(), evtwt);
+            hists->Fill("SS_pass/Z_mass", recoZ.M(), evtwt);
+            hists->Fill("SS_pass/Z_pt", recoZ.Pt(), evtwt);
         }
     }  // end event loop
     fin->Close();
