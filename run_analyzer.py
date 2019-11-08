@@ -45,7 +45,6 @@ def listener(q, fname):
             if m == 'kill':
                 f.write('killed')
                 break
-            print 'writing to file'
             f.write(str(m) + '\n')
             f.flush()
 
