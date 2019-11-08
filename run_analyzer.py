@@ -5,55 +5,90 @@ import multiprocessing
 
 def format_command(args, ifile):
     if not os.path.exists(args.output_dir):
-      os.mkdir(args.output_dir)
+        os.mkdir(args.output_dir)
     output_name = ifile.replace('.root', '_output.root').split('/')[-1]
     print output_name
     if args.local:
-      args.ext = ''
-    callstring = './{0} -i {1}{2} -o {3}/{4} -j {5} -t {6}'.format(args.exe, args.ext, ifile, args.output_dir, output_name, args.json, args.treename)
+        args.ext = ''
+    callstring = './{0} -i {1}{2} -o {3}/{4} -j {5} -t {6}'.format(
+        args.exe, args.ext, ifile, args.output_dir, output_name, args.json, args.treename)
     if args.verbose:
-      callstring += ' -v'
+        callstring += ' -v'
     if 'JetHT_Run' in ifile or 'muon' in ifile.lower() or 'electron' in ifile.lower() or 'data_output' in ifile.lower():
-      callstring += ' --data'
+        callstring += ' --data'
     return callstring
 
 
-def runner(ifile):
-  def run_command(cmd):
-      code = subprocess.call(cmd, shell=True)
-      if code != 0:
-        ifile.write('[ERROR] returned non-zero exit code while running {}\n'.format(cmd))
-        print '\033[91m[ERROR] returned non-zero exit code while running {}\033[0m'.format(cmd)
-      else:
-        ifile.write('[SUCCESS] {} completed successfully\n'.format(cmd))
-        print '\033[92m[SUCCESS] {} completed successfully \033[0m'.format(cmd)
-      return None
-  return run_command
+def run_command(cmd, q=None, parallel=False):
+    code = subprocess.call(cmd, shell=True)
+    message = ''
+    if code != 0:
+        message = '\033[91m[ERROR] returned non-zero exit code while running {}\033[0m'.format(cmd)
+    else:
+        message = '\033[92m[SUCCESS] {} completed successfully \033[0m'.format(cmd)
+
+    # print message
+    print message
+
+    # write to log or queue depending on if multiprocessing
+    file_message = message[8:-7] # strip colors off message for file
+    q.put(file_message) if parallel else q.write(file_message)
+    return None
+
+
+def build_listener(fname):
+    def listener(q):
+        '''listens for messages on the q, writes to file. '''
+
+        with open(fname, 'w') as f:
+            while 1:
+                m = q.get()
+                if m == 'kill':
+                    f.write('killed')
+                    break
+                f.write(str(m) + '\n')
+                f.flush()
+    return listener
 
 
 def main(args):
     commands = []
     if args.local:
-      file_list = [os.path.join(args.input_path, f) for f in os.listdir(args.input_path) if os.path.isfile(os.path.join(args.input_path, f))]
-      commands = [format_command(args, ifile) for ifile in file_list]
+        file_list = [os.path.join(args.input_path, f) for f in os.listdir(args.input_path)
+                     if os.path.isfile(os.path.join(args.input_path, f))]
+        commands = [format_command(args, ifile) for ifile in file_list]
     else:
-      search = ['xrdfs', 'root://cmseos.fnal.gov/', 'ls', args.input_path]
-      commands = [
-          format_command(args, ifile) for ifile in subprocess.check_output(search).split('\n') if '.root' in ifile
-      ]
+        search = ['xrdfs', 'root://cmseos.fnal.gov/', 'ls', args.input_path]
+        commands = [
+            format_command(args, ifile) for ifile in subprocess.check_output(search).split('\n') if '.root' in ifile
+        ]
 
-    with open('{}/runninglog.txt'.format(args.output_dir), 'w') as f:
-      if args.parallel:
-        # Use 4 cores if the machine has more than 8 total cores.
+    if args.parallel:
+        manager = multiprocessing.Manager()
+        q = manager.Queue()
+
+        # Use 5 cores if the machine has more than 10 total cores.
         # Otherwise, use half the available cores.
         n_processes = min(5, multiprocessing.cpu_count() / 2)
-  
+
         pool = multiprocessing.Pool(processes=n_processes)
-        r = pool.map_async(runner(f), commands)
-        r.wait()
-      else:
-        crunner = runner(f)
-        [crunner(command) for command in commands]
+        watcher = pool.apply_async(build_listener('{}/runninglog.txt'.format(args.output_dir)), (q,))
+
+        jobs = []
+        for command in commands:
+            job = pool.apply_async(run_command, (command, q, True))
+            jobs.append(job)
+
+        for job in jobs:
+            job.get()
+
+        q.put('kill')
+        pool.close()
+        pool.join()
+    else:
+        with open('{}/runninglog.txt'.format(args.output_dir), 'w') as ifile:
+            [run_command(command, ifile, False) for command in commands]
+
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
