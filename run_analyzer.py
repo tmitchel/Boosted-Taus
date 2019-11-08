@@ -19,7 +19,7 @@ def format_command(args, ifile):
     return callstring
 
 
-def run_command(cmd, q=None, parallel=False):
+def run_command(cmd, q, parallel=False):
     code = subprocess.call(cmd, shell=True)
     message = ''
     if code != 0:
@@ -31,7 +31,7 @@ def run_command(cmd, q=None, parallel=False):
     print message
 
     # write to log or queue depending on if multiprocessing
-    file_message = message[8:-7] # strip colors off message for file
+    file_message = message[5:-5] # strip colors off message for file
     q.put(file_message) if parallel else q.write(file_message + '\n')
     return None
 
