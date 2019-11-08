@@ -1,6 +1,8 @@
 **/*.pdf
 **/*.png
 **/*.root
+**/*.pyc
+**/*.log
 **/*.tar.gz
 .vscode
 a.out
