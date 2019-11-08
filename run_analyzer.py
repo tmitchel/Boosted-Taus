@@ -19,11 +19,15 @@ def format_command(args, ifile):
 
 
 def run_command(cmd):
-    print cmd
     code = subprocess.call(cmd, shell=True)
     if code != 0:
-      outname = cmd.split('-o ')[-1].split(' ')[0]
-      print '\033[91m[ERROR] {} returned non-zero exit code'.format(outname)
+      with open('runninglog.txt') as f:
+        f.write('[ERROR] returned non-zero exit code while running {}\n'.format(cmd))
+      print '\033[91m[ERROR] returned non-zero exit code while running {}\033[0m'.format(cmd)
+    else:
+      with open('runninglog.txt') as f:
+        f.write('[SUCCESS] {} completed successfully\n'.format(cmd))
+      print '\033[92m[SUCCESS] {} completed successfully \033[0m'.format(cmd.split('-o ')[-1].split(' ')[0])
     return None
 
 
@@ -37,7 +41,7 @@ def main(args):
       commands = [
           format_command(args, ifile) for ifile in subprocess.check_output(search).split('\n') if '.root' in ifile
       ]
-   
+
     if args.parallel:
       # Use 4 cores if the machine has more than 8 total cores.
       # Otherwise, use half the available cores.
