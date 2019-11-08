@@ -27,7 +27,7 @@ def run_command(cmd):
     else:
       with open('runninglog.txt') as f:
         f.write('[SUCCESS] {} completed successfully\n'.format(cmd))
-      print '\033[92m[SUCCESS] {} completed successfully \033[0m'.format(cmd.split('-o ')[-1].split(' ')[0])
+      print '\033[92m[SUCCESS] {} completed successfully \033[0m'.format(cmd)
     return None
 
 
