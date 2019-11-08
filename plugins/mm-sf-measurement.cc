@@ -164,6 +164,7 @@ int main(int argc, char** argv) {
     fin->Close();
     hists->Write();
     logfile.close();
+    return 0;
 }
 
 // pass_electron_veto returns false if the event has any
