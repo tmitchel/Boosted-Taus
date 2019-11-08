@@ -42,7 +42,7 @@ def main(args):
           format_command(args, ifile) for ifile in subprocess.check_output(search).split('\n') if '.root' in ifile
       ]
 
-    with open('runninglog.txt') as f:
+    with open('{}/runninglog.txt'.format(args.output_dir), 'w') as f:
       if args.parallel:
         # Use 4 cores if the machine has more than 8 total cores.
         # Otherwise, use half the available cores.
