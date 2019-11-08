@@ -37,15 +37,18 @@ def main(args):
       file_list = [os.path.join(args.input_path, f) for f in os.listdir(args.input_path) if os.path.isfile(os.path.join(args.input_path, f))]
       commands = [format_command(args, ifile) for ifile in file_list]
     else:
-      search = ['xrdfs', 'root://cmseos.fnal.gov/', 'ls', args.input_path]
-      commands = [
-          format_command(args, ifile) for ifile in subprocess.check_output(search).split('\n') if '.root' in ifile
-      ]
+        search = ['xrdfs', 'root://cmseos.fnal.gov/', 'ls', args.input_path]
+        commands = [
+            format_command(args, ifile) for ifile in subprocess.check_output(search).split('\n') if '.root' in ifile
+        ]
 
-    with open('{}/runninglog.txt'.format(args.output_dir), 'w') as f:
-      if args.parallel:
+    if args.parallel:
+        manager = multiprocessing.Manager()
+        q = manager.Queue()
+
         # Use 4 cores if the machine has more than 8 total cores.
-        # Otherwise, use half the available cores.
+        # Otherwise, use half the available cores. (one core goes)
+        # to the watcher.
         n_processes = min(5, multiprocessing.cpu_count() / 2)
   
         pool = multiprocessing.Pool(processes=n_processes)
