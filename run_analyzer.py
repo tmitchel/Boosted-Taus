@@ -32,23 +32,22 @@ def run_command(cmd, q=None, parallel=False):
 
     # write to log or queue depending on if multiprocessing
     file_message = message[8:-7] # strip colors off message for file
-    q.put(file_message) if parallel else q.write(file_message)
+    q.put(file_message) if parallel else q.write(file_message + '\n')
     return None
 
 
-def build_listener(fname):
-    def listener(q):
-        '''listens for messages on the q, writes to file. '''
+def listener(q, fname):
+    '''listens for messages on the q, writes to file. '''
 
-        with open(fname, 'w') as f:
-            while 1:
-                m = q.get()
-                if m == 'kill':
-                    f.write('killed')
-                    break
-                f.write(str(m) + '\n')
-                f.flush()
-    return listener
+    with open(fname, 'w') as f:
+        while 1:
+            m = q.get()
+            if m == 'kill':
+                f.write('killed')
+                break
+            print 'writing to file'
+            f.write(str(m) + '\n')
+            f.flush()
 
 
 def main(args):
@@ -72,7 +71,7 @@ def main(args):
         n_processes = min(5, multiprocessing.cpu_count() / 2)
 
         pool = multiprocessing.Pool(processes=n_processes)
-        watcher = pool.apply_async(build_listener('{}/runninglog.txt'.format(args.output_dir)), (q,))
+        watcher = pool.apply_async(listener, (q,'{}/runninglog.txt'.format(args.output_dir)))
 
         jobs = []
         for command in commands:
