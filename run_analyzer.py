@@ -18,17 +18,17 @@ def format_command(args, ifile):
     return callstring
 
 
-def run_command(cmd):
-    code = subprocess.call(cmd, shell=True)
-    if code != 0:
-      with open('runninglog.txt') as f:
-        f.write('[ERROR] returned non-zero exit code while running {}\n'.format(cmd))
-      print '\033[91m[ERROR] returned non-zero exit code while running {}\033[0m'.format(cmd)
-    else:
-      with open('runninglog.txt') as f:
-        f.write('[SUCCESS] {} completed successfully\n'.format(cmd))
-      print '\033[92m[SUCCESS] {} completed successfully \033[0m'.format(cmd)
-    return None
+def runner(ifile):
+  def run_command(cmd):
+      code = subprocess.call(cmd, shell=True)
+      if code != 0:
+        ifile.write('[ERROR] returned non-zero exit code while running {}\n'.format(cmd))
+        print '\033[91m[ERROR] returned non-zero exit code while running {}\033[0m'.format(cmd)
+      else:
+        ifile.write('[SUCCESS] {} completed successfully\n'.format(cmd))
+        print '\033[92m[SUCCESS] {} completed successfully \033[0m'.format(cmd)
+      return None
+  return run_command
 
 
 def main(args):
@@ -42,16 +42,18 @@ def main(args):
           format_command(args, ifile) for ifile in subprocess.check_output(search).split('\n') if '.root' in ifile
       ]
 
-    if args.parallel:
-      # Use 4 cores if the machine has more than 8 total cores.
-      # Otherwise, use half the available cores.
-      n_processes = min(5, multiprocessing.cpu_count() / 2)
- 
-      pool = multiprocessing.Pool(processes=n_processes)
-      r = pool.map_async(run_command, commands)
-      r.wait()
-    else:
-      [run_command(command) for command in commands]
+    with open('runninglog.txt') as f:
+      if args.parallel:
+        # Use 4 cores if the machine has more than 8 total cores.
+        # Otherwise, use half the available cores.
+        n_processes = min(5, multiprocessing.cpu_count() / 2)
+  
+        pool = multiprocessing.Pool(processes=n_processes)
+        r = pool.map_async(runner(f), commands)
+        r.wait()
+      else:
+        crunner = runner(f)
+        [crunner(command) for command in commands]
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
