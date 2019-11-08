@@ -20,7 +20,11 @@ def format_command(args, ifile):
 
 def run_command(cmd):
     print cmd
-    return subprocess.call(cmd, shell=True)
+    code = subprocess.call(cmd, shell=True)
+    if code != 0:
+      outname = cmd.split('-o ')[-1].split(' ')[0]
+      print '\033[91m[ERROR] {} returned non-zero exit code'.format(outname)
+    return None
 
 
 def main(args):
