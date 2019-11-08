@@ -54,13 +54,30 @@ void histManager::load_histograms(std::string json_file) {
     nlohmann::json histo_definitions;
     histograms >> histo_definitions;
     for (auto it = histo_definitions.begin(); it != histo_definitions.end(); it++) {
-        if (it.value().size() == 3) {
-            hists_1d[it.key()] = new TH1F(it.key().c_str(), it.key().c_str(), it.value().at(0), it.value().at(1), it.value().at(2));
-        } else if (it.value().size() == 6) {
-            hists_2d[it.key()] = new TH2F(it.key().c_str(), it.key().c_str(), it.value().at(0), it.value().at(1), it.value().at(2), it.value().at(3),
-                                          it.value().at(4), it.value().at(5));
+        if (it.value().is_object()) {
+            fout->mkdir(it.key().c_str());
+            fout->cd(it.key().c_str());
+            for (auto jt = it.value().begin(); jt != it.value().end(); jt++) {
+                if (jt.value().size() == 3) {
+                    hists_1d[it.key() + "/" + jt.key()] =
+                        new TH1F(jt.key().c_str(), jt.key().c_str(), jt.value().at(0), jt.value().at(1), jt.value().at(2));
+                } else if (it.value().size() == 6) {
+                    hists_2d[it.key() + "/" + jt.key()] = new TH2F(jt.key().c_str(), jt.key().c_str(), jt.value().at(0), jt.value().at(1),
+                                                                   jt.value().at(2), jt.value().at(3), jt.value().at(4), jt.value().at(5));
+                } else {
+                    std::cout << "Histogram " << jt.key() << " has the wrong number of bins. Skipping." << std::endl;
+                }
+            }
+            fout->cd();
         } else {
-            std::cout << "Histogram " << it.key() << " has the wrong number of bins. Skipping." << std::endl;
+            if (it.value().size() == 3) {
+                hists_1d[it.key()] = new TH1F(it.key().c_str(), it.key().c_str(), it.value().at(0), it.value().at(1), it.value().at(2));
+            } else if (it.value().size() == 6) {
+                hists_2d[it.key()] = new TH2F(it.key().c_str(), it.key().c_str(), it.value().at(0), it.value().at(1), it.value().at(2),
+                                              it.value().at(3), it.value().at(4), it.value().at(5));
+            } else {
+                std::cout << "Histogram " << it.key() << " has the wrong number of bins. Skipping." << std::endl;
+            }
         }
     }
 }
